@@ -1,0 +1,31 @@
+{
+  "scripts": {
+    "compile:css": "sass --style=compressed --load-path=node_modules --embed-sources src/styles:app/static",
+    "compile:js": "webpack",
+    "compile": "npm run compile:css && npm run compile:js",
+    "dev:css": "sass --load-path=node_modules --watch src/styles:app/static",
+    "dev:js": "webpack --config webpack.config.js --mode=development --watch",
+    "dev": "npm run dev:css & npm run dev:js &",
+    "lint:fix": "prettier --write . && stylelint --fix 'src/styles/**/*.scss' && eslint --fix 'src/scripts/**/*.js'",
+    "test:all": "npm run test:lint",
+    "test:lint": "prettier --check . && stylelint 'src/styles/**/*.scss' && eslint 'src/scripts/**/*.js'"
+  },
+  "dependencies": {
+    "@nationalarchives/frontend": "0.2.18"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.11",
+    "@babel/preset-env": "^7.22.10",
+    "babel-loader": "^9.1.3",
+    "eslint": "^8.47.0",
+    "prettier": "^3.0.2",
+    "sass": "^1.69.4",
+    "stylelint": "^16.1.0",
+    "stylelint-config-standard-scss": "^13.0.0",
+    "stylelint-order": "^6.0.4",
+    "stylelint-selector-bem-pattern": "^4.0.1",
+    "terser-webpack-plugin": "^5.3.10",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  }
+}

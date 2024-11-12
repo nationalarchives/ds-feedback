@@ -1,0 +1,97 @@
+{%- extends 'layouts/base.html' -%}
+
+{%- from 'components/breadcrumbs/macro.html' import tnaBreadcrumbs -%}
+{%- from 'components/button/macro.html' import tnaButton -%}
+{%- from 'components/cookie-banner/macro.html' import tnaCookieBanner -%}
+{%- from 'components/footer/macro.html' import tnaFooter -%}
+{%- from 'components/global-header/macro.html' import tnaGlobalHeader -%}
+{%- from 'components/header/macro.html' import tnaHeader -%}
+{%- from 'components/phase-banner/macro.html' import tnaPhaseBanner -%}
+
+{%- set theme = request.COOKIES['theme'] or 'system' -%}
+{%- set themeAccent = themeAccent if themeAccent else 'yellow' -%}
+{%- set htmlAttributes = {
+  'data-ga4id': app_config.GA4_ID or '',
+  'data-cookiesdomain': app_config.COOKIE_DOMAIN or ''
+} -%}
+
+{% block headIcons %}
+    <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{{ static('assets/images/favicon.ico') }}" type="image/x-icon">
+    <link rel="mask-icon" href="{{ static('assets/images/mask-icon.svg') }}" color="{{ themeColor | default('#010101') }}">
+    <link rel="apple-touch-icon" sizes="48x48" href="{{ static('assets/images/icon-48x48.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ static('assets/images/icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="96x96" href="{{ static('assets/images/icon-96x96.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ static('assets/images/icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ static('assets/images/icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ static('assets/images/icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="167x167" href="{{ static('assets/images/icon-167x167.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ static('assets/images/icon-180x180.png') }}">
+    <link rel="apple-touch-icon" sizes="192x192" href="{{ static('assets/images/icon-192x192.png') }}">
+    <link rel="apple-touch-icon" sizes="256x256" href="{{ static('assets/images/icon-256x256.png') }}">
+    <link rel="apple-touch-icon" sizes="512x512" href="{{ static('assets/images/icon-512x512.png') }}">
+    <link rel="apple-touch-icon" sizes="1024x1024" href="{{ static('assets/images/icon-1024x1024.png') }}">
+{% endblock %}
+
+{% block head %}
+    <meta name="tna.response.generated" content="{{ now_iso_8601() }}">
+    <meta name="tna.response.status_code" content="{{ status_code | default('200') }}">
+    <meta name="tna.app.tna-frontend" content="{{ app_config.TNA_FRONTEND_VERSION }}">
+    <meta name="tna.app.build-version" content="{{ app_config.BUILD_VERSION }}">
+    <meta name="tna.settings.theme" content="{{ theme }}">
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="preconnect" href="https://use.typekit.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://use.typekit.net/kaq6qqh.css">
+    <link rel="stylesheet" href="{{ static('main.css') }}?v={{ app_config.BUILD_VERSION }}">
+    <link rel="stylesheet" href="{{ static('font-awesome.css') }}?v={{ app_config.BUILD_VERSION }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400..700&family=Roboto+Mono:wght@400..500&display=swap" media="screen,print">
+    <link rel="stylesheet" href="{{ static('ie.css') }}?v={{ app_config.BUILD_VERSION }}" media="all and (-ms-high-contrast: none), (-ms-high-contrast: active)">
+{% endblock %}
+
+{% block cookies %}
+{% if 'cookie_preferences_set' not in request.COOKIES or not request.COOKIES['cookie_preferences_set'] %}
+{{ tnaCookieBanner({
+  'serviceName': 'The National Archives',
+  'cookiesUrl': url('main:cookies'),
+  'cookiesDomain': app_config.COOKIE_DOMAIN
+}) | indent(6) }}
+{% endif %}
+{% endblock %}
+
+{% block header %}
+{{ tnaHeader({
+  'logo': {
+    'href': url('main:index'),
+    'title': 'Service home page'
+  }
+}) | indent(6) }}
+{% endblock %}
+
+{% block beforeContent %}
+{% if breadcrumbs and breadcrumbs | length > 0 %}
+      <div class="tna-container">
+        <div class="tna-column tna-column--full">
+          {{ tnaBreadcrumbs({
+            'items': breadcrumbs,
+            'structuredData': True
+          }) }}
+        </div>
+      </div>
+{% endif %}
+{% endblock %}
+
+{% block footer %}
+{{ tnaFooter({
+  'themeSelector': True,
+  'currentTheme': theme,
+  'classes': 'tna-!--margin-top-l'
+}) | indent(4) }}
+{% endblock %}
+
+{% block bodyEnd %}
+<script src="{{ static('main.min.js') }}?v={{ app_config.BUILD_VERSION }}" defer></script>
+<script src="{{ static('analytics.min.js') }}?v={{ app_config.BUILD_VERSION }}" defer></script>
+{% endblock %}

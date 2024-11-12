@@ -1,0 +1,45 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        IMAGE: ghcr.io/nationalarchives/tna-python-django
+        IMAGE_TAG: preview
+    environment:
+      - ENVIRONMENT=develop
+      - DJANGO_SETTINGS_MODULE=config.settings.develop
+      - SECRET_KEY=abc123
+      - NPM_DEVELOP_COMMAND=dev
+      - DATABASE_NAME=postgres
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DJANGO_SUPERUSER_PASSWORD=admin
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - COOKIE_DOMAIN=localhost
+      - CSP_STYLE_SRC_ELEM='self',fonts.googleapis.com,p.typekit.net,use.typekit.net
+      - CSP_FONT_SRC='self',fonts.gstatic.com,use.typekit.net
+    ports:
+      - 82:8080
+    depends_on:
+      - db
+    volumes:
+      - ./:/app
+
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=postgres
+
+  dev:
+    image: ghcr.io/nationalarchives/tna-python-dev:preview
+    volumes:
+      - ./:/app
+
+  docs:
+    image: squidfunk/mkdocs-material
+    volumes:
+      - .:/docs
+    ports:
+      - 1082:8000

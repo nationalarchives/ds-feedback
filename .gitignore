@@ -1,0 +1,12 @@
+.DS_Store
+__pycache__
+.pytest_cache
+db.sqlite3
+/static
+/node_modules
+/app/static/assets/*
+/app/static/*.css
+/app/static/*.css.map
+/app/static/*.min.js
+/app/static/*.min.js.map
+!.gitkeep

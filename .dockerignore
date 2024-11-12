@@ -1,0 +1,13 @@
+.dockerignore
+.git
+.gitkeep
+docker-compose.yml
+Dockerfile
+README.md
+node_modules
+.babelrc.json
+.eslintrc.js
+.flake8
+.gitignore
+.prettierignore
+stylelint.config.mjs
