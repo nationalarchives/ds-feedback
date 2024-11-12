@@ -21,7 +21,7 @@ services:
       - CSP_STYLE_SRC_ELEM='self',fonts.googleapis.com,p.typekit.net,use.typekit.net
       - CSP_FONT_SRC='self',fonts.gstatic.com,use.typekit.net
     ports:
-      - 82:8080
+      - 65527:8080
     depends_on:
       - db
     volumes:
@@ -42,4 +42,4 @@ services:
     volumes:
       - .:/docs
     ports:
-      - 1082:8000
+      - 65526:8000
