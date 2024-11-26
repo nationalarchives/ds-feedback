@@ -5,6 +5,7 @@ from datetime import datetime
 from django.conf import settings
 from django.templatetags.static import static
 from django.urls import reverse
+
 from jinja2 import Environment
 
 
