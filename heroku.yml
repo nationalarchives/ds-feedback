@@ -1,6 +1,4 @@
 build:
-  config:
-    IMAGE_TAG: "custom-port"
   docker:
     web: Dockerfile
 release:
