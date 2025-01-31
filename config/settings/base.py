@@ -71,6 +71,7 @@ ASGI_APPLICATION = "config.asgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# Using dj-database-url for the temporary Heroku dev environment
 DATABASES = {"default": dj_database_url.config(conn_max_age=600)}
 
 
