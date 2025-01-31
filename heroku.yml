@@ -1,0 +1,8 @@
+# Only required for temporary Heroku dev environment
+build:
+  docker:
+    web: Dockerfile
+release:
+  image: web
+  command:
+    - poetry run python /app/manage.py check --deploy && poetry run python /app/manage.py createcachetable && poetry run python /app/manage.py migrate --noinput
