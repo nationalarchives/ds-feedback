@@ -1,0 +1,89 @@
+erDiagram
+    Project {
+        int id PK "NOT NULL"
+        char(128) name "NOT NULL"
+        int created_by FK "NOT NULL"
+        char(128) domain "NOT NULL"
+        int retention_period "NOT NULL"
+    }
+    Survey {
+        chat(128) name
+        int project_id FK "NOT NULL"
+        int created_by FK "NOT NULL"
+        int disabled_by FK "NOT NULL"
+        timestamp disabled_at "NOT NULL"
+        SmallInteger priority_order
+    }
+    SurveyMatchingRule {
+        int survey_id FK "NOT NULL"
+        varchar(1024) path_pattern "NOT NULL"
+        varchar(1024) computed_path_pattern "NOT NULL, pg_trgm index"
+    }
+    Prompt {
+        int id PK "NOT NULL"
+        char(128) prompt "NOT NULL"
+        int created_by FK "NOT NULL"
+        int disabled_by FK "NOT NULL"
+        timestamp disabled_at "NOT NULL"
+        SmallInteger order "NOT NULL"
+    }
+    RangedPrompt {
+        int prompt_ptr PK "NOT NULL"
+    }
+    RangedPromptOption {
+        int ranged_prompt_id FK "NOT NULL"
+        char(128) option_label "NOT NULL"
+    }
+    BinaryPrompt {
+        int prompt_ptr PK "NOT NULL"
+        varchar(128) positive_response_label 
+        varchar(128) negative_response_label 
+    }
+    TextPrompt {
+        int prompt_ptr PK "NOT NULL"
+        int max_length "NOT NULL"
+    }
+    SurveyResponse {
+        int id PK "NOT NULL"
+        int survey_id FK "NOT NULL"
+        char(256) url "NOT NULL"
+        timestamp created_at "NOT NULL"
+        JSON metadata "NOT NULL"
+    }
+    PromptResponse {
+        int id PK "NOT NULL"
+        int survey_response_id FK "NOT NULL"
+        int prompt_id FK "NOT NULL"
+        text value "NOT NULL"
+        timestamp created_at "NOT NULL"
+    }
+    User {
+        int id PK "NOT NULL"
+        char(256) email "NOT NULL"
+        char(256) password "NOT NULL"
+    }
+    Access {
+        int project_id FK "NOT NULL"
+        int user_id FK "NOT NULL"
+        enum level "NOT NULL"
+    }
+    APIAccess {
+        int id PK "NOT NULL"
+        int project_id FK "NOT NULL"
+        char role
+        int account_id FK "NOT NULL"
+    }
+    APIAccess }o--|| Project : "belongs to"
+    Prompt ||--o| RangedPrompt : "is a type of"
+    RangedPrompt ||--o| RangedPromptOption : "contains"
+    Prompt ||--o| BinaryPrompt : "is a type of"
+    Prompt ||--o| TextPrompt : "is a type of"
+    Survey ||--o{ SurveyMatchingRule: "has many"
+    Project ||--o{ Survey : "contains"
+    Survey ||--o{ Prompt: "contains"
+    Survey ||--o{ SurveyResponse: "has many"
+    Prompt ||--o{ PromptResponse : "has many"
+    SurveyResponse ||--|{ PromptResponse : "contains"
+    Project ||--o{ Access : "has many"
+    User ||--o{  Access : "has many"
+    APIAccess }o--|| User : "has many"
