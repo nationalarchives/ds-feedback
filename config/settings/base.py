@@ -1,6 +1,5 @@
 import json
 import os
-from pathlib import Path
 from sysconfig import get_path
 
 import dj_database_url
