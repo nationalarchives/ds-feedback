@@ -15,6 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.apps import apps
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -25,3 +26,9 @@ urlpatterns = [
     path("healthcheck/", include("app.healthcheck.urls")),
     path("admin/", admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+if settings.DEBUG:
+    # Try to install the django debug toolbar, if exists
+    if apps.is_installed("debug_toolbar"):
+        import debug_toolbar
+        urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
