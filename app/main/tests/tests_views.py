@@ -1,21 +1,25 @@
 from http import HTTPStatus
+from urllib.parse import urlparse
 
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
-from urllib.parse import urlparse
 
 
 class TestIndexView(TestCase):
     @classmethod
     def setUpClass(cls):
         super(TestIndexView, cls).setUpClass()
-        cls.admin_user = User.objects.create_user(username="test", password="password", is_staff=True)
+        cls.admin_user = User.objects.create_user(
+            username="test", password="password", is_staff=True
+        )
 
     def test_get_index_not_authorised(self):
         response = self.client.get(reverse("main:index"))
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        self.assertEqual(urlparse(response.headers["Location"]).path, reverse("admin:login"))
+        self.assertEqual(
+            urlparse(response.headers["Location"]).path, reverse("admin:login")
+        )
 
     def test_get_index_authorised(self):
         self.client.force_login(self.admin_user)
@@ -27,7 +31,9 @@ class TestAdminIndexView(TestCase):
     @classmethod
     def setUpClass(cls):
         super(TestAdminIndexView, cls).setUpClass()
-        cls.admin_user = User.objects.create_user(username="test", password="password", is_staff=True)
+        cls.admin_user = User.objects.create_user(
+            username="test", password="password", is_staff=True
+        )
 
     def test_get_login(self):
         response = self.client.get(reverse("admin:login"))
@@ -36,7 +42,9 @@ class TestAdminIndexView(TestCase):
     def test_get_index_not_authorised(self):
         response = self.client.get(reverse("admin:index"))
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        self.assertEqual(urlparse(response.headers["Location"]).path, reverse("admin:login"))
+        self.assertEqual(
+            urlparse(response.headers["Location"]).path, reverse("admin:login")
+        )
 
     def test_get_index_authorised(self):
         self.client.force_login(self.admin_user)
