@@ -5,18 +5,17 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.http import urlencode
 
+from app.main.factories import StaffUserFactory
+
 
 class TestIndexView(TestCase):
     @classmethod
-    def setUpClass(cls):
-        super(TestIndexView, cls).setUpClass()
-        cls.admin_user = User.objects.create_user(
-            username="test", password="password", is_staff=True
-        )
+    def setUpTestData(cls):
+        cls.admin_user = StaffUserFactory()
 
     def test_get_index_not_authorised(self):
         response = self.client.get(reverse("main:index"))
-        login_url = reverse("admin:login") + '?' + urlencode({"next": "/"})
+        login_url = reverse("admin:login") + "?" + urlencode({"next": "/"})
         self.assertRedirects(response, login_url, HTTPStatus.FOUND)
 
     def test_get_index_authorised(self):
@@ -27,11 +26,8 @@ class TestIndexView(TestCase):
 
 class TestAdminIndexView(TestCase):
     @classmethod
-    def setUpClass(cls):
-        super(TestAdminIndexView, cls).setUpClass()
-        cls.admin_user = User.objects.create_user(
-            username="test", password="password", is_staff=True
-        )
+    def setUpTestData(cls):
+        cls.admin_user = StaffUserFactory()
 
     def test_get_login(self):
         response = self.client.get(reverse("admin:login"))
@@ -39,7 +35,11 @@ class TestAdminIndexView(TestCase):
 
     def test_get_index_not_authorised(self):
         response = self.client.get(reverse("admin:index"))
-        login_url = reverse("admin:login") + '?' + urlencode({"next": reverse("admin:index")})
+        login_url = (
+            reverse("admin:login")
+            + "?"
+            + urlencode({"next": reverse("admin:index")})
+        )
         self.assertRedirects(response, login_url, HTTPStatus.FOUND)
 
     def test_get_index_authorised(self):
