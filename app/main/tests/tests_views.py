@@ -1,9 +1,9 @@
 from http import HTTPStatus
-from urllib.parse import urlparse
 
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.http import urlencode
 
 
 class TestIndexView(TestCase):
@@ -16,10 +16,8 @@ class TestIndexView(TestCase):
 
     def test_get_index_not_authorised(self):
         response = self.client.get(reverse("main:index"))
-        self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        self.assertEqual(
-            urlparse(response.headers["Location"]).path, reverse("admin:login")
-        )
+        login_url = reverse("admin:login") + '?' + urlencode({"next": "/"})
+        self.assertRedirects(response, login_url, HTTPStatus.FOUND)
 
     def test_get_index_authorised(self):
         self.client.force_login(self.admin_user)
@@ -41,10 +39,8 @@ class TestAdminIndexView(TestCase):
 
     def test_get_index_not_authorised(self):
         response = self.client.get(reverse("admin:index"))
-        self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        self.assertEqual(
-            urlparse(response.headers["Location"]).path, reverse("admin:login")
-        )
+        login_url = reverse("admin:login") + '?' + urlencode({"next": reverse("admin:index")})
+        self.assertRedirects(response, login_url, HTTPStatus.FOUND)
 
     def test_get_index_authorised(self):
         self.client.force_login(self.admin_user)
