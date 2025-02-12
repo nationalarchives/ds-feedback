@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 
-from factory import LazyAttribute, Sequence
+from factory import Sequence
 from factory.django import DjangoModelFactory
 
 
