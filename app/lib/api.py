@@ -33,7 +33,7 @@ class BaseAPI:
         if response.status_code == 404:
             # current_app.logger.warning(f"Resource not found: {url}")
             raise ApiResourceNotFound("Resource not found")
-        if response.status_code == requests.codes.ok:
+        if response.status_code == requests.codes.get('ok'):
             return self.parse_response(response)
         # current_app.logger.error(
         #     f"API responded with {response.status_code} status for {url}"

@@ -18,6 +18,7 @@ psycopg2-binary = "^2.9.9"
 requests = "^2.31.0"
 tna-frontend-jinja = "0.2.18"
 whitenoise = "^6.7.0"
+django-types = "^0.20.0"
 
 
 [tool.poetry.group.dev]
@@ -40,3 +41,10 @@ include = '\.pyi?$'
 testpaths = [
     "test",
 ]
+
+[tool.pyright]
+include = ["app/**"]
+exclude = ["**/migrations"]
+extraPaths = [".venv/lib/python3.12/site-packages/"]
+pythonVersion = "3.12"
+pythonPlatform = "Linux"
