@@ -27,6 +27,7 @@ optional = true
 factory-boy = "^3.3.3"
 pytest = "^8.1.1"
 requests-mock = "^1.12.1"
+django-debug-toolbar = "^5.0.1"
 
 [build-system]
 requires = ["poetry-core"]
