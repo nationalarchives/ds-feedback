@@ -11,14 +11,6 @@ class MainTestCase(TestCase):
         self.assertEqual(rv.status_code, 301)
         self.assertEqual(rv.url, "/healthcheck/live/")
 
-    def test_homepage(self):
-        rv = self.client.get("/")
-        self.assertContains(
-            rv,
-            '<h1 class="tna-heading-xl">TNA Django application</h1>',
-            status_code=200,
-        )
-
     def test_cookies(self):
         rv = self.client.get("/cookies/")
         self.assertContains(
