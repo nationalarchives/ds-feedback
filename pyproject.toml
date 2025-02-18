@@ -20,6 +20,7 @@ tna-frontend-jinja = "0.2.18"
 whitenoise = "^6.7.0"
 
 
+# Group for dev dependencies used in developer environments & dev container
 [tool.poetry.group.dev]
 optional = true
 
@@ -27,6 +28,13 @@ optional = true
 factory-boy = "^3.3.3"
 pytest = "^8.1.1"
 requests-mock = "^1.12.1"
+
+
+# Group for dev dependencies used in app container
+[tool.poetry.group.dev-app]
+optional = true
+
+[tool.poetry.group.dev-app.dependencies]
 django-debug-toolbar = "^5.0.1"
 
 [build-system]
