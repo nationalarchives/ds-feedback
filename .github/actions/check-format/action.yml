@@ -1,0 +1,14 @@
+name: Check formatting
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Node dependencies
+      run: npm ci
+      shell: bash
+    - name: Apply Python and JS formatting
+      run: docker compose run dev ./format.sh
+      shell: bash
+    - name: Check for formatting changes
+      run: "[ $(git diff --name-only | wc -w) -eq 0 ]"
+      shell: bash
