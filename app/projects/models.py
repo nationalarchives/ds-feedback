@@ -15,6 +15,7 @@ class Project(TimestampedModel, UUIDModel):
     name = models.CharField(max_length=128)
     domain = models.CharField(max_length=256)
     retention_period_days = models.PositiveSmallIntegerField(
+        "Retention period",
         choices={
             choice: f"{choice} days" for choice in RETENTION_PERIOD_CHOICES
         },
