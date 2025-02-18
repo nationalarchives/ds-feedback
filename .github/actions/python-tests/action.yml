@@ -15,8 +15,14 @@ runs:
     - name: Install Poetry dependencies
       run: poetry install --no-interaction --no-root --with dev
       shell: bash
-    - name: Collect statics assets
-      run: poetry run python manage.py collectstatic
+    - name: Collect static assets
+      run: poetry run python manage.py collectstatic --no-input
+      shell: bash
+    - name: Django checks
+      run: poetry run python manage.py check
+      shell: bash
+    - name: Check migrations
+      run: poetry run python manage.py makemigrations --check --noinput
       shell: bash
     - name: Run Python tests
       run: poetry run python manage.py test
