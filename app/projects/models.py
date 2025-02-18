@@ -1,7 +1,7 @@
-from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.constraints import CheckConstraint
 
+from app.users.models import User
 from app.utils.models import TimestampedModel, UUIDModel
 
 RETENTION_PERIOD_CHOICES: list[int] = [30, 60, 180]

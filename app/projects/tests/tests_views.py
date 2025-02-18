@@ -1,13 +1,12 @@
 from datetime import datetime
 from http import HTTPStatus
 
-from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from app.main.factories import StaffUserFactory
 from app.projects.factories import ProjectFactory
 from app.projects.models import Project
+from app.users.factories import StaffUserFactory
 from app.utils.testing import get_change_list_results
 
 
