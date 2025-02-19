@@ -1,4 +1,7 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import MinLengthValidator
 from django.db import models
+from django.db.models import UniqueConstraint
 
 from app.projects.models import Project
 from app.users.models import User
@@ -32,9 +35,19 @@ class PathPattern(TimestampedModel, UUIDModel):
     feedback_form = models.ForeignKey(
         FeedbackForm, on_delete=models.CASCADE, related_name="path_patterns"
     )
+    project = models.ForeignKey(
+        Project, on_delete=models.PROTECT, related_name="+"
+    )
     created_by = models.ForeignKey(
         User, on_delete=models.PROTECT, editable=False, related_name="+"
     )
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=["project", "pattern"], name="unique_project_pattern"
+            )
+        ]
 
     def __str__(self):
         return self.pattern
