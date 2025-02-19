@@ -10,8 +10,8 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 DEBUG: bool = strtobool(os.getenv("DEBUG", "True"))
 
 # Adds Django Debug Toolbar
-INSTALLED_APPS.append("debug_toolbar") # noqa
-MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware") # noqa
+INSTALLED_APPS.append("debug_toolbar")  # noqa
+MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")  # noqa
 SHOW_TOOLBAR = True
 DEBUG_TOOLBAR_CONFIG = {
     # The default debug_toolbar_middleware.show_toolbar function checks whether the
