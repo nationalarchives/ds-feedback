@@ -28,7 +28,7 @@ docker compose exec dev poetry run python /app/manage.py test
 ### Format and lint code
 
 ```sh
-docker compose exec dev format
+docker compose run dev ./format.sh
 ```
 
 ## Environment variables
