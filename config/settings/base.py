@@ -12,6 +12,8 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
 USE_X_FORWARDED_HOST = strtobool(os.getenv("USE_X_FORWARDED_HOST", "False"))
 
+AUTH_USER_MODEL = "users.User"
+
 # Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -21,6 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "csp",
+    "app.users",
     "app.main",
     "app.projects",
 ]

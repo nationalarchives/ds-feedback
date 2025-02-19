@@ -1,7 +1,7 @@
-from django.contrib.auth.models import User
-
 from factory import Sequence
 from factory.django import DjangoModelFactory
+
+from .models import User
 
 
 class StaffUserFactory(DjangoModelFactory):

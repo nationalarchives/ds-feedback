@@ -3,7 +3,7 @@ from http import HTTPStatus
 from django.test import TestCase
 from django.urls import reverse
 
-from app.main.factories import StaffUserFactory
+from app.users.factories import StaffUserFactory
 from app.utils.testing import reverse_with_query
 
 
