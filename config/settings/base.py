@@ -197,6 +197,9 @@ DEBUG: bool = strtobool(os.getenv("DEBUG", "False"))
 
 COOKIE_DOMAIN: str = os.environ.get("COOKIE_DOMAIN", "")
 
+if "CSRF_TRUSTED_ORIGINS" in os.environ:
+    CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+
 CSP_IMG_SRC: list[str] = os.environ.get("CSP_IMG_SRC", "'self'").split(",")
 CSP_SCRIPT_SRC: list[str] = os.environ.get("CSP_SCRIPT_SRC", "'self'").split(
     ","
