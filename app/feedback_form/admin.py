@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib import admin
+from django.core.exceptions import ValidationError
+from django.forms import BaseInlineFormSet
 from django.utils import timezone
 
 from app.feedback_form.models import FeedbackForm, PathPattern
@@ -36,7 +38,35 @@ class FeedbackFormForm(forms.ModelForm):
         return instance
 
 
+class PathPatternFormSet(BaseInlineFormSet):
+    def clean(self):
+        cleaned_data = super().clean()
+
+        patterns = set()
+        for form in self.forms:
+            if form.cleaned_data and "pattern" in form.cleaned_data:
+                # Propagate project from feedback_form
+                instance: PathPattern = form.instance
+                instance.project = form.cleaned_data["feedback_form"].project
+
+                form.full_clean()
+
+                # Ensure multiple new PathPatterns cannot share the same pattern.
+                if instance.pattern in patterns:
+                    if not form.has_error("pattern"):
+                        form.add_error(
+                            "pattern",
+                            ValidationError(
+                                "You cannot use the same pattern twice in a project"
+                            ),
+                        )
+                patterns.add(instance.pattern)
+
+        return cleaned_data
+
+
 class PathPatternInline(admin.TabularInline):
+    formset = PathPatternFormSet
     model = PathPattern
     extra = 1
     ordering = ["pattern"]
