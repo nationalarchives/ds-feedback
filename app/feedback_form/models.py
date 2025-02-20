@@ -41,6 +41,23 @@ class PathPattern(TimestampedModel, UUIDModel):
         User, on_delete=models.PROTECT, editable=False, related_name="+"
     )
 
+    # This custom validation is used because until Django 5.2,
+    # UniqueConstraint does not support a custom error message unless it has a condition
+    def clean(self):
+        super().clean()
+        if (
+            PathPattern.objects.filter(
+                pattern=self.pattern, project_id=self.project_id
+            )
+            .exclude(id=self.id)
+            .exists()
+        ):
+            raise ValidationError(
+                {
+                    "pattern": "You cannot use the same pattern twice in a project"
+                }
+            )
+
     class Meta:
         constraints = [
             UniqueConstraint(

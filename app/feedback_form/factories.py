@@ -22,4 +22,5 @@ class PathPatternFactory(DjangoModelFactory):
         model = PathPattern
 
     feedback_form = SubFactory(FeedbackFormFactory)
+    project = LazyAttribute(lambda pattern: pattern.feedback_form.project)
     created_by = LazyAttribute(lambda pattern: pattern.feedback_form.created_by)
