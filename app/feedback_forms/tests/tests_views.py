@@ -65,7 +65,6 @@ class TestAdminProjectsView(TestCase):
         feedback_form = FeedbackForm.objects.prefetch_related(
             "path_patterns"
         ).get(name="Test feedback form")
-
         patterns = feedback_form.path_patterns.all()
         self.assertEqual(len(patterns), 2)
         self.assertEqual(patterns[0].pattern, "/foo/*")
@@ -73,7 +72,64 @@ class TestAdminProjectsView(TestCase):
         self.assertEqual(patterns[1].pattern, "/bar")
         self.assertEqual(patterns[1].feedback_form, feedback_form)
 
-    # As a Django Admin user I can search for feedback forms in Django admin
+    # As an Admin user I cannot create a feedback form with duplicate patterns in Django admin
+    def test_create_feedback_form_with_duplicate_path_patterns(self):
+        project = ProjectFactory.create(
+            created_at=datetime(2000, 1, 2), created_by=self.admin_user
+        )
+
+        self.client.force_login(self.admin_user)
+        response = self.client.post(
+            reverse("admin:feedback_forms_feedbackform_add"),
+            {
+                "name": "Test feedback form",
+                "project": project.pk,
+                "path_patterns-TOTAL_FORMS": 2,
+                "path_patterns-INITIAL_FORMS": 0,
+                "path_patterns-0-pattern": "/foo",
+                "path_patterns-1-pattern": "/foo",
+            },
+        )
+
+        self.assertEqual(
+            response.context["inline_admin_formset"]
+            .formset[1]
+            .errors["pattern"],
+            ["You cannot use the same pattern twice in a project."],
+        )
+
+    # As an Admin user I cannot create a feedback form which duplicates a pattern in the project in Django admin
+    def test_create_feedback_form_with_duplicate_project_path_patterns(self):
+        project = ProjectFactory.create(
+            created_at=datetime(2000, 1, 2), created_by=self.admin_user
+        )
+
+        FeedbackFormFactory.create(
+            created_by=self.admin_user,
+            project=project,
+            path_patterns=["/foo", "/bar"],
+        )
+
+        self.client.force_login(self.admin_user)
+        response = self.client.post(
+            reverse("admin:feedback_forms_feedbackform_add"),
+            {
+                "name": "Test feedback form",
+                "project": project.pk,
+                "path_patterns-TOTAL_FORMS": 2,
+                "path_patterns-INITIAL_FORMS": 0,
+                "path_patterns-0-pattern": "/foo",
+            },
+        )
+
+        self.assertEqual(
+            response.context["inline_admin_formset"]
+            .formset[0]
+            .errors["pattern"],
+            ["You cannot use the same pattern twice in a project."],
+        )
+
+    # As an Admin user I can search for feedback forms in Django admin
     def test_search_feedback_forms(self):
         project = ProjectFactory.create(
             created_at=datetime(2000, 1, 2), created_by=self.admin_user

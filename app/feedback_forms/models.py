@@ -1,3 +1,6 @@
+import warnings
+
+import django
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import UniqueConstraint
@@ -41,6 +44,28 @@ class PathPattern(TimestampedModel, UUIDModel):
     created_by = models.ForeignKey(
         User, on_delete=models.PROTECT, editable=False, related_name="+"
     )
+
+    def clean(self):
+        super().clean()
+
+        if django.VERSION >= (5, 2):
+            warnings.warn(
+                "Custom validation no longer needed, since UniqueConstraint now supports custom error messages",
+                DeprecationWarning,
+            )
+
+        if (
+            PathPattern.objects.filter(
+                pattern__iexact=self.pattern, project_id=self.project_id
+            )
+            .exclude(id=self.id)
+            .exists()
+        ):
+            raise ValidationError(
+                {
+                    "pattern": "You cannot use the same pattern twice in a project."
+                }
+            )
 
     class Meta:
         constraints = [
