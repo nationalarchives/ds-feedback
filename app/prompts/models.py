@@ -1,6 +1,6 @@
 from django.db import models
 
-from app.feedback_form.models import FeedbackForm
+from app.feedback_forms.models import FeedbackForm
 from app.users.models import User
 from app.utils.models import TimestampedModel, UUIDModel
 
