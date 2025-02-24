@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "app.main",
     "app.projects",
     "app.feedback_form",
+    "app.prompts",
 ]
 
 MIDDLEWARE = [
