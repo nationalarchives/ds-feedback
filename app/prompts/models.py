@@ -30,3 +30,23 @@ class Prompt(TimestampedModel, UUIDModel):
 
 class TextPrompt(Prompt):
     max_length = models.PositiveSmallIntegerField(default=1000)
+
+
+class BinaryPrompt(Prompt):
+    positive_answer_label = models.CharField(max_length=64, default="Yes")
+    negative_answer_label = models.CharField(max_length=64, default="No")
+
+
+class RangedPrompt(Prompt):
+    pass
+
+
+class RangedPromptOption(models.Model):
+    ranged_prompt = models.ForeignKey(
+        RangedPrompt, on_delete=models.CASCADE, related_name="options"
+    )
+    label = models.CharField(max_length=64)
+    value = models.PositiveSmallIntegerField()
+
+    def __str__(self):
+        return self.label
