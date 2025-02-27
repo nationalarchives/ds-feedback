@@ -7,7 +7,8 @@ from django.urls import reverse
 from app.feedback_forms.factories import FeedbackFormFactory
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.factories import ProjectFactory
-from app.prompts.models import TextPrompt
+from app.prompts.admin import PROMPT_TYPE_NAMES
+from app.prompts.models import BinaryPrompt, Prompt, RangedPrompt, TextPrompt
 from app.users.factories import StaffUserFactory
 from app.utils.testing import (
     get_change_list_results,
@@ -16,7 +17,7 @@ from app.utils.testing import (
 )
 
 
-class TestAdminProjectsView(TestCase):
+class TestAdminFeedbackFormView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory(is_superuser=True)
@@ -45,10 +46,7 @@ class TestAdminProjectsView(TestCase):
         list_url = reverse("admin:feedback_forms_feedbackform_changelist")
         self.assertRedirects(response, list_url)
 
-        feedback_form = FeedbackForm.objects.prefetch_related(
-            "path_patterns"
-        ).get(name="Test Feedback Form")
-
+        feedback_form = FeedbackForm.objects.get(name="Test Feedback Form")
         self.assertEqual(feedback_form.created_by, self.admin_user)
 
     # As an Admin user I can create a feedback form with multiple path patterns in Django admin
@@ -185,7 +183,7 @@ class TestAdminProjectsView(TestCase):
             [feedback_form_1, feedback_form_2],
         )
 
-    # As an Admin user I can create a feedback form with multiple text prompts in Django admin
+    # As an Admin user I can create a feedback form with multiple prompts in Django admin
     def test_create_feedback_form_with_text_prompts(self):
         project = ProjectFactory.create(
             created_at=datetime(2000, 1, 2), created_by=self.admin_user
@@ -201,15 +199,15 @@ class TestAdminProjectsView(TestCase):
                 "path_patterns-INITIAL_FORMS": 0,
                 "prompts-TOTAL_FORMS": 3,
                 "prompts-INITIAL_FORMS": 0,
+                "prompts-0-prompt_type": PROMPT_TYPE_NAMES[BinaryPrompt],
                 "prompts-0-text": "Was this page useful?",
                 "prompts-0-order": "1",
-                "prompts-0-max_length": "1000",
+                "prompts-1-prompt_type": PROMPT_TYPE_NAMES[TextPrompt],
                 "prompts-1-text": "How could it be improved?",
                 "prompts-1-order": "2",
-                "prompts-1-max_length": "500",
-                "prompts-2-text": "What was your favorite part?",
+                "prompts-2-prompt_type": PROMPT_TYPE_NAMES[RangedPrompt],
+                "prompts-2-text": "How would you rate it?",
                 "prompts-2-order": "3",
-                "prompts-2-max_length": "500",
                 "prompts-2-is_disabled": "on",
             },
         )
@@ -219,13 +217,18 @@ class TestAdminProjectsView(TestCase):
         feedback_form = FeedbackForm.objects.prefetch_related(
             "path_patterns"
         ).get(name="Test feedback form")
-        prompts = feedback_form.prompts.all()
+        prompts = feedback_form.prompts.all().select_subclasses(
+            BinaryPrompt, RangedPrompt, TextPrompt
+        )
         self.assertEqual(len(prompts), 3)
+        self.assertIsInstance(prompts[0], BinaryPrompt)
         self.assertEqual(prompts[0].text, "Was this page useful?")
         self.assertEqual(prompts[0].order, 1)
+        self.assertIsInstance(prompts[1], TextPrompt)
         self.assertEqual(prompts[1].text, "How could it be improved?")
         self.assertEqual(prompts[1].order, 2)
-        self.assertEqual(prompts[2].text, "What was your favorite part?")
+        self.assertIsInstance(prompts[2], RangedPrompt)
+        self.assertEqual(prompts[2].text, "How would you rate it?")
         self.assertEqual(prompts[2].order, 3)
         self.assertEqual(prompts[2].disabled_by, self.admin_user)
 
@@ -245,22 +248,22 @@ class TestAdminProjectsView(TestCase):
                 "path_patterns-INITIAL_FORMS": 0,
                 "prompts-TOTAL_FORMS": 4,
                 "prompts-INITIAL_FORMS": 0,
+                "prompts-0-prompt_type": PROMPT_TYPE_NAMES[BinaryPrompt],
                 "prompts-0-text": "Was this page useful?",
                 "prompts-0-order": "1",
-                "prompts-0-max_length": "1000",
+                "prompts-1-prompt_type": PROMPT_TYPE_NAMES[TextPrompt],
                 "prompts-1-text": "How could it be improved?",
                 "prompts-1-order": "2",
-                "prompts-1-max_length": "500",
-                "prompts-2-text": "What was your favorite part?",
+                "prompts-2-prompt_type": PROMPT_TYPE_NAMES[RangedPrompt],
+                "prompts-2-text": "How would you rate it?",
                 "prompts-2-order": "3",
-                "prompts-2-max_length": "500",
-                "prompts-3-text": "What else would you like to say?",
+                "prompts-3-prompt_type": PROMPT_TYPE_NAMES[TextPrompt],
+                "prompts-3-text": "What else would you like to know?",
                 "prompts-3-order": "4",
-                "prompts-3-max_length": "1000",
             },
         )
 
-        text_prompt_formset = get_inline_formset(response.context, TextPrompt)
+        text_prompt_formset = get_inline_formset(response.context, Prompt)
         self.assertEqual(
             text_prompt_formset[3].errors["text"],
             ["You cannot have more than 3 enabled prompts"],
@@ -280,21 +283,21 @@ class TestAdminProjectsView(TestCase):
                 "project": project.pk,
                 "path_patterns-TOTAL_FORMS": 1,
                 "path_patterns-INITIAL_FORMS": 0,
-                "prompts-TOTAL_FORMS": 4,
+                "prompts-TOTAL_FORMS": 3,
                 "prompts-INITIAL_FORMS": 0,
+                "prompts-0-prompt_type": PROMPT_TYPE_NAMES[BinaryPrompt],
                 "prompts-0-text": "Was this page useful?",
                 "prompts-0-order": "1",
-                "prompts-0-max_length": "1000",
+                "prompts-1-prompt_type": PROMPT_TYPE_NAMES[TextPrompt],
                 "prompts-1-text": "How could it be improved?",
                 "prompts-1-order": "2",
-                "prompts-1-max_length": "500",
-                "prompts-2-text": "What was your favorite part?",
+                "prompts-2-prompt_type": PROMPT_TYPE_NAMES[RangedPrompt],
+                "prompts-2-text": "How would you rate it?",
                 "prompts-2-order": "2",
-                "prompts-2-max_length": "500",
             },
         )
 
-        text_prompt_formset = get_inline_formset(response.context, TextPrompt)
+        text_prompt_formset = get_inline_formset(response.context, Prompt)
         self.assertEqual(
             text_prompt_formset[2].errors["order"],
             ["This order number is used in another prompt"],
