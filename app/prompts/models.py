@@ -1,11 +1,15 @@
 from django.db import models
 
+from model_utils.managers import InheritanceManager
+
 from app.feedback_forms.models import FeedbackForm
 from app.users.models import User
 from app.utils.models import TimestampedModel, UUIDModel
 
 
 class Prompt(TimestampedModel, UUIDModel):
+    objects = InheritanceManager()
+
     text = models.CharField(max_length=128)
     feedback_form = models.ForeignKey(
         FeedbackForm, on_delete=models.CASCADE, related_name="prompts"
