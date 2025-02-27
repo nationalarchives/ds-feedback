@@ -20,9 +20,9 @@ class ProjectAdmin(HideReadOnlyOnCreationAdmin, SetCreatedByOnCreationAdmin):
     ]
     list_display = [
         "name",
+        "domain",
         "owned_by",
         "created_at",
-        "retention_period_days",
         "uuid",
     ]
     list_filter = ["retention_period_days", "owned_by"]

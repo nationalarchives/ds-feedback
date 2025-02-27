@@ -1,42 +1,22 @@
-from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.forms import BaseInlineFormSet
-from django.utils import timezone
 
 from app.feedback_forms.models import FeedbackForm, PathPattern
-from app.prompts.admin import TextPromptAdmin
-from app.prompts.models import TextPrompt
+from app.prompts.admin import PROMPT_TYPES, PromptAdmin
+from app.prompts.models import Prompt
 from app.utils.admin import (
     HideReadOnlyOnCreationAdmin,
+    IsDisabledCheckboxForm,
     SetCreatedByOnCreationAdmin,
     SetDisabledByWhenDisabledAdmin,
 )
 
 
-class FeedbackFormForm(forms.ModelForm):
-    is_disabled = forms.BooleanField(
-        label="Disabled", required=False, initial=False
-    )
-
+class FeedbackFormForm(IsDisabledCheckboxForm):
     class Meta:
         model = FeedbackForm
         fields = "__all__"
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and self.instance.disabled_at:
-            self.fields["is_disabled"].initial = True
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        if cleaned_data["is_disabled"] and not self.instance.disabled_at:
-            self.instance.disabled_at = timezone.now()
-        if not self.cleaned_data["is_disabled"]:
-            self.instance.disabled_at = None
-
-        return cleaned_data
 
 
 class PathPatternFormSet(BaseInlineFormSet):
@@ -89,7 +69,7 @@ class FeedbackFormAdmin(
     SetDisabledByWhenDisabledAdmin,
 ):
     form = FeedbackFormForm
-    inlines = [PathPatternInline, TextPromptAdmin]
+    inlines = [PathPatternInline, PromptAdmin]
     ordering = ["name"]
     fields = [
         "uuid",
@@ -136,22 +116,32 @@ class FeedbackFormAdmin(
     # Set created_by for new PathPatterns
     def save_formset(self, request, form, formset, change):
         # Set created_by for new PathPatterns and Prompts
-        if formset.model == PathPattern or formset.model == TextPrompt:
+        if formset.model == PathPattern or formset.model == Prompt:
             for form in formset.forms:
                 instance = form.instance
                 if instance.pk is None:
                     instance.created_by = request.user
 
         # Set disabled_by for disabled Prompts
-        if formset.model == TextPrompt:
+        if formset.model == Prompt:
             for form in formset.forms:
-                prompt: TextPrompt = form.instance
+                prompt: Prompt = form.instance
                 if prompt.disabled_at and not prompt.disabled_by:
                     prompt.disabled_by = request.user
                 if not prompt.disabled_at:
                     prompt.disabled_by = None
 
         super().save_formset(request, form, formset, change)
+
+        # Save selected prompt type for multi-table inheritance
+        if formset.model == Prompt:
+            for form in formset.forms:
+                prompt = form.instance
+                if not form.cleaned_data.get("id") and prompt.id:
+                    PromptModel = PROMPT_TYPES[form.cleaned_data["prompt_type"]]
+                    specific_prompt = PromptModel(prompt_ptr_id=prompt.id)
+                    specific_prompt.__dict__.update(prompt.__dict__)
+                    specific_prompt.save()
 
 
 admin.site.register(FeedbackForm, FeedbackFormAdmin)

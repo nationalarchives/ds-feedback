@@ -25,10 +25,13 @@ def get_inline_formset(context: Context, model_class: ModelBase):
     """
     Returns the inline formset for a given model
     """
-    return next(
-        (
-            formset.formset
-            for formset in context["inline_admin_formsets"]
-            if formset.formset.model == model_class
-        ),
-    )
+    try:
+        return next(
+            (
+                formset.formset
+                for formset in context["inline_admin_formsets"]
+                if formset.formset.model == model_class
+            ),
+        )
+    except StopIteration:
+        raise ValueError(f"Inline formset for {model_class} not found")
