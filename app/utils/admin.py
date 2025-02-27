@@ -1,6 +1,9 @@
 from django import forms
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.utils import timezone
+
+from app.utils.models import CreatedByModel, DisableableModel
 
 
 class HideReadOnlyOnCreationAdmin(admin.ModelAdmin):
@@ -18,27 +21,42 @@ class HideReadOnlyOnCreationAdmin(admin.ModelAdmin):
 
 class SetCreatedByOnCreationAdmin(admin.ModelAdmin):
     """
-    Mixin to set created_by field to the current user on model creation
+    Mixin to set created_by field on creation in form or inline forms
     """
 
     def save_model(self, request, obj, form, change):
-        if not change:
-            obj.created_by = request.user
+        if isinstance(obj, CreatedByModel):
+            obj.set_initial_created_by(request.user)
+
         super().save_model(request, obj, form, change)
+
+    # Update created_by on inline forms
+    def save_formset(self, request, form, formset, change):
+        for form in formset.forms:
+            if isinstance(form.instance, CreatedByModel):
+                form.instance.set_initial_created_by(request.user)
+
+        super().save_formset(request, form, formset, change)
 
 
 class SetDisabledByWhenDisabledAdmin(admin.ModelAdmin):
     """
-    Mixin to set disabled_by when disabled_at is set
+    Mixin to set disabled_by when disabled_at is set in form or inline forms
     """
 
     def save_model(self, request, obj, form, change):
-        if obj.disabled_at and not obj.disabled_by:
-            obj.disabled_by = request.user
-        if not obj.disabled_at:
-            obj.disabled_by = None
+        if isinstance(obj, DisableableModel):
+            obj.update_disabled_by(request.user)
 
         super().save_model(request, obj, form, change)
+
+    # Update disabled_by on inline forms
+    def save_formset(self, request, form, formset, change):
+        for form in formset.forms:
+            if isinstance(form.instance, DisableableModel):
+                form.instance.update_disabled_by(request.user)
+
+        super().save_formset(request, form, formset, change)
 
 
 class IsDisabledCheckboxForm(forms.ModelForm):
@@ -64,3 +82,19 @@ class IsDisabledCheckboxForm(forms.ModelForm):
             self.instance.disabled_at = None
 
         return cleaned_data
+
+
+def disallow_duplicates(
+    forms: list[forms.ModelForm], field_name: str, error: str
+):
+    """
+    Adds validation errors if there are any duplicate values for a field in a list of forms
+    """
+    values = set()
+    for form in forms:
+        if field_name in form.cleaned_data:
+            if getattr(form.instance, field_name) in values:
+                if not form.has_error(field_name):
+                    form.add_error(field_name, ValidationError(error))
+
+            values.add(getattr(form.instance, field_name))

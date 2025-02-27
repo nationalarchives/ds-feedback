@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.core.exceptions import ValidationError
 from django.forms import BaseInlineFormSet
 
 from app.feedback_forms.models import FeedbackForm, PathPattern
@@ -10,6 +9,7 @@ from app.utils.admin import (
     IsDisabledCheckboxForm,
     SetCreatedByOnCreationAdmin,
     SetDisabledByWhenDisabledAdmin,
+    disallow_duplicates,
 )
 
 
@@ -23,24 +23,19 @@ class PathPatternFormSet(BaseInlineFormSet):
     def clean(self):
         cleaned_data = super().clean()
 
-        patterns = set()
+        # Propagate project from FeedbackForm to PathPattern
         for form in self.forms:
-            if form.cleaned_data and "pattern" in form.cleaned_data:
-                # Propagate project from feedback_form
-                instance: PathPattern = form.instance
-                instance.project = form.cleaned_data["feedback_form"].project
+            if "feedback_form" in form.cleaned_data:
+                feedback_form = form.cleaned_data["feedback_form"]
+                form.instance.project_id = feedback_form.project_id
+                # Run validation again to check project/pattern uniqueness
                 form.full_clean()
 
-                # Ensure multiple new PathPatterns cannot share the same pattern.
-                if instance.pattern in patterns:
-                    if not form.has_error("pattern"):
-                        form.add_error(
-                            "pattern",
-                            ValidationError(
-                                "You cannot use the same pattern twice in a project."
-                            ),
-                        )
-                patterns.add(instance.pattern)
+        disallow_duplicates(
+            self.forms,
+            "pattern",
+            "You cannot use the same pattern twice in a project.",
+        )
 
         return cleaned_data
 
@@ -99,13 +94,12 @@ class FeedbackFormAdmin(
     prompt_count.short_description = "Number of prompts"
 
     def get_queryset(self, request):
-        id = request.resolver_match.kwargs.get("object_id")
+        is_list_page = not request.resolver_match.kwargs.get("object_id")
         query_set = super().get_queryset(request)
         query_set = query_set.select_related(
             "created_by", "disabled_by", "project"
         )
-        # Prefetch only changelist page
-        if not id:
+        if is_list_page:
             query_set = query_set.prefetch_related(
                 "path_patterns__created_by",
                 "prompts__disabled_by",
@@ -113,35 +107,16 @@ class FeedbackFormAdmin(
             )
         return query_set
 
-    # Set created_by for new PathPatterns
+    # Save selected prompt type for multi-table inheritance
     def save_formset(self, request, form, formset, change):
-        # Set created_by for new PathPatterns and Prompts
-        if formset.model == PathPattern or formset.model == Prompt:
-            for form in formset.forms:
-                instance = form.instance
-                if instance.pk is None:
-                    instance.created_by = request.user
-
-        # Set disabled_by for disabled Prompts
-        if formset.model == Prompt:
-            for form in formset.forms:
-                prompt: Prompt = form.instance
-                if prompt.disabled_at and not prompt.disabled_by:
-                    prompt.disabled_by = request.user
-                if not prompt.disabled_at:
-                    prompt.disabled_by = None
-
         super().save_formset(request, form, formset, change)
 
-        # Save selected prompt type for multi-table inheritance
         if formset.model == Prompt:
             for form in formset.forms:
                 prompt = form.instance
                 if not form.cleaned_data.get("id") and prompt.id:
                     PromptModel = PROMPT_TYPES[form.cleaned_data["prompt_type"]]
-                    specific_prompt = PromptModel(prompt_ptr_id=prompt.id)
-                    specific_prompt.__dict__.update(prompt.__dict__)
-                    specific_prompt.save()
+                    prompt.specialise(PromptModel).save()
 
 
 admin.site.register(FeedbackForm, FeedbackFormAdmin)

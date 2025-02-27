@@ -1,3 +1,5 @@
+from typing import Type
+
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
@@ -12,11 +14,11 @@ from app.prompts.models import (
     RangedPromptOption,
     TextPrompt,
 )
-from app.utils.admin import IsDisabledCheckboxForm
+from app.utils.admin import IsDisabledCheckboxForm, disallow_duplicates
 
 ENABLED_PROMPT_LIMIT = 3
 
-PROMPT_TYPES = {
+PROMPT_TYPES: dict[str, Type[Prompt]] = {
     "TextPrompt": TextPrompt,
     "BinaryPrompt": BinaryPrompt,
     "RangedPrompt": RangedPrompt,
@@ -253,21 +255,9 @@ class PromptFormSet(BaseInlineFormSet):
                     ),
                 )
 
-        # Check for duplicate order numbers in enabled prompts
-        orders = set()
-        for form in self.forms:
-            if form.cleaned_data and "order" in form.cleaned_data:
-                instance: TextPrompt = form.instance
-
-                if instance.order in orders:
-                    form.add_error(
-                        "order",
-                        ValidationError(
-                            "This order number is used in another prompt"
-                        ),
-                    )
-
-                orders.add(instance.order)
+        disallow_duplicates(
+            self.forms, "order", "This order number is used in another prompt"
+        )
 
         return cleaned_data
 
