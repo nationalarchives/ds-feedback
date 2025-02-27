@@ -14,7 +14,11 @@ from app.prompts.factories import (
 )
 from app.prompts.models import RangedPromptOption
 from app.users.factories import StaffUserFactory
-from app.utils.testing import get_change_list_results, reverse_with_query
+from app.utils.testing import (
+    get_change_list_results,
+    get_inline_formset,
+    reverse_with_query,
+)
 
 
 class TestAdminTextPromptsView(TestCase):
@@ -214,3 +218,48 @@ class TestAdminRangedPromptsView(TestCase):
         self.assertEqual(prompt_options[0].value, 1)
         self.assertEqual(prompt_options[1].label, "Likely")
         self.assertEqual(prompt_options[1].value, 2)
+
+    # As an Admin user I cannot create duplicate options for a range prompt in Django admin
+    def test_create_range_duplicate_prompt_options(self):
+        project = ProjectFactory.create(
+            created_at=datetime(2000, 1, 2), created_by=self.admin_user
+        )
+        feedback_form = FeedbackFormFactory.create(
+            created_by=self.admin_user,
+            project=project,
+        )
+        ranged_prompt = RangedPromptFactory.create(
+            created_by=self.admin_user,
+            feedback_form=feedback_form,
+            text="Are you likely to recommend this page?",
+        )
+
+        self.client.force_login(self.admin_user)
+
+        response = self.client.post(
+            reverse(
+                "admin:prompts_rangedprompt_change",
+                kwargs={"object_id": ranged_prompt.id},
+            ),
+            {
+                "text": "Are you likely to recommend this page?",
+                "options-TOTAL_FORMS": 2,
+                "options-INITIAL_FORMS": 0,
+                "options-0-label": "Unlikely",
+                "options-0-value": "1",
+                "options-1-label": "Unlikely",
+                "options-1-value": "1",
+            },
+        )
+
+        text_prompt_formset = get_inline_formset(
+            response.context, RangedPromptOption
+        )
+        self.assertEqual(
+            text_prompt_formset[1].errors["label"],
+            ["This label is used in another option"],
+        )
+        self.assertEqual(
+            text_prompt_formset[1].errors["value"],
+            ["This value is used in another option"],
+        )
