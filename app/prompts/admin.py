@@ -132,8 +132,23 @@ class BinaryPromptAdmin(admin.ModelAdmin):
         return query_set.select_related("created_by", "disabled_by")
 
 
+class RangedPromptOptionFormSet(BaseInlineFormSet):
+    def clean(self):
+        cleaned_data = super().clean()
+
+        disallow_duplicates(
+            self.forms, "value", "This value is used in another option"
+        )
+        disallow_duplicates(
+            self.forms, "label", "This label is used in another option"
+        )
+
+        return cleaned_data
+
+
 class RangedPromptOptionAdmin(admin.TabularInline):
     model = RangedPromptOption
+    formset = RangedPromptOptionFormSet
     extra = 1
     ordering = ["value"]
     fields = [
