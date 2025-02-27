@@ -12,17 +12,16 @@ class ProjectAdmin(HideReadOnlyOnCreationAdmin, SetCreatedByOnCreationAdmin):
     readonly_fields = ["uuid", "created_by"]
     fields = [
         "uuid",
-        "created_by",
         "name",
         "domain",
         "retention_period_days",
         "owned_by",
+        "created_by",
     ]
     list_display = [
         "name",
         "domain",
         "owned_by",
-        "created_at",
         "uuid",
     ]
     list_filter = ["retention_period_days", "owned_by"]
