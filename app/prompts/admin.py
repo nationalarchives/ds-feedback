@@ -14,7 +14,12 @@ from app.prompts.models import (
     RangedPromptOption,
     TextPrompt,
 )
-from app.utils.admin import IsDisabledCheckboxForm, disallow_duplicates
+from app.utils.admin import (
+    IsDisabledCheckboxForm,
+    IsDisabledHiddenCheckboxForm,
+    SetDisabledByWhenDisabledAdmin,
+    disallow_duplicates,
+)
 
 ENABLED_PROMPT_LIMIT = 3
 
@@ -39,25 +44,25 @@ PROMPT_LABELS = {
 }
 
 
-class TextPromptForm(IsDisabledCheckboxForm):
+class TextPromptForm(IsDisabledHiddenCheckboxForm):
     class Meta:
         model = TextPrompt
         fields = "__all__"
 
 
-class BinaryPromptForm(IsDisabledCheckboxForm):
+class BinaryPromptForm(IsDisabledHiddenCheckboxForm):
     class Meta:
         model = BinaryPrompt
         fields = "__all__"
 
 
-class RangedPromptForm(IsDisabledCheckboxForm):
+class RangedPromptForm(IsDisabledHiddenCheckboxForm):
     class Meta:
         model = RangedPrompt
         fields = "__all__"
 
 
-class TextPromptAdmin(admin.ModelAdmin):
+class TextPromptAdmin(SetDisabledByWhenDisabledAdmin):
     model = TextPrompt
     form = TextPromptForm
     extra = 1
@@ -66,6 +71,8 @@ class TextPromptAdmin(admin.ModelAdmin):
         "uuid",
         "feedback_form",
         "order",
+        "is_disabled",
+        "disabled",
         "text",
         "max_length",
         "created_by",
@@ -74,11 +81,17 @@ class TextPromptAdmin(admin.ModelAdmin):
         "uuid",
         "feedback_form",
         "order",
+        "disabled",
         "created_by",
     ]
     list_display = ["text", "feedback_form", "order", "uuid"]
     list_filter = ["feedback_form"]
     search_fields = ["text", "uuid"]
+
+    def disabled(self, instance):
+        return "Yes" if instance.disabled_at else "No"
+
+    disabled.short_description = "Disabled"
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -88,7 +101,7 @@ class TextPromptAdmin(admin.ModelAdmin):
         return query_set.select_related("created_by", "disabled_by")
 
 
-class BinaryPromptAdmin(admin.ModelAdmin):
+class BinaryPromptAdmin(SetDisabledByWhenDisabledAdmin):
     model = BinaryPrompt
     form = BinaryPromptForm
     extra = 1
@@ -97,6 +110,8 @@ class BinaryPromptAdmin(admin.ModelAdmin):
         "uuid",
         "feedback_form",
         "order",
+        "is_disabled",
+        "disabled",
         "text",
         "positive_answer_label",
         "negative_answer_label",
@@ -106,6 +121,7 @@ class BinaryPromptAdmin(admin.ModelAdmin):
         "uuid",
         "feedback_form",
         "order",
+        "disabled",
         "created_by",
     ]
     list_display = [
@@ -123,6 +139,11 @@ class BinaryPromptAdmin(admin.ModelAdmin):
         "negative_answer_label",
         "uuid",
     ]
+
+    def disabled(self, instance):
+        return "Yes" if instance.disabled_at else "No"
+
+    disabled.short_description = "Disabled"
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -157,7 +178,7 @@ class RangedPromptOptionAdmin(admin.TabularInline):
     ]
 
 
-class RangedPromptAdmin(admin.ModelAdmin):
+class RangedPromptAdmin(SetDisabledByWhenDisabledAdmin):
     model = RangedPrompt
     form = RangedPromptForm
     inlines = [RangedPromptOptionAdmin]
@@ -167,6 +188,8 @@ class RangedPromptAdmin(admin.ModelAdmin):
         "uuid",
         "feedback_form",
         "order",
+        "is_disabled",
+        "disabled",
         "text",
         "created_by",
     ]
@@ -174,11 +197,17 @@ class RangedPromptAdmin(admin.ModelAdmin):
         "uuid",
         "feedback_form",
         "order",
+        "disabled",
         "created_by",
     ]
     list_display = ["text", "options", "feedback_form", "order", "uuid"]
     list_filter = ["feedback_form"]
     search_fields = ["text", "uuid", "options__label"]
+
+    def disabled(self, instance):
+        return "Yes" if instance.disabled_at else "No"
+
+    disabled.short_description = "Disabled"
 
     def has_add_permission(self, request, obj=None):
         return False

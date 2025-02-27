@@ -64,9 +64,7 @@ class IsDisabledCheckboxForm(forms.ModelForm):
     Mixin to add an is_disabled field which sets or unsets a disabled_at Date field
     """
 
-    is_disabled = forms.BooleanField(
-        label="disabled", required=False, initial=False
-    )
+    is_disabled = forms.BooleanField(label="disabled", required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -82,6 +80,17 @@ class IsDisabledCheckboxForm(forms.ModelForm):
             self.instance.disabled_at = None
 
         return cleaned_data
+
+
+class IsDisabledHiddenCheckboxForm(IsDisabledCheckboxForm):
+    """
+    Mixin to add a hidden is_disabled field which sets or unsets a disabled_at Date field
+    This is needed to stop the field being wiped when the form is submitted
+    """
+
+    is_disabled = forms.BooleanField(
+        label="disabled", required=False, widget=forms.HiddenInput()
+    )
 
 
 def disallow_duplicates(
