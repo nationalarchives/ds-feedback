@@ -288,16 +288,17 @@ class PromptFormSet(BaseInlineFormSet):
         for form in self.forms:
             instance: TextPrompt = form.instance
 
-            if instance.text and not instance.disabled_at:
-                count += 1
+            if not instance.disabled_at:
+                if instance.text:
+                    count += 1
 
-            if count > ENABLED_PROMPT_LIMIT and instance.order is not None:
-                form.add_error(
-                    "text",
-                    ValidationError(
-                        f"You cannot have more than {ENABLED_PROMPT_LIMIT} enabled prompts"
-                    ),
-                )
+                if count > ENABLED_PROMPT_LIMIT and instance.order is not None:
+                    form.add_error(
+                        "text",
+                        ValidationError(
+                            f"You cannot have more than {ENABLED_PROMPT_LIMIT} enabled prompts"
+                        ),
+                    )
 
         disallow_duplicates(
             self.forms, "order", "This order number is used in another prompt"
