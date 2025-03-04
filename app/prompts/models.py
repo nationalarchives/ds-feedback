@@ -52,6 +52,14 @@ class BinaryPrompt(Prompt):
     positive_answer_label = models.CharField(max_length=64, default="Yes")
     negative_answer_label = models.CharField(max_length=64, default="No")
 
+    def get_label(self, answer: bool) -> str:
+        """
+        Returns the label given a positive or negative answer
+        """
+        return (
+            self.positive_answer_label if answer else self.negative_answer_label
+        )
+
 
 class RangedPrompt(Prompt):
     field_label = "Ranged Prompt"
