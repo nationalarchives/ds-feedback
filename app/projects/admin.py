@@ -8,6 +8,7 @@ from app.utils.admin import (
 
 
 class ProjectAdmin(HideReadOnlyOnCreationAdmin, SetCreatedByOnCreationAdmin):
+    model = Project
     ordering = ["-created_at"]
     readonly_fields = ["uuid", "created_by"]
     fields = [
