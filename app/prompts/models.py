@@ -1,3 +1,5 @@
+from typing import Type
+
 from django.db import models
 
 from model_utils.managers import InheritanceManager
@@ -22,6 +24,13 @@ class Prompt(
         FeedbackForm, on_delete=models.CASCADE, related_name="prompts"
     )
     order = models.PositiveSmallIntegerField()
+
+    @staticmethod
+    def get_subclass_by_name(name: str):
+        """
+        Returns a Prompt subclass by its name
+        """
+        return PROMPT_TYPES[name]
 
     def __str__(self):
         return self.text
@@ -49,3 +58,9 @@ class RangedPromptOption(models.Model):
 
     def __str__(self):
         return self.label
+
+
+PROMPT_TYPES: dict[str, Type[Prompt]] = {
+    PromptType.__name__: PromptType
+    for PromptType in [TextPrompt, BinaryPrompt, RangedPrompt]
+}

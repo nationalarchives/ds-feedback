@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.forms import BaseInlineFormSet
 
 from app.feedback_forms.models import FeedbackForm, PathPattern
-from app.prompts.admin import PROMPT_TYPES, PromptAdmin
+from app.prompts.admin import PromptAdmin
 from app.prompts.models import Prompt
 from app.utils.admin import (
     HideReadOnlyOnCreationAdmin,
@@ -113,9 +113,11 @@ class FeedbackFormAdmin(
 
         if formset.model == Prompt:
             for form in formset.forms:
-                prompt = form.instance
+                prompt: Prompt = form.instance
                 if not form.cleaned_data.get("id") and prompt.id:
-                    PromptModel = PROMPT_TYPES[form.cleaned_data["prompt_type"]]
+                    PromptModel = Prompt.get_subclass_by_name(
+                        form.cleaned_data["prompt_type"]
+                    )
                     prompt.specialise(PromptModel).save()
 
 

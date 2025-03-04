@@ -23,25 +23,25 @@ from app.utils.admin import (
 
 ENABLED_PROMPT_LIMIT = 3
 
-PROMPT_TYPES: dict[str, Type[Prompt]] = {
-    "TextPrompt": TextPrompt,
-    "BinaryPrompt": BinaryPrompt,
-    "RangedPrompt": RangedPrompt,
+PROMPT_LABELS = {
+    TextPrompt.__name__: "Text prompt",
+    BinaryPrompt.__name__: "Binary prompt",
+    RangedPrompt.__name__: "Ranged prompt",
 }
 
-PROMPT_TYPE_NAMES = {value: key for key, value in PROMPT_TYPES.items()}
 
-PROMPT_VIEWNAMES = {
+PROMPT_VIEWNAMES: dict[Type[Prompt], str] = {
     TextPrompt: "admin:prompts_textprompt_change",
     BinaryPrompt: "admin:prompts_binaryprompt_change",
     RangedPrompt: "admin:prompts_rangedprompt_change",
 }
 
-PROMPT_LABELS = {
-    "TextPrompt": "Text prompt",
-    "BinaryPrompt": "Binary prompt",
-    "RangedPrompt": "Ranged prompt",
-}
+
+def get_prompt_viewname(prompt):
+    """
+    Gets the viewname for a prompt instance
+    """
+    return PROMPT_VIEWNAMES[type(prompt)]
 
 
 class TextPromptForm(IsDisabledHiddenCheckboxForm):
@@ -241,7 +241,7 @@ class PromptDetailsWidget(forms.Widget):
             return ""
 
         url = reverse(
-            PROMPT_VIEWNAMES[type(self.instance)],
+            get_prompt_viewname(self.instance),
             kwargs={"object_id": self.instance.id},
         )
         return mark_safe(f'<a href="{url}">Edit details</a>')
@@ -272,9 +272,9 @@ class PromptForm(IsDisabledCheckboxForm):
 
             # For existing prompts set prompt type
             if self.instance.pk:
-                self.fields["prompt_type"].initial = PROMPT_TYPE_NAMES[
-                    type(self.instance)
-                ]
+                self.fields["prompt_type"].initial = type(
+                    self.instance
+                ).__name__
                 self.fields["prompt_type"].disabled = True
                 self.fields["prompt_type"].required = False
 
