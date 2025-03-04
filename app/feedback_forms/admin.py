@@ -21,7 +21,7 @@ class FeedbackFormForm(IsDisabledCheckboxForm):
 
 class PathPatternFormSet(BaseInlineFormSet):
     def clean(self):
-        cleaned_data = super().clean()
+        super().clean()
 
         # Propagate project from FeedbackForm to PathPattern
         for form in self.forms:
@@ -36,8 +36,6 @@ class PathPatternFormSet(BaseInlineFormSet):
             "pattern",
             "You cannot use the same pattern twice in a project.",
         )
-
-        return cleaned_data
 
 
 class PathPatternInline(admin.TabularInline):

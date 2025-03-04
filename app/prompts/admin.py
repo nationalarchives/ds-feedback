@@ -155,7 +155,7 @@ class BinaryPromptAdmin(SetDisabledByWhenDisabledAdmin):
 
 class RangedPromptOptionFormSet(BaseInlineFormSet):
     def clean(self):
-        cleaned_data = super().clean()
+        super().clean()
 
         disallow_duplicates(
             self.forms, "value", "This value is used in another option"
@@ -163,8 +163,6 @@ class RangedPromptOptionFormSet(BaseInlineFormSet):
         disallow_duplicates(
             self.forms, "label", "This label is used in another option"
         )
-
-        return cleaned_data
 
 
 class RangedPromptOptionAdmin(admin.TabularInline):
@@ -281,7 +279,7 @@ class PromptForm(IsDisabledCheckboxForm):
 
 class PromptFormSet(BaseInlineFormSet):
     def clean(self):
-        cleaned_data = super().clean()
+        super().clean()
 
         # Check for enabled prompts exceeding limit
         count = 0
@@ -303,8 +301,6 @@ class PromptFormSet(BaseInlineFormSet):
         disallow_duplicates(
             self.forms, "order", "This order number is used in another prompt"
         )
-
-        return cleaned_data
 
 
 class PromptAdmin(admin.TabularInline):
