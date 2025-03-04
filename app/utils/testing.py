@@ -7,11 +7,11 @@ from django.urls import reverse
 from django.utils.http import urlencode
 
 
-def reverse_with_query(name: str, query: Dict[str, str]):
+def reverse_with_query(viewname: str, query: Dict[str, str], *args, **kwargs):
     """
     Returns a reversed URL with query parameters
     """
-    return reverse(name) + "?" + urlencode(query)
+    return reverse(viewname, *args, **kwargs) + "?" + urlencode(query)
 
 
 def get_change_list_results(response: HttpResponse):
