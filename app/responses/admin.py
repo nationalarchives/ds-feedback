@@ -6,13 +6,7 @@ from django.utils.safestring import mark_safe
 
 from app.prompts.admin import get_prompt_viewname
 from app.prompts.models import Prompt
-from app.responses.models import (
-    BinaryPromptResponse,
-    PromptResponse,
-    RangedPromptResponse,
-    Response,
-    TextPromptResponse,
-)
+from app.responses.models import PromptResponse, Response
 from app.utils.admin import (
     HideReadOnlyOnCreationAdmin,
     SetCreatedByOnCreationAdmin,
@@ -51,9 +45,7 @@ class PromptResponseInline(admin.TabularInline):
 
     def get_queryset(self, request):
         query_set = super().get_queryset(request)
-        return query_set.prefetch_related("prompt").select_subclasses(
-            BinaryPromptResponse, RangedPromptResponse, TextPromptResponse
-        )
+        return query_set.prefetch_related("prompt").select_subclasses()
 
 
 class ResponseAdmin(HideReadOnlyOnCreationAdmin, SetCreatedByOnCreationAdmin):

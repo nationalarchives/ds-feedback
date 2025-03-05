@@ -35,9 +35,18 @@ class Prompt(
     def __str__(self):
         return self.text
 
+    @classmethod
+    def type(cls):
+        return cls.__name__
+
 
 class TextPrompt(Prompt):
     max_length = models.PositiveSmallIntegerField(default=1000)
+
+    def spec(self):
+        return {
+            "max_length": self.max_length,
+        }
 
 
 class BinaryPrompt(Prompt):
@@ -52,12 +61,19 @@ class BinaryPrompt(Prompt):
             self.positive_answer_label if answer else self.negative_answer_label
         )
 
+    def spec(self):
+        return {
+            "positive_answer_label": self.positive_answer_label,
+            "negative_answer_label": self.negative_answer_label,
+        }
+
 
 class RangedPrompt(Prompt):
-    pass
+    def spec(self):
+        return {"options": [option.spec() for option in self.options.all()]}
 
 
-class RangedPromptOption(models.Model):
+class RangedPromptOption(UUIDModel):
     ranged_prompt = models.ForeignKey(
         RangedPrompt, on_delete=models.CASCADE, related_name="options"
     )
@@ -66,6 +82,9 @@ class RangedPromptOption(models.Model):
 
     def __str__(self):
         return self.label
+
+    def spec(self):
+        return {"label": self.label, "value": self.value}
 
 
 PROMPT_TYPES: dict[str, Type[Prompt]] = {
