@@ -19,3 +19,7 @@ DEBUG_TOOLBAR_CONFIG = {
     # we set it in settings.local instead.
     "SHOW_TOOLBAR_CALLBACK": lambda x: SHOW_TOOLBAR,
 }
+
+# Adds Django Silk
+MIDDLEWARE.insert(0, "silk.middleware.SilkyMiddleware")  # noqa
+INSTALLED_APPS.append("silk")  # noqa

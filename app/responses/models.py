@@ -59,6 +59,9 @@ class TextPromptResponse(PromptResponse):
         """
         return self.value
 
+    def answer_json(self):
+        return self.value
+
     def __str__(self):
         return "Text prompt"
 
@@ -73,6 +76,9 @@ class BinaryPromptResponse(PromptResponse):
         Returns the selected binary label
         """
         return self.get_subclass_prompt().get_label(self.value)
+
+    def answer_json(self):
+        return self.value
 
     def __str__(self):
         return "Binary prompt"
@@ -90,6 +96,13 @@ class RangedPromptResponse(PromptResponse):
         Returns the selected option label
         """
         return self.value.label
+
+    def answer_json(self):
+        # If prefetched RangedPromptResponse exists, use that instead
+        if hasattr(self, "rangedpromptresponse"):
+            return self.rangedpromptresponse.value.uuid
+
+        return self.value.uuid
 
     def __str__(self):
         return "Ranged prompt"

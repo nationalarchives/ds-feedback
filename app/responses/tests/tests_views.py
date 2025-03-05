@@ -121,14 +121,16 @@ class TestAdminResponseView(TestCase):
         responses = [form.instance for form in formset.forms]
 
         self.assertEqual(responses[0].prompt.text, "How could it be improved?")
-        self.assertEqual(responses[0].answer(), "More pictures of cats please!")
+        self.assertEqual(
+            responses[0].response(), "More pictures of cats please!"
+        )
 
         self.assertEqual(
             responses[1].prompt.text, "What is your impression of the author?"
         )
-        self.assertEqual(responses[1].answer(), "Positive")
+        self.assertEqual(responses[1].response(), "Positive")
 
         self.assertEqual(
             responses[2].prompt.text, "Are you satisfied with page?"
         )
-        self.assertEqual(responses[2].answer(), "Satisfied")
+        self.assertEqual(responses[2].response(), "Satisfied")
