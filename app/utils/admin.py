@@ -23,3 +23,17 @@ class SetCreatedByOnCreationAdmin(admin.ModelAdmin):
         if not change:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
+
+
+class SetDisabledByWhenDisabledAdmin(admin.ModelAdmin):
+    """
+    Mixin to set disabled_by when disabled_at is set
+    """
+
+    def save_model(self, request, obj, form, change):
+        if obj.disabled_at and not obj.disabled_by:
+            obj.disabled_by = request.user
+        if not obj.disabled_at:
+            obj.disabled_by = None
+
+        super().save_model(request, obj, form, change)
