@@ -1,7 +1,10 @@
 import uuid
 from typing import Self
 
+from django.apps import apps
 from django.db import models
+
+from model_utils.managers import InheritanceManager
 
 from app.users.models import User
 
@@ -92,6 +95,39 @@ class CreateSubclassModelMixin(models.Model):
         setattr(instance, subclass._meta.model_name + "_ptr", self)
         instance.__dict__.update(self.__dict__)
         return instance
+
+    class Meta:
+        abstract = True
+
+
+class GetSubclassesModelMixin(models.Model):
+    """
+    Abstract base class model that provides helper to get model subclasses and
+    subclasses by model name
+    """
+
+    @classmethod
+    def get_subclasses_mapping(cls) -> dict[str, type[Self]]:
+        """
+        Uses the InheritanceManager to return a mapping of model names to subclasses
+        """
+        assert isinstance(
+            cls.objects, InheritanceManager
+        ), f"{cls} must use InheritanceManager to support LookupSubclasses"
+
+        return {
+            model_name: apps.get_model(
+                app_label=cls._meta.app_label, model_name=model_name
+            )
+            for model_name in cls.objects.all()._get_subclasses_recurse(cls)
+        }
+
+    @classmethod
+    def get_subclass_by_name(cls, name: str):
+        """
+        Returns a model subclass from its model name
+        """
+        return cls.get_subclasses_mapping()[name]
 
     class Meta:
         abstract = True
