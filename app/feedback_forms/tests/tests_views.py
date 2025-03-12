@@ -216,9 +216,7 @@ class TestAdminFeedbackFormView(TestCase):
         feedback_form = FeedbackForm.objects.prefetch_related(
             "path_patterns"
         ).get(name="Test feedback form")
-        prompts = feedback_form.prompts.all().select_subclasses(
-            BinaryPrompt, RangedPrompt, TextPrompt
-        )
+        prompts = feedback_form.prompts.all().select_subclasses()
         self.assertEqual(len(prompts), 3)
         self.assertIsInstance(prompts[0], BinaryPrompt)
         self.assertEqual(prompts[0].text, "Was this page useful?")

@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from app.feedback_forms.models import FeedbackForm, PathPattern
-from app.prompts.models import BinaryPrompt, Prompt, RangedPrompt, TextPrompt
+from app.prompts.models import Prompt, TextPrompt
 from app.utils.admin import (
     HideReadOnlyOnCreationAdmin,
     IsDisabledCheckboxForm,
@@ -178,9 +178,9 @@ class PromptAdmin(admin.TabularInline):
 
     def get_queryset(self, request):
         query_set = super().get_queryset(request)
-        return query_set.select_subclasses(
-            BinaryPrompt, RangedPrompt, TextPrompt
-        ).select_related("created_by", "disabled_by")
+        return query_set.select_subclasses().select_related(
+            "created_by", "disabled_by"
+        )
 
 
 class FeedbackFormAdmin(
