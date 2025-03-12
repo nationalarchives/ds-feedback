@@ -50,11 +50,17 @@ class DisableableModelMixin(models.Model):
         related_name="+",
     )
 
-    def update_disabled_by(self, user: User):
+    def update_disabled_by(self, user: User, commit=True):
+        """
+        Sets disabled by user when disabled_at is set,
+        otherwise sets disabled_at to None
+        """
         if self.disabled_at and not self.disabled_by_id:
             self.disabled_by = user
         if not self.disabled_at:
             self.disabled_by = None
+        if commit:
+            self.save()
 
     class Meta:
         abstract = True
@@ -69,9 +75,14 @@ class CreatedByModelMixin(models.Model):
         User, on_delete=models.PROTECT, editable=False, related_name="+"
     )
 
-    def set_initial_created_by(self, user: User):
+    def set_initial_created_by(self, user: User, commit=True):
+        """
+        Sets created_by if it has not already been set
+        """
         if not self.created_by_id:
             self.created_by = user
+            if commit:
+                self.save()
 
     class Meta:
         abstract = True

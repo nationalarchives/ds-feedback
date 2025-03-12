@@ -26,7 +26,7 @@ class SetCreatedByOnCreationAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if isinstance(obj, CreatedByModelMixin):
-            obj.set_initial_created_by(request.user)
+            obj.set_initial_created_by(request.user, commit=False)
 
         super().save_model(request, obj, form, change)
 
@@ -34,7 +34,7 @@ class SetCreatedByOnCreationAdmin(admin.ModelAdmin):
     def save_formset(self, request, form, formset, change):
         for form in formset.forms:
             if isinstance(form.instance, CreatedByModelMixin):
-                form.instance.set_initial_created_by(request.user)
+                form.instance.set_initial_created_by(request.user, commit=False)
 
         super().save_formset(request, form, formset, change)
 
@@ -46,7 +46,7 @@ class SetDisabledByWhenDisabledAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if isinstance(obj, DisableableModelMixin):
-            obj.update_disabled_by(request.user)
+            obj.update_disabled_by(request.user, commit=False)
 
         super().save_model(request, obj, form, change)
 
@@ -54,7 +54,7 @@ class SetDisabledByWhenDisabledAdmin(admin.ModelAdmin):
     def save_formset(self, request, form, formset, change):
         for form in formset.forms:
             if isinstance(form.instance, DisableableModelMixin):
-                form.instance.update_disabled_by(request.user)
+                form.instance.update_disabled_by(request.user, commit=False)
 
         super().save_formset(request, form, formset, change)
 
