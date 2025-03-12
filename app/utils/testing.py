@@ -1,20 +1,18 @@
-from typing import Dict
-
 from django.db.models.base import ModelBase
-from django.http import HttpResponse
 from django.template.context import Context
+from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.http import urlencode
 
 
-def reverse_with_query(viewname: str, query: Dict[str, str], *args, **kwargs):
+def reverse_with_query(viewname: str, query: dict[str, str], *args, **kwargs):
     """
     Returns a reversed URL with query parameters
     """
     return reverse(viewname, *args, **kwargs) + "?" + urlencode(query)
 
 
-def get_change_list_results(response: HttpResponse):
+def get_change_list_results(response: TemplateResponse):
     """
     Returns the change list results from a response
     """

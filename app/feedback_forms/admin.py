@@ -1,5 +1,3 @@
-from typing import Type
-
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
@@ -25,7 +23,7 @@ PROMPT_LABELS = {
     RangedPrompt.__name__: "Ranged prompt",
 }
 
-PROMPT_VIEWNAMES: dict[Type[Prompt], str] = {
+PROMPT_VIEWNAMES: dict[type[Prompt], str] = {
     TextPrompt: "admin:prompts_textprompt_change",
     BinaryPrompt: "admin:prompts_binaryprompt_change",
     RangedPrompt: "admin:prompts_rangedprompt_change",
