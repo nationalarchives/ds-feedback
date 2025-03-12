@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.forms import BaseInlineFormSet
 from django.urls import reverse
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.prompts.models import Prompt, TextPrompt
@@ -90,7 +90,7 @@ class PromptDetailsWidget(forms.Widget):
             get_prompt_viewname(self.instance),
             kwargs={"object_id": self.instance.id},
         )
-        return mark_safe(f'<a href="{url}">Edit details</a>')
+        return format_html('<a href="{url}">Edit details</a>', url=url)
 
 
 class PromptForm(IsDisabledCheckboxForm):
