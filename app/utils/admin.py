@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from app.utils.models import CreatedByModel, DisableableModel
+from app.utils.models import CreatedByModelMixin, DisableableModelMixin
 
 
 class HideReadOnlyOnCreationAdmin(admin.ModelAdmin):
@@ -25,7 +25,7 @@ class SetCreatedByOnCreationAdmin(admin.ModelAdmin):
     """
 
     def save_model(self, request, obj, form, change):
-        if isinstance(obj, CreatedByModel):
+        if isinstance(obj, CreatedByModelMixin):
             obj.set_initial_created_by(request.user)
 
         super().save_model(request, obj, form, change)
@@ -33,7 +33,7 @@ class SetCreatedByOnCreationAdmin(admin.ModelAdmin):
     # Update created_by on inline forms
     def save_formset(self, request, form, formset, change):
         for form in formset.forms:
-            if isinstance(form.instance, CreatedByModel):
+            if isinstance(form.instance, CreatedByModelMixin):
                 form.instance.set_initial_created_by(request.user)
 
         super().save_formset(request, form, formset, change)
@@ -45,7 +45,7 @@ class SetDisabledByWhenDisabledAdmin(admin.ModelAdmin):
     """
 
     def save_model(self, request, obj, form, change):
-        if isinstance(obj, DisableableModel):
+        if isinstance(obj, DisableableModelMixin):
             obj.update_disabled_by(request.user)
 
         super().save_model(request, obj, form, change)
@@ -53,7 +53,7 @@ class SetDisabledByWhenDisabledAdmin(admin.ModelAdmin):
     # Update disabled_by on inline forms
     def save_formset(self, request, form, formset, change):
         for form in formset.forms:
-            if isinstance(form.instance, DisableableModel):
+            if isinstance(form.instance, DisableableModelMixin):
                 form.instance.update_disabled_by(request.user)
 
         super().save_formset(request, form, formset, change)

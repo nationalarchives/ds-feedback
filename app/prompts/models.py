@@ -6,19 +6,19 @@ from model_utils.managers import InheritanceManager
 
 from app.feedback_forms.models import FeedbackForm
 from app.utils.models import (
-    CreatedByModel,
+    CreatedByModelMixin,
     CreateSubclassModelMixin,
-    DisableableModel,
-    TimestampedModel,
-    UUIDModel,
+    DisableableModelMixin,
+    TimestampedModelMixin,
+    UUIDModelMixin,
 )
 
 
 class Prompt(
-    TimestampedModel,
-    UUIDModel,
-    CreatedByModel,
-    DisableableModel,
+    TimestampedModelMixin,
+    UUIDModelMixin,
+    CreatedByModelMixin,
+    DisableableModelMixin,
     CreateSubclassModelMixin,
 ):
     objects = InheritanceManager()

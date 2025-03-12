@@ -6,7 +6,7 @@ from django.db import models
 from app.users.models import User
 
 
-class TimestampedModel(models.Model):
+class TimestampedModelMixin(models.Model):
     """
     Abstract base class model that provides self-managed "created_at" and "modified_at" fields.
     """
@@ -18,7 +18,7 @@ class TimestampedModel(models.Model):
         abstract = True
 
 
-class UUIDModel(models.Model):
+class UUIDModelMixin(models.Model):
     """
     Abstract base class model that provides a separate UUID field for external access,
     to avoid revealing the enumerable internal ID.
@@ -32,7 +32,7 @@ class UUIDModel(models.Model):
         abstract = True
 
 
-class DisableableModel(models.Model):
+class DisableableModelMixin(models.Model):
     """
     Abstract base class model that provides "disabled_at" and "disabled_by" fields
     """
@@ -57,7 +57,7 @@ class DisableableModel(models.Model):
         abstract = True
 
 
-class CreatedByModel(models.Model):
+class CreatedByModelMixin(models.Model):
     """
     Abstract base class model that provides "created_by" field
     """

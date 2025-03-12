@@ -8,15 +8,18 @@ from django.db.models.functions import Lower
 
 from app.projects.models import Project
 from app.utils.models import (
-    CreatedByModel,
-    DisableableModel,
-    TimestampedModel,
-    UUIDModel,
+    CreatedByModelMixin,
+    DisableableModelMixin,
+    TimestampedModelMixin,
+    UUIDModelMixin,
 )
 
 
 class FeedbackForm(
-    TimestampedModel, UUIDModel, CreatedByModel, DisableableModel
+    TimestampedModelMixin,
+    UUIDModelMixin,
+    CreatedByModelMixin,
+    DisableableModelMixin,
 ):
     name = models.CharField(max_length=128)
     project = models.ForeignKey(
@@ -27,7 +30,7 @@ class FeedbackForm(
         return self.name
 
 
-class PathPattern(TimestampedModel, UUIDModel, CreatedByModel):
+class PathPattern(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
     pattern = models.CharField(max_length=512)
     feedback_form = models.ForeignKey(
         FeedbackForm, on_delete=models.CASCADE, related_name="path_patterns"
