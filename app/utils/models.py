@@ -1,5 +1,5 @@
 import uuid
-from typing import Self, Type
+from typing import Self
 
 from django.db import models
 
@@ -74,17 +74,24 @@ class CreatedByModel(models.Model):
         abstract = True
 
 
-class Specialisable(models.Model):
+class CreateSubclassModelMixin(models.Model):
     """
-    Abstract base class model that provides "specialise" helper to create a specialised version of a model.
+    Abstract base class model that provides create_subclass helper to create a subclassed version of a model.
     Assumes default *_ptr field name.
     """
 
-    def specialise(self, Subclass: Type[Self]):
-        specialised = Subclass()
-        setattr(specialised, Subclass._meta.model_name + "_ptr", self)
-        specialised.__dict__.update(self.__dict__)
-        return specialised
+    def create_subclass(self, subclass: type[Self]):
+        """
+        Converts a model into a multi-table inheritance subclass
+        """
+        assert issubclass(
+            subclass, type(self)
+        ), f"{subclass} must be a subclass of {type(self)}"
+
+        instance = subclass()
+        setattr(instance, subclass._meta.model_name + "_ptr", self)
+        instance.__dict__.update(self.__dict__)
+        return instance
 
     class Meta:
         abstract = True

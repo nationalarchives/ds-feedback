@@ -243,7 +243,7 @@ class FeedbackFormAdmin(
                     PromptModel = Prompt.get_subclass_by_name(
                         form.cleaned_data["prompt_type"]
                     )
-                    prompt.specialise(PromptModel).save()
+                    prompt.create_subclass(PromptModel).save()
 
 
 admin.site.register(FeedbackForm, FeedbackFormAdmin)
