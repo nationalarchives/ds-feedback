@@ -22,6 +22,7 @@ class Prompt(
     CreateSubclassModelMixin,
 ):
     objects = InheritanceManager()
+    field_label = "Prompt"
 
     text = models.CharField(max_length=128)
     feedback_form = models.ForeignKey(
@@ -40,16 +41,20 @@ class Prompt(
 
 
 class TextPrompt(Prompt):
+    field_label = "Text Prompt"
+
     max_length = models.PositiveSmallIntegerField(default=1000)
 
 
 class BinaryPrompt(Prompt):
+    field_label = "Binary Prompt"
+
     positive_answer_label = models.CharField(max_length=64, default="Yes")
     negative_answer_label = models.CharField(max_length=64, default="No")
 
 
 class RangedPrompt(Prompt):
-    pass
+    field_label = "Ranged Prompt"
 
 
 class RangedPromptOption(models.Model):

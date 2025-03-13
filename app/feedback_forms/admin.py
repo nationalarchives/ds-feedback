@@ -17,12 +17,6 @@ from app.utils.admin import (
 
 ENABLED_PROMPT_LIMIT = 3
 
-PROMPT_LABELS = {
-    TextPrompt.__name__: "Text prompt",
-    BinaryPrompt.__name__: "Binary prompt",
-    RangedPrompt.__name__: "Ranged prompt",
-}
-
 
 class FeedbackFormForm(IsDisabledCheckboxForm):
     class Meta:
@@ -89,7 +83,10 @@ class PromptForm(IsDisabledCheckboxForm):
     prompt_type = forms.ChoiceField(
         choices=[
             ("", "Please select..."),
-            *PROMPT_LABELS.items(),
+            *[
+                (model_name, prompt_type.field_label)
+                for model_name, prompt_type in Prompt.get_subclasses_mapping().items()
+            ],
         ]
     )
 
