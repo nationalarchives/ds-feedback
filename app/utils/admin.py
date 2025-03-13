@@ -64,7 +64,7 @@ class IsDisabledCheckboxForm(forms.ModelForm):
     Mixin to add an is_disabled field which sets or unsets a disabled_at Date field
     """
 
-    is_disabled = forms.BooleanField(label="disabled", required=False)
+    is_disabled = forms.BooleanField(label="Disabled", required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
