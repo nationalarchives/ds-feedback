@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import admin
+from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils.html import format_html
 
@@ -41,7 +42,9 @@ class PromptResponseInline(admin.TabularInline):
 
     def get_queryset(self, request):
         query_set = super().get_queryset(request)
-        return query_set.prefetch_related("prompt").select_subclasses()
+        return query_set.prefetch_related(
+            Prefetch("prompt", queryset=Prompt.objects.select_subclasses()),
+        ).select_subclasses()
 
 
 class ResponseAdmin(HideReadOnlyOnCreationAdmin, SetCreatedByOnCreationAdmin):
