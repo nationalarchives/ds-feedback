@@ -39,7 +39,10 @@ class PromptResponse(TimestampedModelMixin, UUIDModelMixin):
         """
         Gets the subclassed prompt based on the subclassed prompt response
         """
-        return self.prompt_type.objects.get(id=self.prompt.id)
+        if not isinstance(self.prompt, self.prompt_type):
+            self.prompt = self.prompt_type.objects.get(id=self.prompt_id)
+
+        return self.prompt
 
     def __str__(self):
         return str(self.uuid)

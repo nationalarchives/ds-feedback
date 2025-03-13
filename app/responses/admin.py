@@ -10,6 +10,7 @@ from app.utils.admin import (
     HideReadOnlyOnCreationAdmin,
     SetCreatedByOnCreationAdmin,
 )
+from app.utils.views import get_admin_viewname
 
 
 class PromptResponseForm(forms.ModelForm):
@@ -30,13 +31,21 @@ class PromptResponseInline(admin.TabularInline):
     list_display = ["uuid"]
     readonly_fields = ["uuid", "prompt_link"]
 
-    def prompt_link(self, instance: Prompt):
+    def prompt_link(self, instance: PromptResponse):
         """
         Replaces prompt field in order to include link to the prompt
         """
-        prompt: Prompt = instance.get_subclass_prompt()
-        url = reverse(prompt.get_viewname(), kwargs={"object_id": prompt.id})
-        return format_html('<a href="{url}">{text}</a>', url=url, text=prompt)
+        url = reverse(
+            get_admin_viewname(
+                "prompts",
+                instance.prompt_type,
+                "change",
+            ),
+            kwargs={"object_id": instance.prompt.id},
+        )
+        return format_html(
+            '<a href="{url}">{text}</a>', url=url, text=instance.prompt
+        )
 
     prompt_link.short_description = "Prompt"
 

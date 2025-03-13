@@ -14,6 +14,7 @@ from app.utils.admin import (
     SetDisabledByWhenDisabledAdmin,
     disallow_duplicates,
 )
+from app.utils.views import get_admin_viewname
 
 ENABLED_PROMPT_LIMIT = 3
 
@@ -68,7 +69,7 @@ class PromptDetailsWidget(forms.Widget):
             return ""
 
         url = reverse(
-            self.instance.get_viewname(),
+            get_admin_viewname("prompts", self.instance, "change"),
             kwargs={"object_id": self.instance.id},
         )
         return format_html('<a href="{url}">Edit details</a>', url=url)
