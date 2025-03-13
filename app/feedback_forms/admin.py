@@ -23,19 +23,6 @@ PROMPT_LABELS = {
     RangedPrompt.__name__: "Ranged prompt",
 }
 
-PROMPT_VIEWNAMES: dict[type[Prompt], str] = {
-    TextPrompt: "admin:prompts_textprompt_change",
-    BinaryPrompt: "admin:prompts_binaryprompt_change",
-    RangedPrompt: "admin:prompts_rangedprompt_change",
-}
-
-
-def get_prompt_viewname(prompt):
-    """
-    Gets the viewname for a prompt instance
-    """
-    return PROMPT_VIEWNAMES[type(prompt)]
-
 
 class FeedbackFormForm(IsDisabledCheckboxForm):
     class Meta:
@@ -87,7 +74,7 @@ class PromptDetailsWidget(forms.Widget):
             return ""
 
         url = reverse(
-            get_prompt_viewname(self.instance),
+            self.instance.get_viewname(),
             kwargs={"object_id": self.instance.id},
         )
         return format_html('<a href="{url}">Edit details</a>', url=url)

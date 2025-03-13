@@ -29,6 +29,12 @@ class Prompt(
     )
     order = models.PositiveSmallIntegerField()
 
+    def get_viewname(self):
+        """
+        Gets the viewname for this prompt
+        """
+        return f"admin:prompts_{self._meta.model_name}_change"
+
     def __str__(self):
         return self.text
 
