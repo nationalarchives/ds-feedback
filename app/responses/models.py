@@ -69,7 +69,7 @@ class BinaryPromptResponse(PromptResponse):
         """
         Returns the selected binary label
         """
-        return BinaryPrompt.objects.get(id=self.prompt_id).get_label(self.value)
+        return self.get_subclass_prompt().get_label(self.value)
 
     def __str__(self):
         return "Binary prompt"
