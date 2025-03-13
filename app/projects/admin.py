@@ -8,21 +8,21 @@ from app.utils.admin import (
 
 
 class ProjectAdmin(HideReadOnlyOnCreationAdmin, SetCreatedByOnCreationAdmin):
+    model = Project
     ordering = ["-created_at"]
     readonly_fields = ["uuid", "created_by"]
     fields = [
         "uuid",
-        "created_by",
         "name",
         "domain",
         "retention_period_days",
         "owned_by",
+        "created_by",
     ]
     list_display = [
         "name",
+        "domain",
         "owned_by",
-        "created_at",
-        "retention_period_days",
         "uuid",
     ]
     list_filter = ["retention_period_days", "owned_by"]

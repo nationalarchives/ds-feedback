@@ -2,12 +2,16 @@ from django.db import models
 from django.db.models.constraints import CheckConstraint
 
 from app.users.models import User
-from app.utils.models import TimestampedModel, UUIDModel
+from app.utils.models import (
+    CreatedByModelMixin,
+    TimestampedModelMixin,
+    UUIDModelMixin,
+)
 
 RETENTION_PERIOD_CHOICES: list[int] = [30, 60, 180]
 
 
-class Project(TimestampedModel, UUIDModel):
+class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
     """
     Model for a project, which is a grouping for feedback prompts and data collected from a particular domain.
     """
@@ -22,9 +26,6 @@ class Project(TimestampedModel, UUIDModel):
     )
     owned_by = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="+"
-    )
-    created_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, editable=False, related_name="+"
     )
 
     class Meta:
