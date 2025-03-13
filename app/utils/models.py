@@ -55,7 +55,7 @@ class DisableableModelMixin(models.Model):
         Sets disabled by user when disabled_at is set,
         otherwise sets disabled_at to None
         """
-        if self.disabled_at and not self.disabled_by_id:
+        if self.disabled_at and self.disabled_by_id is None:
             self.disabled_by = user
         if not self.disabled_at:
             self.disabled_by = None
@@ -79,7 +79,7 @@ class CreatedByModelMixin(models.Model):
         """
         Sets created_by if it has not already been set
         """
-        if not self.created_by_id:
+        if self.created_by_id is None:
             self.created_by = user
             if commit:
                 self.save()

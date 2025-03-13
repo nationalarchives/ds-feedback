@@ -64,7 +64,7 @@ class PathPatternInline(admin.TabularInline):
 class PromptDetailsWidget(forms.Widget):
     def render(self, name, value, attrs=None, renderer=None):
         # self.instance is added by PromptForm
-        if not self.instance.id:
+        if self.instance.id is None:
             return ""
 
         url = reverse(
