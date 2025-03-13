@@ -118,9 +118,9 @@ class PromptForm(IsDisabledCheckboxForm):
 
             # For existing prompts set prompt type
             if self.instance.pk:
-                self.fields["prompt_type"].initial = type(
-                    self.instance
-                ).__name__
+                self.fields["prompt_type"].initial = (
+                    self.instance._meta.model_name
+                )
                 self.fields["prompt_type"].disabled = True
                 self.fields["prompt_type"].required = False
 
