@@ -154,9 +154,6 @@ class PromptAdmin(admin.TabularInline):
         "disabled_by",
         "created_by",
     ]
-    list_display = ["text", "feedback_form", "order"]
-    list_filter = ["feedback_form"]
-    search_fields = ["text", "uuid"]
 
     def get_queryset(self, request):
         query_set = super().get_queryset(request)
