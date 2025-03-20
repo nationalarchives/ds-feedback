@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import UniqueConstraint
 
 from model_utils.managers import InheritanceManager
 
@@ -40,6 +41,16 @@ class PromptResponse(
     prompt = models.ForeignKey(
         Prompt, on_delete=models.PROTECT, related_name="+"
     )
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                "response",
+                "prompt",
+                name="unique_response_prompt",
+                violation_error_message="You cannot submit the same prompt twice for a response.",
+            )
+        ]
 
     def get_subclassed_prompt(self) -> Prompt:
         """
