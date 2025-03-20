@@ -10,7 +10,11 @@ from app.prompts.models import (
     RangedPromptOption,
     TextPrompt,
 )
-from app.utils.models import TimestampedModelMixin, UUIDModelMixin
+from app.utils.models import (
+    GetSubclassesModelMixin,
+    TimestampedModelMixin,
+    UUIDModelMixin,
+)
 
 
 class Response(TimestampedModelMixin, UUIDModelMixin):
@@ -24,7 +28,9 @@ class Response(TimestampedModelMixin, UUIDModelMixin):
         return self.url
 
 
-class PromptResponse(TimestampedModelMixin, UUIDModelMixin):
+class PromptResponse(
+    TimestampedModelMixin, UUIDModelMixin, GetSubclassesModelMixin
+):
     objects = InheritanceManager()
     prompt_type = Prompt
 
@@ -35,7 +41,7 @@ class PromptResponse(TimestampedModelMixin, UUIDModelMixin):
         Prompt, on_delete=models.PROTECT, related_name="+"
     )
 
-    def get_subclass_prompt(self) -> Prompt:
+    def get_subclassed_prompt(self) -> Prompt:
         """
         Ensures we have the subclassed prompt using the prompt_type field
         """
@@ -44,6 +50,17 @@ class PromptResponse(TimestampedModelMixin, UUIDModelMixin):
             self.prompt = self.prompt_type.objects.get(id=self.prompt_id)
 
         return self.prompt
+
+    @classmethod
+    def get_subclass_from_prompt(cls, prompt: Prompt):
+        subclasses = cls.get_subclasses_mapping().values()
+        return next(
+            (
+                subclass
+                for subclass in subclasses
+                if isinstance(prompt, subclass.prompt_type)
+            ),
+        )
 
     def __str__(self):
         return str(self.uuid)
@@ -73,7 +90,8 @@ class BinaryPromptResponse(PromptResponse):
         """
         Returns the selected binary label
         """
-        return self.get_subclass_prompt().get_label(self.value)
+        return self.get_subclassed_prompt().get_label(self.value)
+
 
     def __str__(self):
         return "Binary prompt"
