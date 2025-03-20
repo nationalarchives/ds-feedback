@@ -59,7 +59,7 @@ class RangedPrompt(Prompt):
     field_label = "Ranged Prompt"
 
 
-class RangedPromptOption(models.Model):
+class RangedPromptOption(UUIDModelMixin):
     ranged_prompt = models.ForeignKey(
         RangedPrompt, on_delete=models.CASCADE, related_name="options"
     )
