@@ -64,14 +64,22 @@ class PromptResponse(
 
     @classmethod
     def get_subclass_from_prompt(cls, prompt: Prompt):
+        """
+        Gets the subclassed PromptResponse for a Prompt
+        """
         subclasses = cls.get_subclasses_mapping().values()
-        return next(
-            (
-                subclass
-                for subclass in subclasses
-                if isinstance(prompt, subclass.prompt_type)
-            ),
-        )
+        try:
+            return next(
+                (
+                    subclass
+                    for subclass in subclasses
+                    if isinstance(prompt, subclass.prompt_type)
+                ),
+            )
+        except StopIteration:
+            raise ValueError(
+                f"Could not find PromptResponse subclass for {repr(prompt)}"
+            )
 
     def __str__(self):
         return str(self.uuid)
