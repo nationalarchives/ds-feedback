@@ -32,4 +32,4 @@ def get_inline_formset(context: Context, model_class: ModelBase):
             ),
         )
     except StopIteration:
-        raise ValueError(f"Inline formset for {model_class} not found")
+        raise ValueError(f"Inline formset for {repr(model_class)} not found")
