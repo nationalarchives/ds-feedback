@@ -1,8 +1,11 @@
 from django.db.models.base import ModelBase
 from django.template.context import Context
 from django.template.response import TemplateResponse
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.http import urlencode
+
+from factory.django import DjangoModelFactory
 
 
 def reverse_with_query(viewname: str, query: dict[str, str], *args, **kwargs):
@@ -33,3 +36,13 @@ def get_inline_formset(context: Context, model_class: ModelBase):
         )
     except StopIteration:
         raise ValueError(f"Inline formset for {repr(model_class)} not found")
+
+
+class ResetFactorySequencesMixin(TestCase):
+    """
+    Mixin to reset all factory sequences
+    """
+
+    def setUp(cls):
+        for factory_class in DjangoModelFactory.__subclasses__():
+            factory_class.reset_sequence()
