@@ -30,6 +30,9 @@ class Prompt(
     )
     order = models.PositiveSmallIntegerField()
 
+    def is_enabled(self):
+        return self.disabled_at is None
+
     def __str__(self):
         return self.text
 

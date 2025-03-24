@@ -111,7 +111,6 @@ class BinaryPromptResponse(PromptResponse):
         """
         return self.get_subclassed_prompt().get_label(self.value)
 
-
     def __str__(self):
         return "Binary prompt"
 
