@@ -7,6 +7,7 @@ from app.feedback_forms.models import FeedbackForm, PathPattern
 class FeedbackFormFactory(DjangoModelFactory):
     class Meta:
         model = FeedbackForm
+        skip_postgeneration_save = True
 
     name = Sequence(lambda i: f"Test feedback form {i}")
 
@@ -14,7 +15,7 @@ class FeedbackFormFactory(DjangoModelFactory):
     def path_patterns(self, create, extracted, **kwargs):
         if extracted:
             for pattern in extracted:
-                PathPatternFactory(feedback_form=self, pattern=pattern)
+                PathPatternFactory.create(feedback_form=self, pattern=pattern)
 
 
 class PathPatternFactory(DjangoModelFactory):
