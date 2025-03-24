@@ -1,4 +1,3 @@
-from datetime import datetime
 from http import HTTPStatus
 
 from django.test import TestCase
@@ -34,9 +33,7 @@ class TestAdminResponseView(TestCase):
 
     # As an Admin user I can view a list of responses for a feedback form in Django admin
     def test_search_responses(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,
@@ -57,9 +54,7 @@ class TestAdminResponseView(TestCase):
 
     # As an Admin user I can view the answers within a response in Django admin
     def test_view_reponse(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,

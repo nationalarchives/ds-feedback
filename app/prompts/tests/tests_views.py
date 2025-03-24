@@ -1,4 +1,3 @@
-from datetime import datetime
 from http import HTTPStatus
 
 from django.test import TestCase
@@ -28,9 +27,7 @@ class TestAdminTextPromptsView(TestCase):
 
     # As an Admin user I can search for text prompts in Django admin
     def test_search_text_prompts(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,
@@ -72,9 +69,7 @@ class TestAdminBinaryPromptsView(TestCase):
 
     # As an Admin user I can search for binary prompts in Django admin
     def test_search_binary_prompts(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,
@@ -122,9 +117,7 @@ class TestAdminRangedPromptsView(TestCase):
 
     # As an Admin user I can search for binary prompts in Django admin
     def test_search_range_prompts(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,
@@ -177,9 +170,7 @@ class TestAdminRangedPromptsView(TestCase):
 
     # As an Admin user I can create options for a range prompt in Django admin
     def test_create_range_prompt_options(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,
@@ -221,9 +212,7 @@ class TestAdminRangedPromptsView(TestCase):
 
     # As an Admin user I cannot create duplicate options for a range prompt in Django admin
     def test_create_range_duplicate_prompt_options(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,
