@@ -20,13 +20,14 @@ from app.responses.factories import (
 from app.responses.models import PromptResponse
 from app.users.factories import StaffUserFactory
 from app.utils.testing import (
+    ResetFactorySequencesMixin,
     get_change_list_results,
     get_inline_formset,
     reverse_with_query,
 )
 
 
-class TestAdminResponseView(TestCase):
+class TestAdminResponseView(ResetFactorySequencesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory(is_superuser=True)

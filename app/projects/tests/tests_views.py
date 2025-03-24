@@ -7,10 +7,13 @@ from django.urls import reverse
 from app.projects.factories import ProjectFactory
 from app.projects.models import Project
 from app.users.factories import StaffUserFactory
-from app.utils.testing import get_change_list_results
+from app.utils.testing import (
+    ResetFactorySequencesMixin,
+    get_change_list_results,
+)
 
 
-class TestAdminProjectsView(TestCase):
+class TestAdminProjectsView(ResetFactorySequencesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory(is_superuser=True)

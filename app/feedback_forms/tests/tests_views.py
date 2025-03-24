@@ -9,13 +9,14 @@ from app.projects.factories import ProjectFactory
 from app.prompts.models import BinaryPrompt, Prompt, RangedPrompt, TextPrompt
 from app.users.factories import StaffUserFactory
 from app.utils.testing import (
+    ResetFactorySequencesMixin,
     get_change_list_results,
     get_inline_formset,
     reverse_with_query,
 )
 
 
-class TestAdminFeedbackFormView(TestCase):
+class TestAdminFeedbackFormView(ResetFactorySequencesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory(is_superuser=True)
