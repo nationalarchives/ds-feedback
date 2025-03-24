@@ -1,3 +1,6 @@
+import contextlib
+import logging
+
 from django.db.models.base import ModelBase
 from django.template.context import Context
 from django.template.response import TemplateResponse
@@ -36,6 +39,22 @@ def get_inline_formset(context: Context, model_class: ModelBase):
         )
     except StopIteration:
         raise ValueError(f"Inline formset for {repr(model_class)} not found")
+
+
+@contextlib.contextmanager
+def ignore_request_warnings():
+    """
+    Ignores warnings from the Django request logger
+    """
+
+    logger = logging.getLogger("django.request")
+    original_level = logger.getEffectiveLevel()
+    logger.setLevel(logging.ERROR)
+
+    try:
+        yield
+    finally:
+        logger.setLevel(original_level)
 
 
 class ResetFactorySequencesMixin(TestCase):
