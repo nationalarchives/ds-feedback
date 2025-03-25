@@ -190,8 +190,8 @@ class RangedPromptAdmin(SetDisabledByWhenDisabledAdmin):
     def get_queryset(self, request):
         query_set = super().get_queryset(request)
         # Prefetch only changelist page
-        id = request.resolver_match.kwargs.get("object_id")
-        if id is None:
+        object_id = request.resolver_match.kwargs.get("object_id")
+        if object_id is None:
             query_set = query_set.prefetch_related("options")
 
         return query_set.select_related("created_by", "disabled_by")
