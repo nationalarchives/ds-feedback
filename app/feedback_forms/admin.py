@@ -69,7 +69,9 @@ class PromptDetailsWidget(forms.Widget):
             return ""
 
         url = reverse(
-            get_admin_viewname("prompts", self.instance, "change"),
+            get_admin_viewname(
+                app_label="prompts", model=self.instance, view_name="change"
+            ),
             kwargs={"object_id": self.instance.id},
         )
         return format_html('<a href="{url}">Edit details</a>', url=url)

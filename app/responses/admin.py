@@ -37,9 +37,9 @@ class PromptResponseInline(admin.TabularInline):
         """
         url = reverse(
             get_admin_viewname(
-                "prompts",
-                instance.prompt_type,
-                "change",
+                app_label="prompts",
+                model=instance.prompt_type,
+                view_name="change",
             ),
             kwargs={"object_id": instance.prompt.id},
         )
