@@ -30,12 +30,6 @@ class Prompt(
     )
     order = models.PositiveSmallIntegerField()
 
-    def get_viewname(self):
-        """
-        Gets the viewname for this prompt
-        """
-        return f"admin:prompts_{self._meta.model_name}_change"
-
     def __str__(self):
         return self.text
 
@@ -51,6 +45,14 @@ class BinaryPrompt(Prompt):
 
     positive_answer_label = models.CharField(max_length=64, default="Yes")
     negative_answer_label = models.CharField(max_length=64, default="No")
+
+    def get_label(self, answer: bool) -> str:
+        """
+        Returns the label given a positive or negative answer
+        """
+        return (
+            self.positive_answer_label if answer else self.negative_answer_label
+        )
 
 
 class RangedPrompt(Prompt):
