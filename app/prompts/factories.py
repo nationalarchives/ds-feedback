@@ -1,28 +1,35 @@
 from factory import Sequence
 from factory.django import DjangoModelFactory
 
-from .models import BinaryPrompt, RangedPrompt, RangedPromptOption, TextPrompt
+from .models import (
+    BinaryPrompt,
+    Prompt,
+    RangedPrompt,
+    RangedPromptOption,
+    TextPrompt,
+)
 
 
-class TextPromptFactory(DjangoModelFactory):
+class PromptFactory(DjangoModelFactory):
+    order = Sequence(lambda i: i)
+
+    class Meta:
+        model = Prompt
+
+
+class TextPromptFactory(PromptFactory):
     class Meta:
         model = TextPrompt
 
-    order = Sequence(lambda i: i)
 
-
-class BinaryPromptFactory(DjangoModelFactory):
+class BinaryPromptFactory(PromptFactory):
     class Meta:
         model = BinaryPrompt
 
-    order = Sequence(lambda i: i)
 
-
-class RangedPromptFactory(DjangoModelFactory):
+class RangedPromptFactory(PromptFactory):
     class Meta:
         model = RangedPrompt
-
-    order = Sequence(lambda i: i)
 
 
 class RangedPromptOptionFactory(DjangoModelFactory):

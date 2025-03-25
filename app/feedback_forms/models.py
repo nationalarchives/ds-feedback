@@ -26,6 +26,9 @@ class FeedbackForm(
         Project, on_delete=models.PROTECT, related_name="+"
     )
 
+    def is_enabled(self):
+        return self.disabled_at is None
+
     def __str__(self):
         return self.name
 
