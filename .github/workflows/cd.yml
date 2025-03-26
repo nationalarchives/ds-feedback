@@ -52,3 +52,4 @@ jobs:
           docker-image-name: ${{ vars.DOCKER_IMAGE_NAME }}
           wiz-client-id: ${{ secrets.WIZ_CLIENT_ID }}
           wiz-client-secret: ${{ secrets.WIZ_CLIENT_SECRET }}
+          wiz-project-id: ${{ secrets.WIZ_PROJECT_DIGITALSERVICES }}
