@@ -1,7 +1,8 @@
 from django.db.models import Prefetch
 
+
 from rest_framework import generics
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 
 from app.api.serializers import (
     FeedbackFormSerializer,
@@ -10,8 +11,10 @@ from app.api.serializers import (
     ResponseSerializer,
 )
 from app.feedback_forms.models import FeedbackForm
+from app.projects.models import Project
 from app.prompts.models import Prompt
 from app.responses.models import PromptResponse, Response
+from app.api import acl
 
 
 class ValidateFeedbackFormMixin:
@@ -77,6 +80,16 @@ class FeedbackFormDetail(generics.RetrieveAPIView):
     def get_object(self):
         return generics.get_object_or_404(self.get_queryset())
 
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not acl.can_user_view_feedback_forms(
+            user=request.user, project=self.object.project,
+        ):
+            raise PermissionDenied()
+
+        self.validate_feedback_form_exists(kwargs)
+        return super().get(request, *args, **kwargs)
+
 
 class PromptList(generics.ListAPIView, ValidateFeedbackFormMixin):
     queryset = Prompt.objects.all()
@@ -119,16 +132,31 @@ class ResponseListCreate(generics.ListCreateAPIView, ValidateFeedbackFormMixin):
                 ),
             )
         )
-
+    
     def create(self, request, *args, **kwargs):
+        project = self.get_project()
+        if not acl.can_user_submit_response(
+            user=request.user, project=project
+        ):
+            raise PermissionDenied()
+
         self.validate_feedback_form_exists(kwargs, ensure_enabled=True)
 
         request.data["feedback_form"] = kwargs["feedback_form_id"]
         return super().create(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
+        project = self.get_project()
+        if not acl.can_user_read_project_data(
+            user=request.user, project=project
+        ):
+            raise PermissionDenied()
+
         self.validate_feedback_form_exists(kwargs)
         return super().list(request, *args, **kwargs)
+
+    def get_project(self) -> Project:
+        return generics.get_object_or_404(Project, uuid=self.kwargs["project_id"])
 
 
 class ResponseDetail(generics.RetrieveAPIView, ValidateFeedbackFormMixin):
@@ -152,13 +180,22 @@ class ResponseDetail(generics.RetrieveAPIView, ValidateFeedbackFormMixin):
                 ),
             )
         )
+    
+    def dispatch(self, request, *args, **kwargs):
+        self.validate_feedback_form_exists(kwargs)
+        project = self.get_project()
+        if not acl.can_user_read_project_data(
+            user=request.user, project=project
+        ):
+            raise PermissionDenied()
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_object(self):
         return generics.get_object_or_404(self.get_queryset())
 
-    def get(self, request, *args, **kwargs):
-        self.validate_feedback_form_exists(kwargs)
-        return super().get(request, *args, **kwargs)
+    def get_project(self) -> Project:
+        return generics.get_object_or_404(Project, uuid=self.kwargs["project_id"])
 
 
 class PromptResponseListCreate(
@@ -180,19 +217,34 @@ class PromptResponseListCreate(
             )
         )
 
-    def create(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         self.validate_feedback_form_exists(kwargs, ensure_enabled=True)
         self.validate_response_exists(kwargs)
+        return super().dispatch(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        project = self.get_project()
+        if not acl.can_user_submit_response(
+            user=request.user, project=project
+        ):
+            raise PermissionDenied()
 
         request.data["response_id"] = kwargs["response_id"]
         request.data["feedback_form_id"] = kwargs["feedback_form_id"]
         return super().create(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
-        self.validate_feedback_form_exists(kwargs)
-        self.validate_response_exists(kwargs)
+        project = self.get_project()
+        if not acl.can_user_read_project_data(
+            user=request.user, project=project
+        ):
+            raise PermissionDenied()
 
         return super().list(request, *args, **kwargs)
+
+    def get_project(self) -> Project:
+        return generics.get_object_or_404(Project, uuid=self.kwargs["project_id"])
+
 
 
 class PromptResponseDetail(
@@ -221,4 +273,14 @@ class PromptResponseDetail(
         self.validate_feedback_form_exists(kwargs)
         self.validate_response_exists(kwargs)
 
+        project = self.get_project()
+        if not acl.can_user_read_project_data(
+            user=request.user, project=project
+        ):
+            raise PermissionDenied()
+
         return super().get(request, *args, **kwargs)
+
+    def get_project(self) -> Project:
+        return generics.get_object_or_404(Project, uuid=self.kwargs["project_id"])
+
