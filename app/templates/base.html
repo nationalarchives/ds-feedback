@@ -6,6 +6,7 @@
 {%- from 'components/footer/macro.html' import tnaFooter -%}
 {%- from 'components/global-header/macro.html' import tnaGlobalHeader -%}
 {%- from 'components/header/macro.html' import tnaHeader -%}
+{%- from 'components/pagination/macro.html' import tnaPagination -%}
 {%- from 'components/phase-banner/macro.html' import tnaPhaseBanner -%}
 
 {%- set theme = request.COOKIES['theme'] or 'system' -%}
@@ -65,7 +66,8 @@
 {{ tnaHeader({
   'logo': {
     'href': url('main:index'),
-    'title': 'Service home page'
+    'strapline': "Feedback",
+    'title': 'Feedback Service home page'
   }
 }) | indent(6) }}
 {% endblock %}

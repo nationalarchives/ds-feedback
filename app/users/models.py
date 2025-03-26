@@ -2,4 +2,5 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    pass
+    def get_display_name(self):
+        return self.get_full_name() or self.get_username()

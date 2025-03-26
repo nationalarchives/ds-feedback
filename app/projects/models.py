@@ -7,6 +7,11 @@ from app.utils.models import TimestampedModel, UUIDModel
 RETENTION_PERIOD_CHOICES: list[int] = [30, 60, 180]
 
 
+class ProjectQuerySet(models.QuerySet):
+    def owned_by(self, user: User):
+        return self.filter(owned_by=user)
+
+
 class Project(TimestampedModel, UUIDModel):
     """
     Model for a project, which is a grouping for feedback prompts and data collected from a particular domain.
@@ -26,6 +31,8 @@ class Project(TimestampedModel, UUIDModel):
     created_by = models.ForeignKey(
         User, on_delete=models.PROTECT, editable=False, related_name="+"
     )
+
+    objects = ProjectQuerySet.as_manager()
 
     class Meta:
         constraints = [
