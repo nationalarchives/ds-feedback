@@ -1,4 +1,5 @@
 import json
+import time
 import uuid
 from http import HTTPStatus
 
@@ -7,7 +8,7 @@ from django.utils import timezone
 
 from rest_framework.test import APITestCase
 
-from app.feedback_forms.factories import FeedbackFormFactory
+from app.feedback_forms.factories import FeedbackFormFactory, PathPatternFactory
 from app.projects.factories import ProjectFactory
 from app.prompts.factories import (
     BinaryPromptFactory,
@@ -1408,3 +1409,56 @@ class TestPromptResponseDetail(APITestCase, ResetFactorySequencesMixin):
             content["detail"],
             f"Response id={response_uuid} does not exist in feedback form id={self.feedback_form.uuid}.",
         )
+
+
+class TestFeedbackFormPathPatternDetail(
+    APITestCase, ResetFactorySequencesMixin
+):
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin_user = StaffUserFactory(is_superuser=True)
+
+        cls.projects = []
+        cls.feedback_forms = []
+        cls.path_patterns = []
+        for project_index in range(20000):
+            project = ProjectFactory.create(
+                created_by=cls.admin_user, name=project_index
+            )
+            cls.projects.append(project)
+
+            for feedback_index in range(5):
+                feedback_form = FeedbackFormFactory.create(
+                    name=feedback_index,
+                    project=project,
+                    created_by=cls.admin_user,
+                )
+                cls.feedback_forms.append(feedback_form)
+
+                for path_index in range(10):
+                    path_pattern = PathPatternFactory.create(
+                        feedback_form=feedback_form,
+                        pattern=f"/path/{feedback_index}/{path_index}/",
+                        is_wildcard=True,
+                    )
+                    cls.path_patterns.append(path_pattern)
+
+    def test_get_feedback_form(self):
+        self.client.force_login(self.admin_user)
+
+        start = time.time()
+        response = self.client.get(
+            reverse(
+                "api:feedback-form-path_detail",
+                kwargs={
+                    "project_id": self.projects[0].uuid,
+                    "path": "/path/1/1/",
+                },
+            ),
+        )
+        end = time.time()
+        milliseconds = 1000 * (end - start)
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        print("🍋", milliseconds)
+        self.assertLess(milliseconds, 20)

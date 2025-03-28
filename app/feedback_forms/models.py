@@ -35,12 +35,22 @@ class FeedbackForm(
 
 class PathPattern(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
     pattern = models.CharField(max_length=512)
+    is_wildcard = models.BooleanField(default=False)
     feedback_form = models.ForeignKey(
         FeedbackForm, on_delete=models.CASCADE, related_name="path_patterns"
     )
     project = models.ForeignKey(
         Project, on_delete=models.PROTECT, related_name="+"
     )
+
+    @property
+    def pattern_with_wildcard(self):
+        return self.pattern + ("*" if self.is_wildcard else "")
+
+    @pattern_with_wildcard.setter
+    def pattern_with_wildcard(self, pattern):
+        self.is_wildcard = pattern.endswith("*")
+        self.pattern = pattern[:-1] if self.is_wildcard else pattern
 
     def clean(self):
         super().clean()
@@ -53,14 +63,16 @@ class PathPattern(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
 
         if (
             PathPattern.objects.filter(
-                pattern__iexact=self.pattern, project_id=self.project_id
+                pattern__iexact=self.pattern,
+                project_id=self.project_id,
+                is_wildcard=self.is_wildcard,
             )
             .exclude(id=self.id)
             .exists()
         ):
             raise ValidationError(
                 {
-                    "pattern": "You cannot use the same pattern twice in a project."
+                    "pattern_with_wildcard": "You cannot use the same pattern twice in a project."
                 }
             )
 
@@ -69,10 +81,11 @@ class PathPattern(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
             UniqueConstraint(
                 "project",
                 Lower("pattern"),
+                "is_wildcard",
                 name="unique_project_pattern",
                 violation_error_message="You cannot use the same pattern twice in a project.",
             )
         ]
 
     def __str__(self):
-        return self.pattern
+        return self.pattern_with_wildcard

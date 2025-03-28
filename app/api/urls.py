@@ -1,7 +1,8 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from app.api.views import (
     FeedbackFormDetail,
+    FeedbackFormPathPatternDetail,
     PromptList,
     PromptResponseDetail,
     PromptResponseListCreate,
@@ -16,6 +17,11 @@ urlpatterns = [
         "projects/<str:project_id>/feedback-forms/<str:feedback_form_id>/",
         FeedbackFormDetail.as_view(),
         name="feedback-form_detail",
+    ),
+    re_path(
+        r"^projects/(?P<project_id>[^\/]+)/feedback-forms/path/(?P<path>.+)/$",
+        FeedbackFormPathPatternDetail.as_view(),
+        name="feedback-form-path_detail",
     ),
     path(
         "projects/<str:project_id>/feedback-forms/<str:feedback_form_id>/prompts/",
