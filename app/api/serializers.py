@@ -33,8 +33,12 @@ class RangedPromptOptionSerializer(serializers.ModelSerializer):
 
 class PromptSerializer(serializers.ModelSerializer):
     id = serializers.CharField(read_only=True, source="uuid")
+    feedback_form = serializers.SlugRelatedField(
+        slug_field="uuid", read_only=True
+    )
+    prompt_type = serializers.CharField(read_only=True, source="type")
     text = serializers.CharField(read_only=True)
-    prompt_type = serializers.CharField(read_only=True, source="field_label")
+
     is_enabled = serializers.BooleanField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
     modified_at = serializers.DateTimeField(read_only=True)
@@ -43,6 +47,7 @@ class PromptSerializer(serializers.ModelSerializer):
         model = Prompt
         fields = [
             "id",
+            "feedback_form",
             "prompt_type",
             "text",
             "is_enabled",
@@ -144,7 +149,9 @@ class FeedbackFormSerializer(serializers.ModelSerializer):
 class PromptResponseSerializer(serializers.ModelSerializer):
     id = serializers.CharField(read_only=True, source="uuid")
     created_at = serializers.DateTimeField(read_only=True)
-
+    response = serializers.SlugRelatedField(
+        queryset=Response.objects.all(), slug_field="uuid"
+    )
     prompt = serializers.SlugRelatedField(
         queryset=Prompt.objects.all()
         .select_related("feedback_form")
@@ -154,7 +161,7 @@ class PromptResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PromptResponse
-        fields = ["id", "created_at", "prompt"]
+        fields = ["id", "created_at", "prompt", "response"]
 
     @classmethod
     def get_subclass_from_prompt_response(
@@ -185,6 +192,11 @@ class PromptResponseSerializer(serializers.ModelSerializer):
         Calls to_representation() on the subclassed PromptResponseSerializer
         """
 
+        # Propagate prefetched value to subclass instance.
+        # This is needed because select_subclasses() doesn't play well with nested subclass relations
+        if isinstance(instance, RangedPromptResponse):
+            instance.value = instance.rangedpromptresponse.value
+
         # On create, PromptResponse and Prompt aren't loaded as subclasses, so we fetch the subclasses
         if type(instance) is PromptResponse:
             instance = PromptResponse.objects.get_subclass(id=instance.id)
@@ -204,16 +216,15 @@ class PromptResponseSerializer(serializers.ModelSerializer):
         Validates that a PromptResponse doesn't already exist for this Prompt/Response
         """
 
-        if hasattr(self, "initial_data") and "response_id" in self.initial_data:
+        if "response" in data:
             prompt_response_exists = PromptResponse.objects.filter(
-                response__uuid=self.initial_data["response_id"],
-                prompt=data["prompt"],
+                response=data["response"], prompt=data["prompt"]
             ).exists()
 
             if prompt_response_exists:
                 raise ValidationError(
                     {
-                        "prompt": f"Prompt response already exists for prompt id={data["prompt"].uuid} and response id={self.initial_data["response_id"]}."
+                        "prompt": f"Prompt response already exists for prompt id={data["prompt"].uuid} and response id={data["response"].uuid}."
                     }
                 )
 
@@ -224,24 +235,20 @@ class PromptResponseSerializer(serializers.ModelSerializer):
 
         prompt = data["prompt"]
 
-        if (
-            hasattr(self, "initial_data")
-            and "feedback_form_id" in self.initial_data
-        ):
-            if (
-                str(prompt.feedback_form.uuid)
-                != self.initial_data["feedback_form_id"]
-            ):
+        if "response" in data:
+            response = data["response"]
+
+            if prompt.feedback_form_id != response.feedback_form_id:
                 raise ValidationError(
                     {
-                        "prompt": f"Prompt id={prompt.uuid} does not exist in feedback form id={self.initial_data["feedback_form_id"]}."
+                        "prompt": f"Prompt id={prompt.uuid} does not exist in feedback form id={response.feedback_form.uuid}."
                     }
                 )
 
             if prompt.disabled_at is not None:
                 raise ValidationError(
                     {
-                        "prompt": f"Prompt id={prompt.uuid} is not enabled in feedback form id={self.initial_data["feedback_form_id"]}."
+                        "prompt": f"Prompt id={prompt.uuid} is not enabled in feedback form id={response.feedback_form.uuid}."
                     }
                 )
 
@@ -265,9 +272,11 @@ class PromptResponseSerializer(serializers.ModelSerializer):
                 )
             )
 
-            return PromptResponseSerializerSubclass(data=data).run_validation(
-                data
-            )
+            serializer_subclass = PromptResponseSerializerSubclass(data=data)
+            serializer_subclass.fields["response"].required = self.fields[
+                "response"
+            ].required
+            return serializer_subclass.run_validation(data)
 
         return super().run_validation(data)
 
@@ -283,12 +292,7 @@ class PromptResponseSerializer(serializers.ModelSerializer):
         """
         prompt = validated_data["prompt"]
         PromptResponseSubclass = PromptResponse.get_subclass_from_prompt(prompt)
-        return PromptResponseSubclass.objects.create(
-            response=Response.objects.get(
-                uuid=self.initial_data["response_id"]
-            ),
-            **validated_data,
-        )
+        return PromptResponseSubclass.objects.create(**validated_data)
 
 
 class TextPromptResponseSerializer(PromptResponseSerializer):
@@ -391,6 +395,14 @@ class ResponseSerializer(serializers.ModelSerializer):
             )
 
         return data
+
+    def run_validation(self, data=empty):
+        """
+        Disables requirement for first_prompt_response.response, since this does not exist until save
+        """
+        self.fields["first_prompt_response"].fields["response"].required = False
+
+        return super().run_validation(data)
 
     @transaction.atomic
     def create(self, validated_data):

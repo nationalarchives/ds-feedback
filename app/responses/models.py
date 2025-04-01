@@ -20,7 +20,7 @@ from app.utils.models import (
 
 class Response(TimestampedModelMixin, UUIDModelMixin):
     feedback_form = models.ForeignKey(
-        FeedbackForm, on_delete=models.PROTECT, related_name="+"
+        FeedbackForm, on_delete=models.PROTECT, related_name="responses"
     )
     url = models.TextField()
     metadata = models.JSONField()

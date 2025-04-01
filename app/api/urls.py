@@ -2,43 +2,55 @@ from django.urls import path
 
 from app.api.views import (
     FeedbackFormDetail,
-    PromptList,
+    FeedbackFormList,
+    PromptResponseCreate,
     PromptResponseDetail,
-    PromptResponseListCreate,
+    PromptResponseList,
+    ResponseCreate,
     ResponseDetail,
-    ResponseListCreate,
+    ResponseList,
 )
 
 app_name = "api"
 
 urlpatterns = [
     path(
-        "projects/<str:project_id>/feedback-forms/<str:feedback_form_id>/",
+        "core/projects/<uuid:project>/feedback-forms/",
+        FeedbackFormList.as_view(),
+        name="feedback-form_list",
+    ),
+    path(
+        "core/projects/<uuid:project>/feedback-forms/<uuid:id>/",
         FeedbackFormDetail.as_view(),
         name="feedback-form_detail",
     ),
     path(
-        "projects/<str:project_id>/feedback-forms/<str:feedback_form_id>/prompts/",
-        PromptList.as_view(),
-        name="prompt_list",
+        "submit/responses/",
+        ResponseCreate.as_view(),
+        name="response_create",
     ),
     path(
-        "projects/<str:project_id>/feedback-forms/<str:feedback_form_id>/responses/",
-        ResponseListCreate.as_view(),
+        "submit/prompt-responses/",
+        PromptResponseCreate.as_view(),
+        name="prompt-response_create",
+    ),
+    path(
+        "explore/responses/",
+        ResponseList.as_view(),
         name="response_list",
     ),
     path(
-        "projects/<str:project_id>/feedback-forms/<str:feedback_form_id>/responses/<str:response_id>/",
+        "explore/responses/<uuid:id>/",
         ResponseDetail.as_view(),
         name="response_detail",
     ),
     path(
-        "projects/<str:project_id>/feedback-forms/<str:feedback_form_id>/responses/<str:response_id>/prompt-responses/",
-        PromptResponseListCreate.as_view(),
+        "explore/prompt-responses/",
+        PromptResponseList.as_view(),
         name="prompt-response_list",
     ),
     path(
-        "projects/<str:project_id>/feedback-forms/<str:feedback_form_id>/responses/<str:response_id>/prompt-responses/<str:prompt_response_id>/",
+        "explore/prompt-responses/<uuid:id>/",
         PromptResponseDetail.as_view(),
         name="prompt-response_detail",
     ),

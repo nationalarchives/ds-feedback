@@ -36,6 +36,9 @@ class Prompt(
     def __str__(self):
         return self.text
 
+    def type(self):
+        return self.__class__.__name__
+
 
 class TextPrompt(Prompt):
     field_label = "Text Prompt"

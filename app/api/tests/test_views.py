@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from rest_framework.test import APITestCase
 
-from app.feedback_forms.factories import FeedbackFormFactory
+from app.feedback_forms.factories import FeedbackFormFactory, PathPatternFactory
 from app.projects.factories import ProjectFactory
 from app.prompts.factories import (
     BinaryPromptFactory,
@@ -25,6 +25,7 @@ from app.users.factories import StaffUserFactory
 from app.utils.testing import (
     ResetFactorySequencesMixin,
     ignore_request_warnings,
+    reverse_with_query,
 )
 
 
@@ -39,6 +40,39 @@ class TestFeedbackFormDetail(APITestCase, ResetFactorySequencesMixin):
             created_by=cls.admin_user,
         )
 
+        cls.text_prompt = TextPromptFactory.create(
+            created_by=cls.admin_user,
+            feedback_form=cls.feedback_form,
+            order=1,
+            text="How could it be improved?",
+        )
+        cls.binary_prompt = BinaryPromptFactory.create(
+            created_by=cls.admin_user,
+            feedback_form=cls.feedback_form,
+            order=2,
+            text="Was this page helpful?",
+            positive_answer_label="Yes",
+            negative_answer_label="No",
+        )
+        cls.ranged_prompt = RangedPromptFactory.create(
+            created_by=cls.admin_user,
+            feedback_form=cls.feedback_form,
+            order=3,
+            text="Are you satisfied with page?",
+        )
+        cls.option_1 = RangedPromptOptionFactory.create(
+            ranged_prompt=cls.ranged_prompt,
+            label="Unsatisfied",
+        )
+        cls.option_2 = RangedPromptOptionFactory.create(
+            ranged_prompt=cls.ranged_prompt,
+            label="Neutral",
+        )
+        cls.option_3 = RangedPromptOptionFactory.create(
+            ranged_prompt=cls.ranged_prompt,
+            label="Satisfied",
+        )
+
     def test_get_feedback_form(self):
         self.client.force_login(self.admin_user)
 
@@ -46,60 +80,8 @@ class TestFeedbackFormDetail(APITestCase, ResetFactorySequencesMixin):
             reverse(
                 "api:feedback-form_detail",
                 kwargs={
-                    "project_id": self.project.uuid,
-                    "feedback_form_id": self.feedback_form.uuid,
-                },
-            ),
-        )
-
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-        self.assertEqual(response.data["name"], "Test feedback form")
-        self.assertEqual(response.data["is_enabled"], True)
-        self.assertEqual(response.data["prompts"], [])
-
-    def test_get_feedback_form_with_prompts(self):
-        text_prompt = TextPromptFactory.create(
-            created_by=self.admin_user,
-            feedback_form=self.feedback_form,
-            order=1,
-            text="How could it be improved?",
-        )
-        binary_prompt = BinaryPromptFactory.create(
-            created_by=self.admin_user,
-            feedback_form=self.feedback_form,
-            order=2,
-            text="Was this page helpful?",
-            positive_answer_label="Yes",
-            negative_answer_label="No",
-        )
-        ranged_prompt = RangedPromptFactory.create(
-            created_by=self.admin_user,
-            feedback_form=self.feedback_form,
-            order=3,
-            text="Are you satisfied with page?",
-        )
-        option_1 = RangedPromptOptionFactory.create(
-            ranged_prompt=ranged_prompt,
-            label="Unsatisfied",
-        )
-        option_2 = RangedPromptOptionFactory.create(
-            ranged_prompt=ranged_prompt,
-            label="Neutral",
-        )
-        option_3 = RangedPromptOptionFactory.create(
-            ranged_prompt=ranged_prompt,
-            label="Satisfied",
-        )
-
-        self.client.force_login(self.admin_user)
-
-        response = self.client.get(
-            reverse(
-                "api:feedback-form_detail",
-                kwargs={
-                    "project_id": self.project.uuid,
-                    "feedback_form_id": self.feedback_form.uuid,
+                    "project": self.project.uuid,
+                    "id": self.feedback_form.uuid,
                 },
             )
         )
@@ -111,177 +93,171 @@ class TestFeedbackFormDetail(APITestCase, ResetFactorySequencesMixin):
         self.assertEqual(len(response.data["prompts"]), 3)
 
         prompt_1 = response.data["prompts"][0]
-        self.assertEqual(prompt_1["prompt_type"], text_prompt.field_label)
-        self.assertEqual(prompt_1["text"], text_prompt.text)
-        self.assertEqual(prompt_1["is_enabled"], text_prompt.is_enabled())
-        self.assertEqual(prompt_1["max_length"], text_prompt.max_length)
+        self.assertEqual(prompt_1["prompt_type"], self.text_prompt.type())
+        self.assertEqual(prompt_1["text"], self.text_prompt.text)
+        self.assertEqual(prompt_1["is_enabled"], self.text_prompt.is_enabled())
+        self.assertEqual(prompt_1["max_length"], self.text_prompt.max_length)
 
         prompt_2 = response.data["prompts"][1]
-        self.assertEqual(prompt_2["prompt_type"], binary_prompt.field_label)
-        self.assertEqual(prompt_2["text"], binary_prompt.text)
-        self.assertEqual(prompt_2["is_enabled"], binary_prompt.is_enabled())
+        self.assertEqual(prompt_2["prompt_type"], self.binary_prompt.type())
+        self.assertEqual(prompt_2["text"], self.binary_prompt.text)
+        self.assertEqual(
+            prompt_2["is_enabled"], self.binary_prompt.is_enabled()
+        )
         self.assertEqual(
             prompt_2["positive_answer_label"],
-            binary_prompt.positive_answer_label,
+            self.binary_prompt.positive_answer_label,
         )
         self.assertEqual(
             prompt_2["negative_answer_label"],
-            binary_prompt.negative_answer_label,
+            self.binary_prompt.negative_answer_label,
         )
 
         prompt_3 = response.data["prompts"][2]
-        self.assertEqual(prompt_3["prompt_type"], ranged_prompt.field_label)
-        self.assertEqual(prompt_3["text"], ranged_prompt.text)
-        self.assertEqual(prompt_3["is_enabled"], ranged_prompt.is_enabled())
-        self.assertEqual(len(prompt_3["options"]), 3)
-        self.assertEqual(prompt_3["options"][0]["label"], option_1.label)
-        self.assertEqual(prompt_3["options"][1]["label"], option_2.label)
-        self.assertEqual(prompt_3["options"][2]["label"], option_3.label)
-
-    def test_get_mismatched_project(self):
-        other_project = ProjectFactory.create(created_by=self.admin_user)
-
-        self.client.force_login(self.admin_user)
-
-        with ignore_request_warnings():
-            response = self.client.get(
-                reverse(
-                    "api:feedback-form_detail",
-                    kwargs={
-                        "project_id": other_project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                    },
-                )
-            )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
+        self.assertEqual(prompt_3["prompt_type"], self.ranged_prompt.type())
+        self.assertEqual(prompt_3["text"], self.ranged_prompt.text)
         self.assertEqual(
-            content["detail"],
-            "No FeedbackForm matches the given query.",
+            prompt_3["is_enabled"], self.ranged_prompt.is_enabled()
         )
+        self.assertEqual(len(prompt_3["options"]), 3)
+        self.assertEqual(prompt_3["options"][0]["label"], self.option_1.label)
+        self.assertEqual(prompt_3["options"][1]["label"], self.option_2.label)
+        self.assertEqual(prompt_3["options"][2]["label"], self.option_3.label)
 
 
-class TestPromptList(APITestCase, ResetFactorySequencesMixin):
+class TestFeedbackFormList(APITestCase, ResetFactorySequencesMixin):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory(is_superuser=True)
-        cls.project = ProjectFactory.create(created_by=cls.admin_user)
-        cls.feedback_form = FeedbackFormFactory.create(
-            name="Test feedback form",
-            project=cls.project,
+        cls.project_1 = ProjectFactory.create(created_by=cls.admin_user)
+        cls.project_2 = ProjectFactory.create(created_by=cls.admin_user)
+
+        cls.feedback_form_1 = FeedbackFormFactory.create(
+            name="Test feedback form 1",
+            project=cls.project_1,
             created_by=cls.admin_user,
         )
 
-    def test_get_prompts(self):
-        text_prompt = TextPromptFactory.create(
-            created_by=self.admin_user,
-            feedback_form=self.feedback_form,
+        cls.feedback_form_2 = FeedbackFormFactory.create(
+            name="Test feedback form 2",
+            project=cls.project_1,
+            created_by=cls.admin_user,
+        )
+
+        cls.feedback_form_3 = FeedbackFormFactory.create(
+            name="Test feedback form 3",
+            project=cls.project_2,
+            created_by=cls.admin_user,
+        )
+
+        cls.text_prompt = TextPromptFactory.create(
+            created_by=cls.admin_user,
+            feedback_form=cls.feedback_form_1,
             order=1,
             text="How could it be improved?",
         )
 
-        binary_prompt = BinaryPromptFactory.create(
-            created_by=self.admin_user,
-            feedback_form=self.feedback_form,
+        cls.binary_prompt = BinaryPromptFactory.create(
+            created_by=cls.admin_user,
+            feedback_form=cls.feedback_form_1,
             order=2,
             text="Was this page helpful?",
             positive_answer_label="Yes",
             negative_answer_label="No",
         )
 
-        ranged_prompt = RangedPromptFactory.create(
-            created_by=self.admin_user,
-            feedback_form=self.feedback_form,
+        cls.ranged_prompt = RangedPromptFactory.create(
+            created_by=cls.admin_user,
+            feedback_form=cls.feedback_form_2,
             order=3,
             text="Are you satisfied with page?",
         )
-        option_1 = RangedPromptOptionFactory.create(
-            ranged_prompt=ranged_prompt,
+        cls.option_1 = RangedPromptOptionFactory.create(
+            ranged_prompt=cls.ranged_prompt,
             label="Unsatisfied",
         )
-        option_2 = RangedPromptOptionFactory.create(
-            ranged_prompt=ranged_prompt,
+        cls.option_2 = RangedPromptOptionFactory.create(
+            ranged_prompt=cls.ranged_prompt,
             label="Neutral",
         )
-        option_3 = RangedPromptOptionFactory.create(
-            ranged_prompt=ranged_prompt,
+        cls.option_3 = RangedPromptOptionFactory.create(
+            ranged_prompt=cls.ranged_prompt,
             label="Satisfied",
         )
 
+    def test_get_feedback_form(self):
         self.client.force_login(self.admin_user)
 
         response = self.client.get(
             reverse(
-                "api:prompt_list",
+                "api:feedback-form_list",
                 kwargs={
-                    "project_id": self.project.uuid,
-                    "feedback_form_id": self.feedback_form.uuid,
+                    "project": self.project_1.uuid,
                 },
             )
         )
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-        self.assertEqual(len(response.data), 3)
+        self.assertEqual(len(response.data), 2)
 
-        prompt_1 = response.data[0]
-        self.assertEqual(prompt_1["prompt_type"], text_prompt.field_label)
-        self.assertEqual(prompt_1["text"], text_prompt.text)
-        self.assertEqual(prompt_1["is_enabled"], text_prompt.is_enabled())
-        self.assertEqual(prompt_1["max_length"], text_prompt.max_length)
-
-        prompt_2 = response.data[1]
-        self.assertEqual(prompt_2["prompt_type"], binary_prompt.field_label)
-        self.assertEqual(prompt_2["text"], binary_prompt.text)
-        self.assertEqual(prompt_2["is_enabled"], binary_prompt.is_enabled())
+        feedback_form_1 = response.data[0]
+        self.assertEqual(feedback_form_1["name"], self.feedback_form_1.name)
         self.assertEqual(
-            prompt_2["positive_answer_label"],
-            binary_prompt.positive_answer_label,
+            feedback_form_1["is_enabled"], self.feedback_form_1.is_enabled()
         )
         self.assertEqual(
-            prompt_2["negative_answer_label"],
-            binary_prompt.negative_answer_label,
+            len(feedback_form_1["prompts"]),
+            self.feedback_form_1.prompts.count(),
         )
 
-        prompt_3 = response.data[2]
-        self.assertEqual(prompt_3["prompt_type"], ranged_prompt.field_label)
-        self.assertEqual(prompt_3["text"], ranged_prompt.text)
-        self.assertEqual(prompt_3["is_enabled"], ranged_prompt.is_enabled())
-        self.assertEqual(len(prompt_3["options"]), 3)
-        self.assertEqual(prompt_3["options"][0]["label"], option_1.label)
-        self.assertEqual(prompt_3["options"][1]["label"], option_2.label)
-        self.assertEqual(prompt_3["options"][2]["label"], option_3.label)
+        feedback_form_2 = response.data[1]
+        self.assertEqual(feedback_form_2["name"], self.feedback_form_2.name)
+        self.assertEqual(
+            feedback_form_2["is_enabled"], self.feedback_form_2.is_enabled()
+        )
+
+        self.assertEqual(
+            len(feedback_form_2["prompts"]),
+            self.feedback_form_2.prompts.count(),
+        )
 
 
 class TestResponseListCreate(APITestCase, ResetFactorySequencesMixin):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory(is_superuser=True)
-        cls.project = ProjectFactory.create(created_by=cls.admin_user)
-        cls.feedback_form = FeedbackFormFactory.create(
-            name="Test feedback form",
-            project=cls.project,
+
+        cls.project_1 = ProjectFactory.create(created_by=cls.admin_user)
+        cls.project_2 = ProjectFactory.create(created_by=cls.admin_user)
+
+        cls.feedback_form_1 = FeedbackFormFactory.create(
+            name="Test feedback form 1",
+            project=cls.project_1,
+            created_by=cls.admin_user,
+        )
+        cls.feedback_form_2 = FeedbackFormFactory.create(
+            name="Test feedback form 2",
+            project=cls.project_2,
             created_by=cls.admin_user,
         )
 
         cls.disabled_prompt = TextPromptFactory.create(
             created_by=cls.admin_user,
-            feedback_form=cls.feedback_form,
+            feedback_form=cls.feedback_form_1,
             order=1,
             text="What did you think of this page?",
             disabled_at=timezone.now(),
         )
         cls.text_prompt = TextPromptFactory.create(
             created_by=cls.admin_user,
-            feedback_form=cls.feedback_form,
+            feedback_form=cls.feedback_form_1,
             order=2,
             text="How could it be improved?",
         )
         cls.binary_prompt = BinaryPromptFactory.create(
             created_by=cls.admin_user,
-            feedback_form=cls.feedback_form,
+            feedback_form=cls.feedback_form_1,
             order=3,
             text="Was this page helpful?",
             positive_answer_label="Yes",
@@ -289,7 +265,7 @@ class TestResponseListCreate(APITestCase, ResetFactorySequencesMixin):
         )
         cls.ranged_prompt = RangedPromptFactory.create(
             created_by=cls.admin_user,
-            feedback_form=cls.feedback_form,
+            feedback_form=cls.feedback_form_1,
             order=4,
             text="Are you satisfied with page?",
         )
@@ -307,118 +283,46 @@ class TestResponseListCreate(APITestCase, ResetFactorySequencesMixin):
             label="Satisfied",
         )
 
-    def test_get_no_responses(self):
-        self.client.force_login(self.admin_user)
-
-        response = self.client.get(
-            reverse(
-                "api:response_list",
-                kwargs={
-                    "project_id": self.project.uuid,
-                    "feedback_form_id": self.feedback_form.uuid,
-                },
-            )
-        )
-
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertEqual(response.data, [])
-
-    def test_get_mismatched_project(self):
-        other_project = ProjectFactory.create(created_by=self.admin_user)
-
-        self.client.force_login(self.admin_user)
-
-        with ignore_request_warnings():
-            response = self.client.get(
-                reverse(
-                    "api:response_list",
-                    kwargs={
-                        "project_id": other_project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                    },
-                )
-            )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Feedback form id={self.feedback_form.uuid} does not exist in project id={other_project.uuid}.",
-        )
-
-    def test_get_missing_feedback_form(self):
-        self.client.force_login(self.admin_user)
-
-        feedback_form_id = uuid.uuid4()
-
-        with ignore_request_warnings():
-            response = self.client.get(
-                reverse(
-                    "api:response_list",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": feedback_form_id,
-                    },
-                )
-            )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Feedback form id={feedback_form_id} does not exist in project id={self.project.uuid}.",
-        )
-
-    def test_get_responses(self):
-        response_1 = ResponseFactory.create(
-            feedback_form=self.feedback_form,
+        cls.response_1 = ResponseFactory.create(
+            feedback_form=cls.feedback_form_1,
             url="https://example.com/path/1",
         )
         TextPromptResponseFactory.create(
-            prompt=self.text_prompt,
-            response=response_1,
+            prompt=cls.text_prompt,
+            response=cls.response_1,
             value="More pictures of cats please!",
         )
         BinaryPromptResponseFactory.create(
-            prompt=self.binary_prompt, response=response_1, value=True
+            prompt=cls.binary_prompt, response=cls.response_1, value=True
         )
         RangedPromptResponseFactory.create(
-            prompt=self.ranged_prompt,
-            response=response_1,
-            value=self.option_satisfied,
+            prompt=cls.ranged_prompt,
+            response=cls.response_1,
+            value=cls.option_satisfied,
         )
 
         response_2 = ResponseFactory.create(
-            feedback_form=self.feedback_form,
+            feedback_form=cls.feedback_form_2,
             url="https://example.com/path/2",
         )
         TextPromptResponseFactory.create(
-            prompt=self.text_prompt,
+            prompt=cls.text_prompt,
             response=response_2,
             value="Less pictures of cats please!",
         )
         BinaryPromptResponseFactory.create(
-            prompt=self.binary_prompt, response=response_2, value=False
+            prompt=cls.binary_prompt, response=response_2, value=False
         )
         RangedPromptResponseFactory.create(
-            prompt=self.ranged_prompt,
+            prompt=cls.ranged_prompt,
             response=response_2,
-            value=self.option_unsatisfied,
+            value=cls.option_unsatisfied,
         )
 
+    def test_get_responses(self):
         self.client.force_login(self.admin_user)
 
-        response = self.client.get(
-            reverse(
-                "api:response_list",
-                kwargs={
-                    "project_id": self.project.uuid,
-                    "feedback_form_id": self.feedback_form.uuid,
-                },
-            )
-        )
+        response = self.client.get(reverse("api:response_list"))
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(len(response.data), 2)
@@ -463,18 +367,38 @@ class TestResponseListCreate(APITestCase, ResetFactorySequencesMixin):
             response_2_prompts[2]["value"], self.option_unsatisfied.uuid
         )
 
+    def test_get_responses_by_project(self):
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(
+            reverse_with_query(
+                "api:response_list", {"project": self.project_1.uuid}
+            )
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_get_responses_by_feedback_form(self):
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(
+            reverse_with_query(
+                "api:response_list",
+                {"feedback_form": self.feedback_form_2.uuid},
+            )
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(len(response.data), 1)
+
     def test_create_response(self):
         self.client.force_login(self.admin_user)
 
         response = self.client.post(
-            reverse(
-                "api:response_list",
-                kwargs={
-                    "project_id": self.project.uuid,
-                    "feedback_form_id": self.feedback_form.uuid,
-                },
-            ),
+            reverse("api:response_create"),
             {
+                "feedback_form": self.feedback_form_1.uuid,
                 "url": "https://example.com/path/1",
                 "metadata": {"user-agent": "Mozilla/5.0 Firefox/133.0"},
                 "first_prompt_response": {
@@ -493,7 +417,7 @@ class TestResponseListCreate(APITestCase, ResetFactorySequencesMixin):
             {"user-agent": "Mozilla/5.0 Firefox/133.0"},
         )
         self.assertEqual(
-            response.data["feedback_form"], self.feedback_form.uuid
+            response.data["feedback_form"], self.feedback_form_1.uuid
         )
         self.assertEqual(len(response.data["prompt_responses"]), 1)
         self.assertEqual(
@@ -505,19 +429,14 @@ class TestResponseListCreate(APITestCase, ResetFactorySequencesMixin):
             "More pictures of cats please!",
         )
 
-    def test_create_response_fails_with_second_prompt(self):
+    def test_create_response_fails_for_second_prompt(self):
         self.client.force_login(self.admin_user)
 
         with ignore_request_warnings():
             response = self.client.post(
-                reverse(
-                    "api:response_list",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                    },
-                ),
+                reverse("api:response_create"),
                 {
+                    "feedback_form": self.feedback_form_1.uuid,
                     "url": "https://example.com/path/1",
                     "metadata": {"user-agent": "Mozilla/5.0 Firefox/133.0"},
                     "first_prompt_response": {
@@ -534,23 +453,18 @@ class TestResponseListCreate(APITestCase, ResetFactorySequencesMixin):
         self.assertEqual(
             content["prompt"],
             [
-                f"Prompt must be the first enabled prompt in the feedback form {self.feedback_form.uuid}"
+                f"Prompt must be the first enabled prompt in the feedback form {self.feedback_form_1.uuid}"
             ],
         )
 
-    def test_create_response_fails_with_disabled_prompt(self):
+    def test_create_response_fails_for_disabled_prompt(self):
         self.client.force_login(self.admin_user)
 
         with ignore_request_warnings():
             response = self.client.post(
-                reverse(
-                    "api:response_list",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                    },
-                ),
+                reverse("api:response_create"),
                 {
+                    "feedback_form": self.feedback_form_1.uuid,
                     "url": "https://example.com/path/1",
                     "metadata": {"user-agent": "Mozilla/5.0 Firefox/133.0"},
                     "first_prompt_response": {
@@ -567,7 +481,7 @@ class TestResponseListCreate(APITestCase, ResetFactorySequencesMixin):
         self.assertEqual(
             content["prompt"],
             [
-                f"Prompt must be the first enabled prompt in the feedback form {self.feedback_form.uuid}"
+                f"Prompt must be the first enabled prompt in the feedback form {self.feedback_form_1.uuid}"
             ],
         )
 
@@ -576,14 +490,9 @@ class TestResponseListCreate(APITestCase, ResetFactorySequencesMixin):
 
         with ignore_request_warnings():
             response = self.client.post(
-                reverse(
-                    "api:response_list",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                    },
-                ),
+                reverse("api:response_create"),
                 {
+                    "feedback_form": self.feedback_form_1.uuid,
                     "url": "https://example.com/path/1",
                     "metadata": {"user-agent": "Mozilla/5.0 Firefox/133.0"},
                 },
@@ -598,78 +507,35 @@ class TestResponseListCreate(APITestCase, ResetFactorySequencesMixin):
             {"first_prompt_response": {"prompt": "This field is required."}},
         )
 
-    def test_create_response_fails_mismatched_project(self):
-        other_project = ProjectFactory.create(created_by=self.admin_user)
-
-        self.client.force_login(self.admin_user)
-
-        with ignore_request_warnings():
-            response = self.client.post(
-                reverse(
-                    "api:response_list",
-                    kwargs={
-                        "project_id": other_project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                    },
-                ),
-                {},
-                format="json",
-            )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Feedback form id={self.feedback_form.uuid} does not exist or is disabled in project id={other_project.uuid}.",
-        )
-
-    def test_create_response_fails_missing_feedback_form(self):
-        self.client.force_login(self.admin_user)
-
-        feedback_form_uuid = uuid.uuid4()
-
-        with ignore_request_warnings():
-            response = self.client.post(
-                reverse(
-                    "api:response_list",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": feedback_form_uuid,
-                    },
-                ),
-                {},
-                format="json",
-            )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Feedback form id={feedback_form_uuid} does not exist or is disabled in project id={self.project.uuid}.",
-        )
-
-    def test_create_response_fails_disabled_feedback_form(self):
+    def test_create_response_fails_for_disabled_feedback_form(self):
         self.client.force_login(self.admin_user)
 
         feedback_form = FeedbackFormFactory.create(
             name="Disabled feedback form",
-            project=self.project,
+            project=self.project_1,
             created_by=self.admin_user,
             disabled_at=timezone.now(),
         )
 
+        text_prompt = TextPromptFactory.create(
+            created_by=self.admin_user,
+            feedback_form=feedback_form,
+            order=1,
+            text="How could it be improved?",
+        )
+
         with ignore_request_warnings():
             response = self.client.post(
-                reverse(
-                    "api:response_list",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": feedback_form.uuid,
+                reverse("api:response_create"),
+                {
+                    "feedback_form": feedback_form.uuid,
+                    "url": "https://example.com/path/1",
+                    "metadata": {},
+                    "first_prompt_response": {
+                        "prompt": text_prompt.uuid,
+                        "value": "More pictures of cats please!",
                     },
-                ),
-                {},
+                },
                 format="json",
             )
 
@@ -678,182 +544,11 @@ class TestResponseListCreate(APITestCase, ResetFactorySequencesMixin):
         content = json.loads(response.content)
         self.assertEqual(
             content["detail"],
-            f"Feedback form id={feedback_form.uuid} does not exist or is disabled in project id={self.project.uuid}.",
+            f"Feedback form id={feedback_form.uuid} is disabled.",
         )
 
 
 class ResponseDetail(APITestCase, ResetFactorySequencesMixin):
-    @classmethod
-    def setUpTestData(cls):
-        cls.admin_user = StaffUserFactory(is_superuser=True)
-        cls.project = ProjectFactory.create(created_by=cls.admin_user)
-        cls.feedback_form = FeedbackFormFactory.create(
-            name="Test feedback form",
-            project=cls.project,
-            created_by=cls.admin_user,
-        )
-
-    def test_get_responses(self):
-        text_prompt = TextPromptFactory.create(
-            created_by=self.admin_user,
-            feedback_form=self.feedback_form,
-            order=1,
-            text="How could it be improved?",
-        )
-
-        binary_prompt = BinaryPromptFactory.create(
-            created_by=self.admin_user,
-            feedback_form=self.feedback_form,
-            order=2,
-            text="Was this page helpful?",
-            positive_answer_label="Yes",
-            negative_answer_label="No",
-        )
-
-        ranged_prompt = RangedPromptFactory.create(
-            created_by=self.admin_user,
-            feedback_form=self.feedback_form,
-            order=3,
-            text="Are you satisfied with page?",
-        )
-        RangedPromptOptionFactory.create(
-            ranged_prompt=ranged_prompt,
-            label="Unsatisfied",
-        )
-        RangedPromptOptionFactory.create(
-            ranged_prompt=ranged_prompt,
-            label="Neutral",
-        )
-        option_satisfied = RangedPromptOptionFactory.create(
-            ranged_prompt=ranged_prompt,
-            label="Satisfied",
-        )
-
-        feedback_response = ResponseFactory.create(
-            feedback_form=self.feedback_form,
-            url="https://example.com/path/1",
-        )
-        TextPromptResponseFactory.create(
-            prompt=text_prompt,
-            response=feedback_response,
-            value="More pictures of cats please!",
-        )
-        BinaryPromptResponseFactory.create(
-            prompt=binary_prompt, response=feedback_response, value=True
-        )
-        RangedPromptResponseFactory.create(
-            prompt=ranged_prompt,
-            response=feedback_response,
-            value=option_satisfied,
-        )
-
-        self.client.force_login(self.admin_user)
-
-        response = self.client.get(
-            reverse(
-                "api:response_detail",
-                kwargs={
-                    "project_id": self.project.uuid,
-                    "feedback_form_id": self.feedback_form.uuid,
-                    "response_id": feedback_response.uuid,
-                },
-            ),
-        )
-
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-        self.assertEqual(response.data["url"], "https://example.com/path/1")
-
-        response_prompts = response.data["prompt_responses"]
-        self.assertEqual(len(response_prompts), 3)
-        self.assertEqual(response_prompts[0]["prompt"], text_prompt.uuid)
-        self.assertEqual(
-            response_prompts[0]["value"], "More pictures of cats please!"
-        )
-        self.assertEqual(response_prompts[1]["prompt"], binary_prompt.uuid)
-        self.assertEqual(response_prompts[1]["value"], True)
-        self.assertEqual(response_prompts[2]["prompt"], ranged_prompt.uuid)
-        self.assertEqual(response_prompts[2]["value"], option_satisfied.uuid)
-
-    def test_get_missing_response(self):
-        self.client.force_login(self.admin_user)
-
-        with ignore_request_warnings():
-            response = self.client.get(
-                reverse(
-                    "api:response_detail",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                        "response_id": uuid.uuid4(),
-                    },
-                ),
-            )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-    def test_get_mismatched_project(self):
-        feedback_response = ResponseFactory.create(
-            feedback_form=self.feedback_form,
-            url="https://example.com/path/1",
-        )
-
-        other_project = ProjectFactory.create(created_by=self.admin_user)
-
-        self.client.force_login(self.admin_user)
-
-        with ignore_request_warnings():
-            response = self.client.get(
-                reverse(
-                    "api:response_detail",
-                    kwargs={
-                        "project_id": other_project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                        "response_id": feedback_response.uuid,
-                    },
-                ),
-            )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Feedback form id={self.feedback_form.uuid} does not exist in project id={other_project.uuid}.",
-        )
-
-    def test_get_missing_feedback_form(self):
-        feedback_response = ResponseFactory.create(
-            feedback_form=self.feedback_form,
-            url="https://example.com/path/1",
-        )
-
-        self.client.force_login(self.admin_user)
-
-        feedback_form_uuid = uuid.uuid4()
-
-        with ignore_request_warnings():
-            response = self.client.get(
-                reverse(
-                    "api:response_detail",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": feedback_form_uuid,
-                        "response_id": feedback_response.uuid,
-                    },
-                ),
-            )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Feedback form id={feedback_form_uuid} does not exist in project id={self.project.uuid}.",
-        )
-
-
-class TestPromptResponseListCreate(APITestCase, ResetFactorySequencesMixin):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory(is_superuser=True)
@@ -870,6 +565,7 @@ class TestPromptResponseListCreate(APITestCase, ResetFactorySequencesMixin):
             order=1,
             text="How could it be improved?",
         )
+
         cls.binary_prompt = BinaryPromptFactory.create(
             created_by=cls.admin_user,
             feedback_form=cls.feedback_form,
@@ -878,9 +574,118 @@ class TestPromptResponseListCreate(APITestCase, ResetFactorySequencesMixin):
             positive_answer_label="Yes",
             negative_answer_label="No",
         )
+
         cls.ranged_prompt = RangedPromptFactory.create(
             created_by=cls.admin_user,
             feedback_form=cls.feedback_form,
+            order=3,
+            text="Are you satisfied with page?",
+        )
+        RangedPromptOptionFactory.create(
+            ranged_prompt=cls.ranged_prompt,
+            label="Unsatisfied",
+        )
+        RangedPromptOptionFactory.create(
+            ranged_prompt=cls.ranged_prompt,
+            label="Neutral",
+        )
+        cls.option_satisfied = RangedPromptOptionFactory.create(
+            ranged_prompt=cls.ranged_prompt,
+            label="Satisfied",
+        )
+
+        cls.response = ResponseFactory.create(
+            feedback_form=cls.feedback_form,
+            url="https://example.com/path/1",
+        )
+        TextPromptResponseFactory.create(
+            prompt=cls.text_prompt,
+            response=cls.response,
+            value="More pictures of cats please!",
+        )
+        BinaryPromptResponseFactory.create(
+            prompt=cls.binary_prompt, response=cls.response, value=True
+        )
+        RangedPromptResponseFactory.create(
+            prompt=cls.ranged_prompt,
+            response=cls.response,
+            value=cls.option_satisfied,
+        )
+
+    def test_get_responses(self):
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(
+            reverse(
+                "api:response_detail",
+                kwargs={"id": self.response.uuid},
+            ),
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        self.assertEqual(response.data["url"], "https://example.com/path/1")
+
+        response_prompts = response.data["prompt_responses"]
+        self.assertEqual(len(response_prompts), 3)
+        self.assertEqual(response_prompts[0]["prompt"], self.text_prompt.uuid)
+        self.assertEqual(
+            response_prompts[0]["value"], "More pictures of cats please!"
+        )
+        self.assertEqual(response_prompts[1]["prompt"], self.binary_prompt.uuid)
+        self.assertEqual(response_prompts[1]["value"], True)
+        self.assertEqual(response_prompts[2]["prompt"], self.ranged_prompt.uuid)
+        self.assertEqual(
+            response_prompts[2]["value"], self.option_satisfied.uuid
+        )
+
+    def test_get_missing_response(self):
+        self.client.force_login(self.admin_user)
+
+        with ignore_request_warnings():
+            response = self.client.get(
+                reverse("api:response_detail", kwargs={"id": uuid.uuid4()}),
+            )
+
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+
+class TestPromptResponseListCreate(APITestCase, ResetFactorySequencesMixin):
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin_user = StaffUserFactory(is_superuser=True)
+
+        cls.project_1 = ProjectFactory.create(created_by=cls.admin_user)
+        cls.project_2 = ProjectFactory.create(created_by=cls.admin_user)
+
+        cls.feedback_form_1 = FeedbackFormFactory.create(
+            name="Test feedback form 1",
+            project=cls.project_1,
+            created_by=cls.admin_user,
+        )
+        cls.feedback_form_2 = FeedbackFormFactory.create(
+            name="Test feedback form 2",
+            project=cls.project_2,
+            created_by=cls.admin_user,
+        )
+
+        cls.text_prompt = TextPromptFactory.create(
+            created_by=cls.admin_user,
+            feedback_form=cls.feedback_form_1,
+            order=1,
+            text="How could it be improved?",
+        )
+        cls.binary_prompt = BinaryPromptFactory.create(
+            created_by=cls.admin_user,
+            feedback_form=cls.feedback_form_1,
+            order=2,
+            text="Was this page helpful?",
+            positive_answer_label="Yes",
+            negative_answer_label="No",
+        )
+        cls.ranged_prompt = RangedPromptFactory.create(
+            created_by=cls.admin_user,
+            feedback_form=cls.feedback_form_2,
             order=3,
             text="Are you satisfied with page?",
         )
@@ -897,36 +702,34 @@ class TestPromptResponseListCreate(APITestCase, ResetFactorySequencesMixin):
             label="Satisfied",
         )
 
-    def test_get_prompt_responses(self):
-        feedback_response = ResponseFactory.create(
-            feedback_form=self.feedback_form,
+        cls.response_1 = ResponseFactory.create(
+            feedback_form=cls.feedback_form_1,
             url="https://example.com/path/1",
         )
         TextPromptResponseFactory.create(
-            prompt=self.text_prompt,
-            response=feedback_response,
+            prompt=cls.text_prompt,
+            response=cls.response_1,
             value="More pictures of cats please!",
         )
         BinaryPromptResponseFactory.create(
-            prompt=self.binary_prompt, response=feedback_response, value=True
+            prompt=cls.binary_prompt, response=cls.response_1, value=True
         )
         RangedPromptResponseFactory.create(
-            prompt=self.ranged_prompt,
-            response=feedback_response,
-            value=self.option_satisfied,
+            prompt=cls.ranged_prompt,
+            response=cls.response_1,
+            value=cls.option_satisfied,
         )
 
+        cls.response_2 = ResponseFactory.create(
+            feedback_form=cls.feedback_form_1,
+            url="https://example.com/path/2",
+        )
+
+    def test_get_prompt_responses(self):
         self.client.force_login(self.admin_user)
 
         response = self.client.get(
-            reverse(
-                "api:prompt-response_list",
-                kwargs={
-                    "project_id": self.project.uuid,
-                    "feedback_form_id": self.feedback_form.uuid,
-                    "response_id": feedback_response.uuid,
-                },
-            ),
+            reverse("api:prompt-response_list"),
         )
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -942,24 +745,13 @@ class TestPromptResponseListCreate(APITestCase, ResetFactorySequencesMixin):
         self.assertEqual(response.data[2]["value"], self.option_satisfied.uuid)
 
     def test_create_text_prompt_response(self):
-        feedback_response = ResponseFactory.create(
-            feedback_form=self.feedback_form,
-            url="https://example.com/path/1",
-        )
-
         self.client.force_login(self.admin_user)
 
         response = self.client.post(
-            reverse(
-                "api:prompt-response_list",
-                kwargs={
-                    "project_id": self.project.uuid,
-                    "feedback_form_id": self.feedback_form.uuid,
-                    "response_id": feedback_response.uuid,
-                },
-            ),
+            reverse("api:prompt-response_create"),
             {
                 "prompt": self.text_prompt.uuid,
+                "response": self.response_2.uuid,
                 "value": "More pictures of cats please!",
             },
             format="json",
@@ -972,16 +764,10 @@ class TestPromptResponseListCreate(APITestCase, ResetFactorySequencesMixin):
             response.data["value"], "More pictures of cats please!"
         )
 
-    def test_create_invalid_prompt_response(self):
-        feedback_response = ResponseFactory.create(
-            feedback_form=self.feedback_form,
-            url="https://example.com/path/1",
-        )
-
-        other_project = ProjectFactory.create(created_by=self.admin_user)
+    def test_create_prompt_response_invalid_prompt(self):
         other_feedback_form = FeedbackFormFactory.create(
             name="Other feedback form",
-            project=other_project,
+            project=self.project_1,
             created_by=self.admin_user,
         )
 
@@ -996,16 +782,9 @@ class TestPromptResponseListCreate(APITestCase, ResetFactorySequencesMixin):
 
         with ignore_request_warnings():
             response = self.client.post(
-                reverse(
-                    "api:prompt-response_list",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                        "response_id": feedback_response.uuid,
-                    },
-                ),
+                reverse("api:prompt-response_create"),
                 {
-                    "response": feedback_response.uuid,
+                    "response": self.response_1.uuid,
                     "prompt": invalid_prompt.uuid,
                     "value": "More pictures of cats please!",
                 },
@@ -1018,36 +797,61 @@ class TestPromptResponseListCreate(APITestCase, ResetFactorySequencesMixin):
         self.assertEqual(
             content["prompt"],
             [
-                f"Prompt id={invalid_prompt.uuid} does not exist in feedback form id={self.feedback_form.uuid}."
+                f"Prompt id={invalid_prompt.uuid} does not exist in feedback form id={self.feedback_form_1.uuid}."
             ],
         )
 
-    def test_create_duplicate_prompt_response(self):
+    def test_create_prompt_response_disabled_prompt(self):
+        feedback_form = FeedbackFormFactory.create(
+            name="Other feedback form",
+            project=self.project_1,
+            created_by=self.admin_user,
+        )
+
         feedback_response = ResponseFactory.create(
-            feedback_form=self.feedback_form,
+            feedback_form=feedback_form,
             url="https://example.com/path/1",
         )
 
-        TextPromptResponseFactory.create(
-            prompt=self.text_prompt,
-            response=feedback_response,
-            value="More pictures of cats please!",
+        disabled_prompt = TextPromptFactory.create(
+            created_by=self.admin_user,
+            feedback_form=feedback_form,
+            disabled_at=timezone.now(),
+            order=4,
+            text="What would you like to see next?",
         )
 
         self.client.force_login(self.admin_user)
 
         with ignore_request_warnings():
             response = self.client.post(
-                reverse(
-                    "api:prompt-response_list",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                        "response_id": feedback_response.uuid,
-                    },
-                ),
+                reverse("api:prompt-response_create"),
                 {
                     "response": feedback_response.uuid,
+                    "prompt": disabled_prompt.uuid,
+                    "value": "More pictures of cats please!",
+                },
+                format="json",
+            )
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+
+        content = json.loads(response.content)
+        self.assertEqual(
+            content["prompt"],
+            [
+                f"Prompt id={disabled_prompt.uuid} is not enabled in feedback form id={feedback_form.uuid}."
+            ],
+        )
+
+    def test_create_duplicate_prompt_response(self):
+        self.client.force_login(self.admin_user)
+
+        with ignore_request_warnings():
+            response = self.client.post(
+                reverse("api:prompt-response_create"),
+                {
+                    "response": self.response_1.uuid,
                     "prompt": self.text_prompt.uuid,
                     "value": "Yet more pictures of cats please!!",
                 },
@@ -1060,190 +864,60 @@ class TestPromptResponseListCreate(APITestCase, ResetFactorySequencesMixin):
         self.assertEqual(
             content["prompt"],
             [
-                f"Prompt response already exists for prompt id={self.text_prompt.uuid} and response id={feedback_response.uuid}."
+                f"Prompt response already exists for prompt id={self.text_prompt.uuid} and response id={self.response_1.uuid}."
             ],
         )
 
-    def test_get_mismatched_project(self):
-        feedback_response = ResponseFactory.create(
-            feedback_form=self.feedback_form,
-            url="https://example.com/path/1",
-        )
-
-        other_project = ProjectFactory.create(created_by=self.admin_user)
-
+    def test_get_prompt_responses_by_project(self):
         self.client.force_login(self.admin_user)
 
-        with ignore_request_warnings():
-            response = self.client.get(
-                reverse(
-                    "api:prompt-response_list",
-                    kwargs={
-                        "project_id": other_project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                        "response_id": feedback_response.uuid,
-                    },
-                ),
+        response = self.client.get(
+            reverse_with_query(
+                "api:prompt-response_list", {"project": self.project_1.uuid}
             )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Feedback form id={self.feedback_form.uuid} does not exist in project id={other_project.uuid}.",
         )
 
-    def test_get_mismatched_feedback_form(self):
-        feedback_response = ResponseFactory.create(
-            feedback_form=self.feedback_form,
-            url="https://example.com/path/1",
-        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(len(response.data), 3)
 
-        other_feedback_form = FeedbackFormFactory.create(
-            name="Other feedback form",
-            project=self.project,
-            created_by=self.admin_user,
-        )
-
+    def test_get_prompt_responses_by_feedback_form(self):
         self.client.force_login(self.admin_user)
 
-        with ignore_request_warnings():
-            response = self.client.get(
-                reverse(
-                    "api:prompt-response_list",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": other_feedback_form.uuid,
-                        "response_id": feedback_response.uuid,
-                    },
-                ),
+        response = self.client.get(
+            reverse_with_query(
+                "api:prompt-response_list",
+                {"feedback_form": self.feedback_form_2.uuid},
             )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Response id={feedback_response.uuid} does not exist in feedback form id={other_feedback_form.uuid}.",
         )
 
-    def test_get_missing_response(self):
-        response_uuid = uuid.uuid4()
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(len(response.data), 0)
 
+    def test_get_prompt_responses_by_response(self):
         self.client.force_login(self.admin_user)
 
-        with ignore_request_warnings():
-            response = self.client.get(
-                reverse(
-                    "api:prompt-response_list",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                        "response_id": response_uuid,
-                    },
-                ),
+        response = self.client.get(
+            reverse_with_query(
+                "api:prompt-response_list",
+                {"response": self.response_1.uuid},
             )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Response id={response_uuid} does not exist in feedback form id={self.feedback_form.uuid}.",
         )
 
-    def test_create_prompt_response_mismatched_project(self):
-        feedback_response = ResponseFactory.create(
-            feedback_form=self.feedback_form,
-            url="https://example.com/path/1",
-        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(len(response.data), 3)
 
-        other_project = ProjectFactory.create(created_by=self.admin_user)
-
+    def test_get_prompt_responses_by_prompt(self):
         self.client.force_login(self.admin_user)
 
-        with ignore_request_warnings():
-            response = self.client.post(
-                reverse(
-                    "api:prompt-response_list",
-                    kwargs={
-                        "project_id": other_project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                        "response_id": feedback_response.uuid,
-                    },
-                ),
-                {},
+        response = self.client.get(
+            reverse_with_query(
+                "api:prompt-response_list",
+                {"prompt": self.text_prompt.uuid},
             )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Feedback form id={self.feedback_form.uuid} does not exist or is disabled in project id={other_project.uuid}.",
         )
 
-    def test_create_prompt_response_mismatched_feedback_form(self):
-        feedback_response = ResponseFactory.create(
-            feedback_form=self.feedback_form,
-            url="https://example.com/path/1",
-        )
-
-        other_feedback_form = FeedbackFormFactory.create(
-            name="Other feedback form",
-            project=self.project,
-            created_by=self.admin_user,
-        )
-
-        self.client.force_login(self.admin_user)
-
-        with ignore_request_warnings():
-            response = self.client.post(
-                reverse(
-                    "api:prompt-response_list",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": other_feedback_form.uuid,
-                        "response_id": feedback_response.uuid,
-                    },
-                ),
-                {},
-            )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Response id={feedback_response.uuid} does not exist in feedback form id={other_feedback_form.uuid}.",
-        )
-
-    def test_create_prompt_response_missing_response(self):
-        response_uuid = uuid.uuid4()
-
-        self.client.force_login(self.admin_user)
-
-        with ignore_request_warnings():
-            response = self.client.post(
-                reverse(
-                    "api:prompt-response_list",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                        "response_id": response_uuid,
-                    },
-                ),
-                {},
-            )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Response id={response_uuid} does not exist in feedback form id={self.feedback_form.uuid}.",
-        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(len(response.data), 1)
 
 
 class TestPromptResponseDetail(APITestCase, ResetFactorySequencesMixin):
@@ -1278,12 +952,7 @@ class TestPromptResponseDetail(APITestCase, ResetFactorySequencesMixin):
         response = self.client.get(
             reverse(
                 "api:prompt-response_detail",
-                kwargs={
-                    "project_id": self.project.uuid,
-                    "feedback_form_id": self.feedback_form.uuid,
-                    "response_id": self.feedback_response.uuid,
-                    "prompt_response_id": self.prompt_response.uuid,
-                },
+                kwargs={"id": self.prompt_response.uuid},
             ),
         )
 
@@ -1306,105 +975,8 @@ class TestPromptResponseDetail(APITestCase, ResetFactorySequencesMixin):
             response = self.client.get(
                 reverse(
                     "api:prompt-response_detail",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                        "response_id": response.uuid,
-                        "prompt_response_id": uuid.uuid4(),
-                    },
+                    kwargs={"id": uuid.uuid4()},
                 ),
             )
 
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-    def test_get_mismatched_project(self):
-        feedback_response = ResponseFactory.create(
-            feedback_form=self.feedback_form,
-            url="https://example.com/path/1",
-        )
-
-        other_project = ProjectFactory.create(created_by=self.admin_user)
-
-        self.client.force_login(self.admin_user)
-
-        with ignore_request_warnings():
-            response = self.client.get(
-                reverse(
-                    "api:prompt-response_detail",
-                    kwargs={
-                        "project_id": other_project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                        "response_id": feedback_response.uuid,
-                        "prompt_response_id": self.prompt_response.uuid,
-                    },
-                ),
-            )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Feedback form id={self.feedback_form.uuid} does not exist in project id={other_project.uuid}.",
-        )
-
-    def test_get_mismatched_feedback_form(self):
-        feedback_response = ResponseFactory.create(
-            feedback_form=self.feedback_form,
-            url="https://example.com/path/1",
-        )
-
-        other_feedback_form = FeedbackFormFactory.create(
-            name="Other feedback form",
-            project=self.project,
-            created_by=self.admin_user,
-        )
-
-        self.client.force_login(self.admin_user)
-
-        with ignore_request_warnings():
-            response = self.client.get(
-                reverse(
-                    "api:prompt-response_detail",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": other_feedback_form.uuid,
-                        "response_id": feedback_response.uuid,
-                        "prompt_response_id": self.prompt_response.uuid,
-                    },
-                ),
-            )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Response id={feedback_response.uuid} does not exist in feedback form id={other_feedback_form.uuid}.",
-        )
-
-    def test_get_missing_response(self):
-        response_uuid = uuid.uuid4()
-
-        self.client.force_login(self.admin_user)
-
-        with ignore_request_warnings():
-            response = self.client.get(
-                reverse(
-                    "api:prompt-response_detail",
-                    kwargs={
-                        "project_id": self.project.uuid,
-                        "feedback_form_id": self.feedback_form.uuid,
-                        "response_id": response_uuid,
-                        "prompt_response_id": self.prompt_response.uuid,
-                    },
-                ),
-            )
-
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-        content = json.loads(response.content)
-        self.assertEqual(
-            content["detail"],
-            f"Response id={response_uuid} does not exist in feedback form id={self.feedback_form.uuid}.",
-        )
