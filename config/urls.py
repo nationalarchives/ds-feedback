@@ -25,6 +25,7 @@ urlpatterns = [
     path("", include(("app.main.urls", "main"), namespace="main")),
     path("healthcheck/", include("app.healthcheck.urls")),
     path("admin/", admin.site.urls),
+    path("api/v1/", include("app.api.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
@@ -35,3 +36,6 @@ if settings.DEBUG:
         urlpatterns = [
             path("__debug__/", include(debug_toolbar.urls))
         ] + urlpatterns
+
+    if apps.is_installed("silk"):
+        urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]

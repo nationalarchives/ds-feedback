@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "app.feedback_forms",
     "app.prompts",
     "app.responses",
+    "app.api",
 ]
 
 MIDDLEWARE = [
@@ -276,3 +277,18 @@ CONTENT_SECURITY_POLICY = (
 )
 
 GA4_ID = os.environ.get("GA4_ID", "")
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "app.api.permissions.IsSuperuser",
+    ],
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+    ],
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
+    ],
+}
