@@ -54,7 +54,7 @@ class TestAdminResponseView(ResetFactorySequencesMixin, TestCase):
         self.assertEqual(get_change_list_results(response), [feedback_response])
 
     # As an Admin user I can view the answers within a response in Django admin
-    def test_view_reponse(self):
+    def test_view_response(self):
         project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
