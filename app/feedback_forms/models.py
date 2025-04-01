@@ -1,6 +1,7 @@
 import warnings
 
 import django
+from django.contrib.postgres.indexes import GinIndex
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import UniqueConstraint
@@ -77,6 +78,8 @@ class PathPattern(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
             )
 
     class Meta:
+        indexes = [GinIndex(fields=["pattern"])]
+
         constraints = [
             UniqueConstraint(
                 "project",

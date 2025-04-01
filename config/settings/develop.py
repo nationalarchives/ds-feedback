@@ -23,3 +23,6 @@ DEBUG_TOOLBAR_CONFIG = {
 # Adds Django Silk
 MIDDLEWARE.insert(0, "silk.middleware.SilkyMiddleware")  # noqa
 INSTALLED_APPS.append("silk")  # noqa
+
+SILKY_ANALYZE_QUERIES = True
+SILKY_PYTHON_PROFILER = True
