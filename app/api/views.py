@@ -98,6 +98,45 @@ class FeedbackFormList(
         )
 
 
+class FeedbackFormPathPatternDetail(generics.RetrieveAPIView):
+    queryset = FeedbackForm.objects.all()
+    serializer_class = FeedbackFormSerializer
+
+    def get_queryset(self):
+        return (
+            self.queryset.alias(path=Value(self.kwargs["path"]))
+            .filter(
+                Q(project__uuid=self.kwargs["project"]),
+                (
+                    Q(path_patterns__pattern=self.kwargs["path"])
+                    & Q(path_patterns__is_wildcard=False)
+                )
+                | (
+                    Q(path__istartswith=F("path_patterns__pattern"))
+                    & Q(path_patterns__is_wildcard=True)
+                ),
+            )
+            .order_by(
+                "path_patterns__is_wildcard",
+                Length("path_patterns__pattern").desc(),
+            )
+            .prefetch_related(
+                Prefetch(
+                    "prompts",
+                    queryset=Prompt.objects.select_subclasses(),
+                ),
+            )[:1]
+        )
+
+    def get_object(self):
+        return generics.get_object_or_404(self.get_queryset())
+
+    def get_project(self, data: dict[str, str]) -> Project:
+        return generics.get_object_or_404(
+            Project.objects.filter(uuid=self.kwargs["project"])
+        )
+
+
 class ResponseCreate(generics.CreateAPIView):
     queryset = Response.objects.all()
     serializer_class = ResponseSerializer
