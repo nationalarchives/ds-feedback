@@ -3,9 +3,11 @@ from functools import cache
 from django.db.models import F, Prefetch, Q, Value
 from django.db.models.functions import Length
 
-from rest_framework import generics
-from rest_framework.exceptions import NotFound
+from rest_framework import generics, views
+from rest_framework.exceptions import NotFound, PermissionDenied
 
+from app.api import acl
+from app.api.models import APIRole
 from app.api.serializers import (
     FeedbackFormSerializer,
     PromptResponseSerializer,
@@ -16,6 +18,36 @@ from app.projects.models import Project
 from app.prompts.models import Prompt
 from app.responses.models import PromptResponse, Response
 from app.utils.views import is_valid_uuid
+
+
+class CheckProjectAccessMixin(views.APIView):
+    """
+    Mixin to check if the user has access to a project with one of allowed_roles
+    """
+
+    allowed_roles: list[APIRole]
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+
+        if not hasattr(self, "allowed_roles"):
+            raise NotImplementedError(
+                "CheckProjectAccessMixin requires self.allowed_roles to be defined as a list of APIRoles."
+            )
+
+        if hasattr(self, "get_project"):
+            if not acl.can_access_project_with_role(
+                user=request.user,
+                project=self.get_project(request.data),
+                allowed_roles=self.allowed_roles,
+            ):
+                raise PermissionDenied()
+        else:
+            if not acl.can_access_any_project_with_role(
+                user=request.user,
+                allowed_roles=self.allowed_roles,
+            ):
+                raise PermissionDenied()
 
 
 class FilterParamMixin:
@@ -43,9 +75,10 @@ class ValidateUUIDMixin:
                 )
 
 
-class FeedbackFormDetail(generics.RetrieveAPIView):
+class FeedbackFormDetail(generics.RetrieveAPIView, CheckProjectAccessMixin):
     queryset = FeedbackForm.objects.all()
     serializer_class = FeedbackFormSerializer
+    allowed_roles = [APIRole.RESPONSE_SUBMITTER, APIRole.READ_ONLY]
 
     def get_queryset(self):
         return (
@@ -74,9 +107,11 @@ class FeedbackFormList(
     generics.ListAPIView,
     ValidateUUIDMixin,
     FilterParamMixin,
+    CheckProjectAccessMixin,
 ):
     queryset = FeedbackForm.objects.all()
     serializer_class = FeedbackFormSerializer
+    allowed_roles = [APIRole.RESPONSE_SUBMITTER, APIRole.READ_ONLY]
 
     def get_queryset(self):
         return (
@@ -98,9 +133,12 @@ class FeedbackFormList(
         )
 
 
-class FeedbackFormPathPatternDetail(generics.RetrieveAPIView):
+class FeedbackFormPathPatternDetail(
+    generics.RetrieveAPIView, CheckProjectAccessMixin
+):
     queryset = FeedbackForm.objects.all()
     serializer_class = FeedbackFormSerializer
+    allowed_roles = [APIRole.RESPONSE_SUBMITTER, APIRole.READ_ONLY]
 
     def get_queryset(self):
         return (
@@ -137,9 +175,10 @@ class FeedbackFormPathPatternDetail(generics.RetrieveAPIView):
         )
 
 
-class ResponseCreate(generics.CreateAPIView):
+class ResponseCreate(generics.CreateAPIView, CheckProjectAccessMixin):
     queryset = Response.objects.all()
     serializer_class = ResponseSerializer
+    allowed_roles = [APIRole.RESPONSE_SUBMITTER]
 
     def get_queryset(self):
         queryset = self.queryset.select_related(
@@ -183,9 +222,10 @@ class ResponseCreate(generics.CreateAPIView):
         return super().create(request, *args, **kwargs)
 
 
-class PromptResponseCreate(generics.CreateAPIView):
+class PromptResponseCreate(generics.CreateAPIView, CheckProjectAccessMixin):
     queryset = PromptResponse.objects.all()
     serializer_class = PromptResponseSerializer
+    allowed_roles = [APIRole.RESPONSE_SUBMITTER]
 
     def get_queryset(self):
         return self.queryset.select_subclasses().prefetch_related(
@@ -224,9 +264,11 @@ class ResponseList(
     generics.ListAPIView,
     ValidateUUIDMixin,
     FilterParamMixin,
+    CheckProjectAccessMixin,
 ):
     queryset = Response.objects.all()
     serializer_class = ResponseSerializer
+    allowed_roles = [APIRole.READ_ONLY]
 
     def get_queryset(self):
         queryset = self.queryset.select_related(
@@ -244,6 +286,14 @@ class ResponseList(
             ),
         )
 
+        if not self.request.user.is_superuser:
+            allowed_projects = acl.get_accessible_projects_with_role(
+                user=self.request.user, allowed_roles=self.allowed_roles
+            )
+            queryset = queryset.filter(
+                feedback_form__project__in=allowed_projects
+            )
+
         queryset = self.filter_queryset_param(
             queryset, "feedback_form__project__uuid", "project"
         )
@@ -260,9 +310,10 @@ class ResponseList(
         return super().list(request, *args, **kwargs)
 
 
-class ResponseDetail(generics.RetrieveAPIView):
+class ResponseDetail(generics.RetrieveAPIView, CheckProjectAccessMixin):
     queryset = Response.objects.all()
     serializer_class = ResponseSerializer
+    allowed_roles = [APIRole.READ_ONLY]
 
     def get_queryset(self):
         return (
@@ -294,9 +345,11 @@ class PromptResponseList(
     generics.ListAPIView,
     ValidateUUIDMixin,
     FilterParamMixin,
+    CheckProjectAccessMixin,
 ):
     queryset = PromptResponse.objects.all()
     serializer_class = PromptResponseSerializer
+    allowed_roles = [APIRole.READ_ONLY]
 
     def get_queryset(self):
         queryset = self.queryset.select_subclasses().prefetch_related(
@@ -304,6 +357,14 @@ class PromptResponseList(
             "rangedpromptresponse__value",
             Prefetch("prompt", queryset=Prompt.objects.select_subclasses()),
         )
+
+        if not self.request.user.is_superuser:
+            allowed_projects = acl.get_accessible_projects_with_role(
+                user=self.request.user, allowed_roles=self.allowed_roles
+            )
+            queryset = queryset.filter(
+                response__feedback_form__project__in=allowed_projects
+            )
 
         queryset = self.filter_queryset_param(
             queryset, "response__feedback_form__project__uuid", "project"
@@ -324,9 +385,10 @@ class PromptResponseList(
         return super().list(request, *args, **kwargs)
 
 
-class PromptResponseDetail(generics.RetrieveAPIView):
+class PromptResponseDetail(generics.RetrieveAPIView, CheckProjectAccessMixin):
     queryset = PromptResponse.objects.all()
     serializer_class = PromptResponseSerializer
+    allowed_roles = [APIRole.READ_ONLY]
 
     def get_queryset(self):
         return (
