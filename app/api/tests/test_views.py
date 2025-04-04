@@ -980,3 +980,153 @@ class TestPromptResponseDetail(APITestCase, ResetFactorySequencesMixin):
             )
 
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+
+class TestFeedbackFormPathPatternDetail(
+    APITestCase, ResetFactorySequencesMixin
+):
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin_user = StaffUserFactory(is_superuser=True)
+
+        cls.project_1 = ProjectFactory.create(created_by=cls.admin_user)
+        cls.project_2 = ProjectFactory.create(created_by=cls.admin_user)
+
+        cls.feedback_form_1 = FeedbackFormFactory.create(
+            name="Test feedback form 1",
+            project=cls.project_1,
+            created_by=cls.admin_user,
+        )
+        cls.feedback_form_2 = FeedbackFormFactory.create(
+            name="Test feedback form 2",
+            project=cls.project_1,
+            created_by=cls.admin_user,
+        )
+        cls.feedback_form_3 = FeedbackFormFactory.create(
+            name="Test feedback form 3",
+            project=cls.project_2,
+            created_by=cls.admin_user,
+            disabled_at=timezone.now(),
+        )
+        cls.feedback_form_4 = FeedbackFormFactory.create(
+            name="Test feedback form 4",
+            project=cls.project_2,
+            created_by=cls.admin_user,
+        )
+
+        cls.path_pattern_1 = PathPatternFactory.create(
+            feedback_form=cls.feedback_form_1,
+            pattern="/foo/",
+            is_wildcard=True,
+        )
+        cls.path_pattern_2 = PathPatternFactory.create(
+            feedback_form=cls.feedback_form_1,
+            pattern="/foo/zim/",
+            is_wildcard=False,
+        )
+        cls.path_pattern_3 = PathPatternFactory.create(
+            feedback_form=cls.feedback_form_2,
+            pattern="/foo/bar/",
+            is_wildcard=False,
+        )
+        cls.path_pattern_4 = PathPatternFactory.create(
+            feedback_form=cls.feedback_form_2,
+            pattern="/foo/zim/",
+            is_wildcard=True,
+        )
+
+        cls.path_pattern_5 = PathPatternFactory.create(
+            feedback_form=cls.feedback_form_3,
+            pattern="/",
+            is_wildcard=True,
+        )
+        cls.path_pattern_6 = PathPatternFactory.create(
+            feedback_form=cls.feedback_form_3,
+            pattern="/foo/",
+            is_wildcard=True,
+        )
+        cls.path_pattern_7 = PathPatternFactory.create(
+            feedback_form=cls.feedback_form_4,
+            pattern="/foo/bar/",
+            is_wildcard=True,
+        )
+
+    def test_get_feedback_form_from_exact_path(self):
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(
+            reverse(
+                "api:feedback-form-path_detail",
+                kwargs={
+                    "project": self.project_1.uuid,
+                    "path": "/foo/zim/",
+                },
+            ),
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.data["id"], str(self.feedback_form_1.uuid))
+
+    def test_get_feedback_form_from_wildcard_path(self):
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(
+            reverse(
+                "api:feedback-form-path_detail",
+                kwargs={
+                    "project": self.project_1.uuid,
+                    "path": "/foo/zim/gir",
+                },
+            ),
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.data["id"], str(self.feedback_form_2.uuid))
+
+    def test_get_feedback_form_from_exact_path_over_wildcard(self):
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(
+            reverse(
+                "api:feedback-form-path_detail",
+                kwargs={
+                    "project": self.project_1.uuid,
+                    "path": "/foo/zim",
+                },
+            ),
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.data["id"], str(self.feedback_form_1.uuid))
+
+    def test_get_feedback_form_from_nested_wildcard(self):
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(
+            reverse(
+                "api:feedback-form-path_detail",
+                kwargs={
+                    "project": self.project_2.uuid,
+                    "path": "/foo/bar/zim",
+                },
+            ),
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.data["id"], str(self.feedback_form_4.uuid))
+
+    def test_get_feedback_form_ignores_disabled(self):
+        self.client.force_login(self.admin_user)
+
+        with ignore_request_warnings():
+            response = self.client.get(
+                reverse(
+                    "api:feedback-form-path_detail",
+                    kwargs={
+                        "project": self.project_2.uuid,
+                        "path": "/",
+                    },
+                ),
+            )
+
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
