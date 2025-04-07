@@ -58,8 +58,8 @@ class TestAdminFeedbackFormView(ResetFactorySequencesMixin, TestCase):
                 "project": project.pk,
                 "path_patterns-TOTAL_FORMS": 2,
                 "path_patterns-INITIAL_FORMS": 0,
-                "path_patterns-0-pattern": "/foo/*",
-                "path_patterns-1-pattern": "/bar",
+                "path_patterns-0-pattern_with_wildcard": "/foo/*",
+                "path_patterns-1-pattern_with_wildcard": "/bar",
                 "prompts-TOTAL_FORMS": 1,
                 "prompts-INITIAL_FORMS": 0,
                 "prompts-0-text": "",
@@ -75,9 +75,11 @@ class TestAdminFeedbackFormView(ResetFactorySequencesMixin, TestCase):
         ).get(name="Test feedback form")
         patterns = feedback_form.path_patterns.all()
         self.assertEqual(len(patterns), 2)
-        self.assertEqual(patterns[0].pattern, "/foo/*")
+        self.assertEqual(patterns[0].pattern, "/foo/")
+        self.assertEqual(patterns[0].is_wildcard, True)
         self.assertEqual(patterns[0].feedback_form, feedback_form)
         self.assertEqual(patterns[1].pattern, "/bar")
+        self.assertEqual(patterns[1].is_wildcard, False)
         self.assertEqual(patterns[1].feedback_form, feedback_form)
 
     # As an Admin user I cannot create a feedback form with duplicate patterns in Django admin
@@ -92,8 +94,8 @@ class TestAdminFeedbackFormView(ResetFactorySequencesMixin, TestCase):
                 "project": project.pk,
                 "path_patterns-TOTAL_FORMS": 2,
                 "path_patterns-INITIAL_FORMS": 0,
-                "path_patterns-0-pattern": "/foo",
-                "path_patterns-1-pattern": "/foo",
+                "path_patterns-0-pattern_with_wildcard": "/foo",
+                "path_patterns-1-pattern_with_wildcard": "/foo",
                 "prompts-TOTAL_FORMS": 1,
                 "prompts-INITIAL_FORMS": 0,
                 "prompts-0-text": "",
@@ -102,9 +104,11 @@ class TestAdminFeedbackFormView(ResetFactorySequencesMixin, TestCase):
             },
         )
 
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
         path_pattern_formset = get_inline_formset(response.context, PathPattern)
         self.assertEqual(
-            path_pattern_formset[1].errors["pattern"],
+            path_pattern_formset[1].errors["pattern_with_wildcard"],
             ["You cannot use the same pattern twice in a project."],
         )
 
@@ -126,7 +130,7 @@ class TestAdminFeedbackFormView(ResetFactorySequencesMixin, TestCase):
                 "project": project.pk,
                 "path_patterns-TOTAL_FORMS": 2,
                 "path_patterns-INITIAL_FORMS": 0,
-                "path_patterns-0-pattern": "/foo",
+                "path_patterns-0-pattern_with_wildcard": "/foo",
                 "prompts-TOTAL_FORMS": 1,
                 "prompts-INITIAL_FORMS": 0,
                 "prompts-0-text": "",
@@ -135,9 +139,11 @@ class TestAdminFeedbackFormView(ResetFactorySequencesMixin, TestCase):
             },
         )
 
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
         path_pattern_formset = get_inline_formset(response.context, PathPattern)
         self.assertEqual(
-            path_pattern_formset[0].errors["pattern"],
+            path_pattern_formset[0].errors["pattern_with_wildcard"],
             ["You cannot use the same pattern twice in a project."],
         )
 
