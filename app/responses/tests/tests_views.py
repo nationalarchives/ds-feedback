@@ -1,4 +1,3 @@
-from datetime import datetime
 from http import HTTPStatus
 
 from django.test import TestCase
@@ -21,22 +20,21 @@ from app.responses.factories import (
 from app.responses.models import PromptResponse
 from app.users.factories import StaffUserFactory
 from app.utils.testing import (
+    ResetFactorySequencesMixin,
     get_change_list_results,
     get_inline_formset,
     reverse_with_query,
 )
 
 
-class TestAdminResponseView(TestCase):
+class TestAdminResponseView(ResetFactorySequencesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory(is_superuser=True)
 
     # As an Admin user I can view a list of responses for a feedback form in Django admin
     def test_search_responses(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,
@@ -56,10 +54,8 @@ class TestAdminResponseView(TestCase):
         self.assertEqual(get_change_list_results(response), [feedback_response])
 
     # As an Admin user I can view the answers within a response in Django admin
-    def test_view_reponse(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+    def test_view_response(self):
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,

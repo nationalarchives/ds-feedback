@@ -1,4 +1,3 @@
-from datetime import datetime
 from http import HTTPStatus
 
 from django.test import TestCase
@@ -15,22 +14,21 @@ from app.prompts.factories import (
 from app.prompts.models import RangedPromptOption
 from app.users.factories import StaffUserFactory
 from app.utils.testing import (
+    ResetFactorySequencesMixin,
     get_change_list_results,
     get_inline_formset,
     reverse_with_query,
 )
 
 
-class TestAdminTextPromptsView(TestCase):
+class TestAdminTextPromptsView(ResetFactorySequencesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory(is_superuser=True)
 
     # As an Admin user I can search for text prompts in Django admin
     def test_search_text_prompts(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,
@@ -65,16 +63,14 @@ class TestAdminTextPromptsView(TestCase):
         )
 
 
-class TestAdminBinaryPromptsView(TestCase):
+class TestAdminBinaryPromptsView(ResetFactorySequencesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory(is_superuser=True)
 
     # As an Admin user I can search for binary prompts in Django admin
     def test_search_binary_prompts(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,
@@ -86,7 +82,7 @@ class TestAdminBinaryPromptsView(TestCase):
             positive_answer_label="Yes",
             negative_answer_label="No",
         )
-        text_prompt_2 = BinaryPromptFactory.create(
+        binary_prompt_2 = BinaryPromptFactory.create(
             created_by=self.admin_user,
             feedback_form=feedback_form,
             text="Would you recommend it?",
@@ -111,20 +107,18 @@ class TestAdminBinaryPromptsView(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(
             get_change_list_results(response),
-            [text_prompt_2],
+            [binary_prompt_2],
         )
 
 
-class TestAdminRangedPromptsView(TestCase):
+class TestAdminRangedPromptsView(ResetFactorySequencesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory(is_superuser=True)
 
     # As an Admin user I can search for binary prompts in Django admin
     def test_search_range_prompts(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,
@@ -177,9 +171,7 @@ class TestAdminRangedPromptsView(TestCase):
 
     # As an Admin user I can create options for a range prompt in Django admin
     def test_create_range_prompt_options(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,
@@ -221,9 +213,7 @@ class TestAdminRangedPromptsView(TestCase):
 
     # As an Admin user I cannot create duplicate options for a range prompt in Django admin
     def test_create_range_duplicate_prompt_options(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,

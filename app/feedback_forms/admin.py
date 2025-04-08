@@ -100,7 +100,7 @@ class PromptForm(IsDisabledCheckboxForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance:
-            # Pass instance to widget to display link to specific Prompt
+            # Pass instance to widget to display link to subclassed Prompt
             self.fields["prompt_details"].widget.instance = self.instance
 
             # For existing prompts set prompt type

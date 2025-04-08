@@ -1,4 +1,3 @@
-from datetime import datetime
 from http import HTTPStatus
 
 from django.test import TestCase
@@ -10,22 +9,21 @@ from app.projects.factories import ProjectFactory
 from app.prompts.models import BinaryPrompt, Prompt, RangedPrompt, TextPrompt
 from app.users.factories import StaffUserFactory
 from app.utils.testing import (
+    ResetFactorySequencesMixin,
     get_change_list_results,
     get_inline_formset,
     reverse_with_query,
 )
 
 
-class TestAdminFeedbackFormView(TestCase):
+class TestAdminFeedbackFormView(ResetFactorySequencesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory(is_superuser=True)
 
     # As an Admin user I can create a feedback form in Django admin
     def test_create_feedback_form(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
 
         self.client.force_login(self.admin_user)
         response = self.client.post(
@@ -50,9 +48,7 @@ class TestAdminFeedbackFormView(TestCase):
 
     # As an Admin user I can create a feedback form with multiple path patterns in Django admin
     def test_create_feedback_form_with_path_patterns(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
 
         self.client.force_login(self.admin_user)
         response = self.client.post(
@@ -86,9 +82,7 @@ class TestAdminFeedbackFormView(TestCase):
 
     # As an Admin user I cannot create a feedback form with duplicate patterns in Django admin
     def test_create_feedback_form_with_duplicate_path_patterns(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
 
         self.client.force_login(self.admin_user)
         response = self.client.post(
@@ -116,9 +110,7 @@ class TestAdminFeedbackFormView(TestCase):
 
     # As an Admin user I cannot create a feedback form which duplicates a pattern in the project in Django admin
     def test_create_feedback_form_with_duplicate_project_path_patterns(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
 
         FeedbackFormFactory.create(
             created_by=self.admin_user,
@@ -151,9 +143,7 @@ class TestAdminFeedbackFormView(TestCase):
 
     # As an Admin user I can search for feedback forms in Django admin
     def test_search_feedback_forms(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
         feedback_form_1 = FeedbackFormFactory.create(
             created_by=self.admin_user,
             project=project,
@@ -169,6 +159,7 @@ class TestAdminFeedbackFormView(TestCase):
             project=project,
             path_patterns=[],
         )
+
         self.client.force_login(self.admin_user)
         response = self.client.get(
             reverse_with_query(
@@ -184,9 +175,7 @@ class TestAdminFeedbackFormView(TestCase):
 
     # As an Admin user I can create a feedback form with multiple prompts in Django admin
     def test_create_feedback_form_with_text_prompts(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
 
         self.client.force_login(self.admin_user)
         response = self.client.post(
@@ -231,9 +220,7 @@ class TestAdminFeedbackFormView(TestCase):
 
     # As an Admin user I cannot create a feedback form with more than 3 enabled text prompts in Django admin
     def test_create_feedback_form_with_excessive_text_prompts(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
 
         self.client.force_login(self.admin_user)
         response = self.client.post(
@@ -268,9 +255,7 @@ class TestAdminFeedbackFormView(TestCase):
 
     # As an Admin user I cannot create a feedback form with text prompts with a duplicate order in Django admin
     def test_create_feedback_form_with_duplicate_order_text_prompts(self):
-        project = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
-        )
+        project = ProjectFactory.create(created_by=self.admin_user)
 
         self.client.force_login(self.admin_user)
         response = self.client.post(

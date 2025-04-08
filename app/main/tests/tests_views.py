@@ -4,10 +4,10 @@ from django.test import TestCase
 from django.urls import reverse
 
 from app.users.factories import StaffUserFactory
-from app.utils.testing import reverse_with_query
+from app.utils.testing import ResetFactorySequencesMixin, reverse_with_query
 
 
-class TestIndexView(TestCase):
+class TestIndexView(ResetFactorySequencesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory()
@@ -23,7 +23,7 @@ class TestIndexView(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
 
-class TestAdminIndexView(TestCase):
+class TestAdminIndexView(ResetFactorySequencesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory()
