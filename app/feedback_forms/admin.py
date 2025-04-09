@@ -25,9 +25,31 @@ class FeedbackFormForm(IsDisabledCheckboxForm):
         fields = "__all__"
 
 
+class PathPatternForm(forms.ModelForm):
+    pattern_with_wildcard = forms.CharField(label="pattern")
+
+    class Meta:
+        model = PathPattern
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["pattern_with_wildcard"].initial = (
+            self.instance.pattern_with_wildcard
+        )
+
+
 class PathPatternFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
+
+        # Set custom field pattern_with_wildcard
+        for form in self.forms:
+            if "pattern_with_wildcard" in form.cleaned_data:
+                form.instance.pattern_with_wildcard = form.cleaned_data[
+                    "pattern_with_wildcard"
+                ]
 
         # Propagate project from FeedbackForm to PathPattern
         for form in self.forms:
@@ -39,18 +61,19 @@ class PathPatternFormSet(BaseInlineFormSet):
 
         disallow_duplicates(
             self.forms,
-            "pattern",
+            "pattern_with_wildcard",
             "You cannot use the same pattern twice in a project.",
         )
 
 
 class PathPatternInline(admin.TabularInline):
+    form = PathPatternForm
     formset = PathPatternFormSet
     model = PathPattern
     extra = 1
     ordering = ["pattern"]
     fields = [
-        "pattern",
+        "pattern_with_wildcard",
         "created_by",
     ]
     readonly_fields = [
@@ -191,7 +214,9 @@ class FeedbackFormAdmin(
     search_fields = ["name", "uuid", "path_patterns__pattern"]
 
     def patterns(self, obj):
-        return ", ".join(pattern.pattern for pattern in obj.path_patterns.all())
+        return ", ".join(
+            pattern.pattern_with_wildcard for pattern in obj.path_patterns.all()
+        )
 
     patterns.short_description = "Path patterns"
 
