@@ -1,5 +1,6 @@
 from django.db import transaction
 
+from drf_spectacular.extensions import OpenApiSerializerExtension
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import empty
@@ -22,7 +23,7 @@ from app.responses.models import (
 
 
 class RangedPromptOptionSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(read_only=True, source="uuid")
+    id = serializers.UUIDField(read_only=True, source="uuid")
     label = serializers.CharField(read_only=True)
     value = serializers.CharField(read_only=True)
 
@@ -32,7 +33,7 @@ class RangedPromptOptionSerializer(serializers.ModelSerializer):
 
 
 class PromptSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(read_only=True, source="uuid")
+    id = serializers.UUIDField(read_only=True, source="uuid")
     feedback_form = serializers.SlugRelatedField(
         slug_field="uuid", read_only=True
     )
@@ -127,7 +128,7 @@ class BinaryPromptSerializer(PromptSerializer):
 
 
 class FeedbackFormSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(read_only=True, source="uuid")
+    id = serializers.UUIDField(read_only=True, source="uuid")
     name = serializers.CharField(read_only=True)
     is_enabled = serializers.BooleanField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
@@ -147,7 +148,7 @@ class FeedbackFormSerializer(serializers.ModelSerializer):
 
 
 class PromptResponseSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(read_only=True, source="uuid")
+    id = serializers.UUIDField(read_only=True, source="uuid")
     created_at = serializers.DateTimeField(read_only=True)
     response = serializers.SlugRelatedField(
         queryset=Response.objects.all(), slug_field="uuid"
@@ -295,6 +296,22 @@ class PromptResponseSerializer(serializers.ModelSerializer):
         return PromptResponseSubclass.objects.create(**validated_data)
 
 
+class PromptResponseSerializerExtension(OpenApiSerializerExtension):
+    """
+    Adds a generic "value" field to the PromptResponseSerializer
+    """
+
+    target_class = PromptResponseSerializer
+
+    def map_serializer(self, auto_schema, direction):
+        schema = auto_schema._map_serializer(
+            self.target_class, direction, bypass_extensions=True
+        )
+        # This is how we specify "any" type in OpenAPI
+        schema["properties"]["value"] = {}
+        return schema
+
+
 class TextPromptResponseSerializer(PromptResponseSerializer):
     value = serializers.CharField()
 
@@ -356,7 +373,7 @@ class RangedPromptResponseSerializer(PromptResponseSerializer):
 
 
 class ResponseSerializer(serializers.ModelSerializer):
-    id = serializers.CharField(read_only=True, source="uuid")
+    id = serializers.UUIDField(read_only=True, source="uuid")
     created_at = serializers.DateTimeField(read_only=True)
     feedback_form = serializers.SlugRelatedField(
         queryset=FeedbackForm.objects.all(), slug_field="uuid"

@@ -1,0 +1,397 @@
+{
+  "info": {
+    "_postman_id": "95136ae3-4008-4aa1-a22d-6126fa8479c7",
+    "name": "TNA Feedback API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42849332"
+  },
+  "item": [
+    {
+      "name": "Core API",
+      "item": [
+        {
+          "name": "Get feedback forms",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{endpoint}}/api/v1/core/projects/{{project}}/feedback-forms/",
+              "host": ["{{endpoint}}"],
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "projects",
+                "{{project}}",
+                "feedback-forms",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get feedback form",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{endpoint}}/api/v1/core/projects/{{project}}/feedback-forms/{{feedback_form}}/",
+              "host": ["{{endpoint}}"],
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "projects",
+                "{{project}}",
+                "feedback-forms",
+                "{{feedback_form}}",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get feedback form by path",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{endpoint}}/api/v1/core/projects/{{project}}/feedback-forms/path{{path}}",
+              "host": ["{{endpoint}}"],
+              "path": [
+                "api",
+                "v1",
+                "core",
+                "projects",
+                "{{project}}",
+                "feedback-forms",
+                "path{{path}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Submit API",
+      "item": [
+        {
+          "name": "Create response",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"feedback_form\": \"{{feedback_form}}\",\n    \"url\": \"http://example.com/\",\n    \"metadata\": {\"user-agent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0\"},\n    \"first_prompt_response\": {\n        \"prompt\": \"{{prompt}}\",\n        \"value\": \"Example\"\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{endpoint}}/api/v1/submit/responses/",
+              "host": ["{{endpoint}}"],
+              "path": ["api", "v1", "submit", "responses", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create prompt response",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"response\": \"{{response}}\",\n    \"prompt\": \"{{prompt}}\",\n    \"value\": \"{{ranged_prompt_option}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{endpoint}}/api/v1/submit/prompt-responses/",
+              "host": ["{{endpoint}}"],
+              "path": ["api", "v1", "submit", "prompt-responses", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Explore API",
+      "item": [
+        {
+          "name": "View responses",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{endpoint}}/api/v1/explore/responses/",
+              "host": ["{{endpoint}}"],
+              "path": ["api", "v1", "explore", "responses", ""],
+              "query": [
+                {
+                  "key": "project",
+                  "value": "{{project}}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "View response",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{endpoint}}/api/v1/explore/responses/{{response}}/",
+              "host": ["{{endpoint}}"],
+              "path": ["api", "v1", "explore", "responses", "{{response}}", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "View prompt responses",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{endpoint}}/api/v1/explore/prompt-responses/",
+              "host": ["{{endpoint}}"],
+              "path": ["api", "v1", "explore", "prompt-responses", ""],
+              "query": [
+                {
+                  "key": "prompt",
+                  "value": "{{prompt}}",
+                  "disabled": true
+                },
+                {
+                  "key": "feedback_form",
+                  "value": "{{feedback_form}}",
+                  "disabled": true
+                },
+                {
+                  "key": "response",
+                  "value": "{{response}}",
+                  "disabled": true
+                },
+                {
+                  "key": "project",
+                  "value": "{{project}}",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "View prompt response",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}",
+                "type": "text"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{endpoint}}/api/v1/explore/prompt-responses/3db7fb5e-bf71-47d6-bd6f-cb2dae13c6c4/",
+              "host": ["{{endpoint}}"],
+              "path": [
+                "api",
+                "v1",
+                "explore",
+                "prompt-responses",
+                "3db7fb5e-bf71-47d6-bd6f-cb2dae13c6c4",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "endpoint",
+      "value": "http://localhost:65527",
+      "type": "default"
+    },
+    {
+      "key": "auth_token",
+      "value": "232f2e777178c81c49309de08e6cfddc0b4cce71",
+      "type": "default"
+    },
+    {
+      "key": "project",
+      "value": "9a99694d-847c-4e99-a160-0dbeae64c157",
+      "type": "string"
+    },
+    {
+      "key": "feedback_form",
+      "value": "7fdf78d4-2c6a-4db9-a41d-dd2ac2c0839f",
+      "type": "string"
+    },
+    {
+      "key": "prompt",
+      "value": "57747260-78c2-4ba0-a8b2-9c4c62865f20",
+      "type": "default"
+    },
+    {
+      "key": "ranged_prompt_option",
+      "value": "5be71f01-0f71-4c5c-b67f-9639b0cab390",
+      "type": "default"
+    },
+    {
+      "key": "response",
+      "value": "f907bc7d-b154-4da8-a548-1010bc6ff96e",
+      "type": "default"
+    },
+    {
+      "key": "path",
+      "value": "/about-us/",
+      "type": "string"
+    }
+  ]
+}
