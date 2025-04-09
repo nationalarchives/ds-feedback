@@ -22,14 +22,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "rest_framework.authtoken",
     "csp",
+    "app.api",
     "app.users",
     "app.main",
     "app.projects",
     "app.feedback_forms",
     "app.prompts",
     "app.responses",
-    "app.api",
 ]
 
 MIDDLEWARE = [
@@ -280,10 +282,10 @@ GA4_ID = os.environ.get("GA4_ID", "")
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "app.api.permissions.IsSuperuser",
+        "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
