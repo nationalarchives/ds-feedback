@@ -1,5 +1,6 @@
 from django.db import transaction
 
+from drf_spectacular.extensions import OpenApiSerializerExtension
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import empty
@@ -293,6 +294,22 @@ class PromptResponseSerializer(serializers.ModelSerializer):
         prompt = validated_data["prompt"]
         PromptResponseSubclass = PromptResponse.get_subclass_from_prompt(prompt)
         return PromptResponseSubclass.objects.create(**validated_data)
+
+
+class PromptResponseSerializerExtension(OpenApiSerializerExtension):
+    """
+    Adds a generic "value" field to the PromptResponseSerializer
+    """
+
+    target_class = PromptResponseSerializer
+
+    def map_serializer(self, auto_schema, direction):
+        schema = auto_schema._map_serializer(
+            self.target_class, direction, bypass_extensions=True
+        )
+        # This is how we specify "any" type in OpenAPI
+        schema["properties"]["value"] = {}
+        return schema
 
 
 class TextPromptResponseSerializer(PromptResponseSerializer):
