@@ -1,0 +1,125 @@
+erDiagram
+    Project {
+        int id PK "NOT NULL"
+        uuid uuid "NOT NULL"
+        char name "NOT NULL"
+        char domain "NOT NULL"
+        int retention_period "NOT NULL"
+        int created_by_id FK "NOT NULL"
+        int owned_by_id FK "NOT NULL"
+        timestamp created_at "NOT NULL"
+        timestamp modified_at "NOT NULL"
+    }
+    FeedbackForm {
+        int id PK "NOT NULL"
+        uuid uuid "NOT NULL"
+        char name "NOT NULL"
+        int project_id FK "NOT NULL"
+        int created_by_id FK "NOT NULL"
+        int disabled_by_id FK
+        timestamp disabled_at
+        timestamp created_at "NOT NULL"
+        timestamp modified_at "NOT NULL"
+    }
+    PathPattern {
+        int id PK "NOT NULL"
+        uuid uuid "NOT NULL"
+        char pattern "NOT NULL"
+        bool is_wildcard "NOT NULL"
+        int feedback_form_id FK "NOT NULL"
+        int created_by_id FK "NOT NULL"
+        timestamp created_at "NOT NULL"
+        timestamp modified_at "NOT NULL"
+    }
+    Prompt {
+        int id PK "NOT NULL"
+        uuid uuid "NOT NULL"
+        char text "NOT NULL"
+        int order "NOT NULL"
+        int feedback_form_id FK "NOT NULL"
+        int disabled_by_id FK
+        timestamp disabled_at
+        int created_by_id FK "NOT NULL"
+        timestamp created_at "NOT NULL"
+        timestamp modified_at "NOT NULL"
+    }
+    TextPrompt {
+        int prompt_ptr_id PK "NOT NULL"
+        int max_length "NOT NULL"
+    }
+    BinaryPrompt {
+        int prompt_ptr_id PK "NOT NULL"
+        char positive_answer_label "NOT NULL"
+        char negative_answer_label "NOT NULL"
+    }
+    RangedPrompt {
+        int prompt_ptr_id PK "NOT NULL"
+    }
+    RangedPromptOption {
+        int id PK "NOT NULL"
+        uuid uuid "NOT NULL"
+        char label "NOT NULL"
+        char ranged_prompt_id "NOT NULL"
+        int ranged_prompt_id FK "NOT NULL"
+    }
+    Response {
+        int id PK "NOT NULL"
+        uuid uuid "NOT NULL"
+        text url "NOT NULL"
+        JSON metadata "NOT NULL"
+        int feedback_form_id FK "NOT NULL"
+        timestamp created_at "NOT NULL"
+        timestamp modified_at "NOT NULL"
+    }
+    PromptResponse {
+        int id PK "NOT NULL"
+        uuid uuid "NOT NULL"
+        int prompt_id FK "NOT NULL"
+        int response_id FK "NOT NULL"
+        timestamp created_at "NOT NULL"
+        timestamp modified_at "NOT NULL"
+    }
+    TextPromptResponse {
+        int promptresponse_ptr_id PK "NOT NULL"
+        text value "NOT NULL"
+    }
+    BinaryPromptResponse {
+        int promptresponse_ptr_id PK "NOT NULL"
+        bool value "NOT NULL"
+    }
+    RangedPromptResponse {
+        int promptresponse_ptr_id PK "NOT NULL"
+        int value_id FK"NOT NULL"
+    }
+    User {
+        int id PK "NOT NULL"
+        char email "NOT NULL"
+        char password "NOT NULL"
+    }
+    ProjectAPIAccess {
+        int id PK "NOT NULL"
+        char role "NOT NULL"
+        int project_id FK "NOT NULL"
+        int grantee_id FK "NOT NULL"
+        int lifespan_days "NOT NULL"
+        timestamp expires_at "NOT NULL"
+        int created_by_id FK "NOT NULL"
+        timestamp created_at "NOT NULL"
+        timestamp modified_at "NOT NULL"
+    }
+    ProjectAPIAccess }o--|| Project : "belongs to"
+    ProjectAPIAccess }o--|| User : "has many"
+    Prompt ||--o| TextPrompt : "is a type of"
+    Prompt ||--o| BinaryPrompt : "is a type of"
+    Prompt ||--o| RangedPrompt : "is a type of"
+    RangedPrompt ||--o{ RangedPromptOption : "contains"
+    FeedbackForm ||--o{ PathPattern: "has many"
+    Project ||--o{ FeedbackForm : "contains"
+    FeedbackForm ||--o{ Prompt: "contains"
+    FeedbackForm ||--o{ Response: "has many"
+    Prompt ||--o{ PromptResponse : "has many"
+    Response ||--|{ PromptResponse : "contains"
+    PromptResponse ||--o| RangedPromptResponse : "is a type of"
+    PromptResponse ||--o| BinaryPromptResponse : "is a type of"
+    PromptResponse ||--o| TextPromptResponse : "is a type of"
+    RangedPromptResponse ||--|| RangedPromptOption : "contains"

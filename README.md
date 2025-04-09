@@ -1,11 +1,35 @@
 # DS Feedback Service
 
-## Quickstart
+This project is An API and administrative tool for collecting quick user feedback across TNA sites, in the style of the [GOV.UK feedback component](https://insidegovuk.blog.gov.uk/2022/03/28/making-the-gov-uk-feedback-component-more-accessible/#:~:text=What%20is%20the%20feedback%20component,also%20can%20demonstrate%20any%20concerns.).
+
+See [Key Concepts](/docs/key-concepts.md) for further information.
+
+This project uses the Django admin interface to manage feedback prompt questions and multiple choice answers, and decide which prompts are offered to users on which URLs. This is intended to be a temporary interface which will be replaced with a custom UI.
+
+See [Technical Guide](/docs/technical-guide.md) for more technical information.
+
+## Installation & Usage
+
+Use docker compose to run the server:
 
 ```sh
 # Build and start the container
 docker compose up -d
 ```
+
+For development, you will need to create a superuser account:
+
+```sh
+docker compose exec app poetry run python /app/manage.py createsuperuser
+```
+
+Then access the server at [http://localhost:65527/](http://localhost:65527/) and login.
+
+### Other resources:
+
+- [Admin interface](http://localhost:65527/admin/)
+- [Swagger API docs](http://localhost:65527/api/v1/schema/swagger/)
+- [Postman collection](/docs/tna-feedback-api.postman_collection.json)
 
 ### Add the static assets
 
@@ -29,6 +53,29 @@ docker compose exec dev poetry run python /app/manage.py test
 
 ```sh
 docker compose run dev ./format.sh
+```
+
+### Dependency management
+
+Install dependencies through the app container:
+
+```sh
+docker compose exec app poetry add django
+```
+
+Then sync your local dependencies, if desired:
+
+```sh
+poetry install
+```
+
+### Migration management:
+
+Manage migrations through the app container:
+
+```sh
+docker compose exec app poetry run python /app/manage.py makemigrations
+docker compose exec app poetry run python /app/manage.py migrate
 ```
 
 ## Environment variables
