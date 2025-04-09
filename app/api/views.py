@@ -1,8 +1,15 @@
+from datetime import datetime
 from functools import cache
 
 from django.db.models import F, Prefetch, Q, Value
 from django.db.models.functions import Length
 
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    extend_schema,
+)
 from rest_framework import generics, views
 from rest_framework.exceptions import NotFound, PermissionDenied
 
@@ -18,6 +25,90 @@ from app.projects.models import Project
 from app.prompts.models import Prompt
 from app.responses.models import PromptResponse, Response
 from app.utils.views import is_valid_uuid
+
+EXAMPLE_DATE = datetime.now().isoformat(timespec="milliseconds") + "Z"
+
+TEXT_PROMPT_EXAMPLE = {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "feedback_form": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "prompt_type": "TextPrompt",
+    "text": "Was this page useful?",
+    "is_enabled": True,
+    "created_at": EXAMPLE_DATE,
+    "modified_at": EXAMPLE_DATE,
+    "max_length": 1000,
+}
+
+BINARY_PROMPT_EXAMPLE = {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "feedback_form": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "prompt_type": "BinaryPrompt",
+    "text": "Was this a good experience?",
+    "is_enabled": True,
+    "created_at": EXAMPLE_DATE,
+    "modified_at": EXAMPLE_DATE,
+    "positive_answer_label": "Yes",
+    "negative_answer_label": "No",
+}
+
+RANGED_PROMPT_EXAMPLE = {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "feedback_form": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "prompt_type": "RangedPrompt",
+    "text": "How do you feel about this page?",
+    "is_enabled": True,
+    "created_at": EXAMPLE_DATE,
+    "modified_at": EXAMPLE_DATE,
+    "options": [
+        {
+            "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "label": "Disatisfied",
+            "value": "1",
+        },
+        {
+            "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "label": "Neutral",
+            "value": "2",
+        },
+        {
+            "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "label": "Satisfied",
+            "value": "3",
+        },
+    ],
+}
+
+FEEDBACK_FORM_EXAMPLE = {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "name": "Explore by topic",
+    "is_enabled": True,
+    "created_at": EXAMPLE_DATE,
+    "modified_at": EXAMPLE_DATE,
+    "prompts": [
+        TEXT_PROMPT_EXAMPLE,
+        BINARY_PROMPT_EXAMPLE,
+        RANGED_PROMPT_EXAMPLE,
+    ],
+}
+
+PROMPT_RESPONSE_EXAMPLE = {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "created_at": EXAMPLE_DATE,
+    "prompt": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "response": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "value": "This page was very helpful",
+}
+
+RESPONSE_EXAMPLE = {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "url": "https://example.com/path/to/page",
+    "created_at": EXAMPLE_DATE,
+    "metadata": {
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0"
+    },
+    "feedback_form": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "prompt_responses": [PROMPT_RESPONSE_EXAMPLE],
+}
 
 
 class CheckProjectAccessMixin(views.APIView):
@@ -104,6 +195,19 @@ class FeedbackFormDetail(generics.RetrieveAPIView, CheckProjectAccessMixin):
             Project.objects.filter(uuid=self.kwargs["project"])
         )
 
+    @extend_schema(
+        description="Get a feedback form in a project, including all associated prompts.",
+        examples=[
+            OpenApiExample(
+                "Example response",
+                response_only=True,
+                value=FEEDBACK_FORM_EXAMPLE,
+            )
+        ],
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
 
 class FeedbackFormList(
     generics.ListAPIView,
@@ -133,6 +237,19 @@ class FeedbackFormList(
         return generics.get_object_or_404(
             Project.objects.filter(uuid=self.kwargs["project"])
         )
+
+    @extend_schema(
+        description="Get all feedback forms in a project, including all associated prompts.",
+        examples=[
+            OpenApiExample(
+                "Example response",
+                response_only=True,
+                value=[FEEDBACK_FORM_EXAMPLE],
+            )
+        ],
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class FeedbackFormPathPatternDetail(
@@ -177,6 +294,19 @@ class FeedbackFormPathPatternDetail(
             Project.objects.filter(uuid=self.kwargs["project"])
         )
 
+    @extend_schema(
+        description="Get the matching feedback form for a URL, given the path component of the URL. The path must start with `/`.",
+        examples=[
+            OpenApiExample(
+                "Example response",
+                response_only=True,
+                value=FEEDBACK_FORM_EXAMPLE,
+            )
+        ],
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
 
 class ResponseCreate(generics.CreateAPIView, CheckProjectAccessMixin):
     queryset = Response.objects.all()
@@ -220,6 +350,36 @@ class ResponseCreate(generics.CreateAPIView, CheckProjectAccessMixin):
                     f"Feedback form id={data["feedback_form"]} is disabled.",
                 )
 
+    @extend_schema(
+        description="Create a response for a feedback form, including the response for the first prompt.",
+        examples=[
+            OpenApiExample(
+                "Example request",
+                description="You must provide the response to the first prompt in this request.",
+                request_only=True,
+                value={
+                    "url": "https://example.com/path/to/page",
+                    "metadata": {
+                        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0"
+                    },
+                    "feedback_form": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "first_prompt_response": {
+                        "prompt": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                        "response": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                        "value": "This page was very helpful",
+                    },
+                },
+            ),
+            OpenApiExample(
+                "Example response",
+                response_only=True,
+                value=RESPONSE_EXAMPLE,
+            ),
+        ],
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
     def create(self, request, *args, **kwargs):
         self.validate_feedback_form_enabled(request.data)
         return super().create(request, *args, **kwargs)
@@ -257,6 +417,49 @@ class PromptResponseCreate(generics.CreateAPIView, CheckProjectAccessMixin):
                 raise NotFound(
                     f"Feedback form id={data["response"]} is disabled.",
                 )
+
+    @extend_schema(
+        description="Create a response for a prompt.",
+        examples=[
+            OpenApiExample(
+                "TextPrompt request",
+                description="For a TextPrompt, please provide a string value.",
+                request_only=True,
+                value={
+                    "prompt": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "response": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "value": "This page was very helpful",
+                },
+            ),
+            OpenApiExample(
+                "BinaryPrompt request",
+                description="For a BinaryPrompt, please provide a boolean value.",
+                request_only=True,
+                value={
+                    "prompt": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "response": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "value": True,
+                },
+            ),
+            OpenApiExample(
+                "RangedPrompt request",
+                description="For a RangedPrompt, please provide the ID for one of the ranged prompt options.",
+                request_only=True,
+                value={
+                    "prompt": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "response": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                },
+            ),
+            OpenApiExample(
+                "TextPrompt response",
+                response_only=True,
+                value=PROMPT_RESPONSE_EXAMPLE,
+            ),
+        ],
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         self.validate_feedback_form_enabled(request.data)
@@ -306,6 +509,33 @@ class ResponseList(
 
         return queryset
 
+    @extend_schema(
+        description="Get a list of all user's responses to feedback forms including all prompt responses.",
+        examples=[
+            OpenApiExample(
+                "Example response",
+                response_only=True,
+                value=[RESPONSE_EXAMPLE],
+            )
+        ],
+        parameters=[
+            OpenApiParameter(
+                "project",
+                type=OpenApiTypes.UUID,
+                allow_blank=True,
+                description="The ID of a project to filter by.",
+            ),
+            OpenApiParameter(
+                "feedback_form",
+                type=OpenApiTypes.UUID,
+                allow_blank=True,
+                description="The ID of a feedback form to filter by.",
+            ),
+        ],
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
     def list(self, request, *args, **kwargs):
         self.validate_uuid_param(request.query_params, "project")
         self.validate_uuid_param(request.query_params, "feedback_form")
@@ -342,6 +572,19 @@ class ResponseDetail(generics.RetrieveAPIView, CheckProjectAccessMixin):
     def get_project(self, data: dict[str, str]) -> Project:
         response = self.get_object()
         return response.feedback_form.project
+
+    @extend_schema(
+        description="Get a user's response to a feedback form including all prompt responses.",
+        examples=[
+            OpenApiExample(
+                "Example response",
+                response_only=True,
+                value=RESPONSE_EXAMPLE,
+            )
+        ],
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class PromptResponseList(
@@ -387,6 +630,39 @@ class PromptResponseList(
 
         return super().list(request, *args, **kwargs)
 
+    @extend_schema(
+        description="Get a list of all responses to individual prompts.",
+        parameters=[
+            OpenApiParameter(
+                "project",
+                type=OpenApiTypes.UUID,
+                allow_blank=True,
+                description="The ID of a project to filter by.",
+            ),
+            OpenApiParameter(
+                "feedback_form",
+                type=OpenApiTypes.UUID,
+                allow_blank=True,
+                description="The ID of a feedback form to filter by.",
+            ),
+            OpenApiParameter(
+                "prompt",
+                type=OpenApiTypes.UUID,
+                allow_blank=True,
+                description="The ID of a prompt to filter by.",
+            ),
+        ],
+        examples=[
+            OpenApiExample(
+                "Example response",
+                response_only=True,
+                value=[PROMPT_RESPONSE_EXAMPLE],
+            )
+        ],
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
 
 class PromptResponseDetail(generics.RetrieveAPIView, CheckProjectAccessMixin):
     queryset = PromptResponse.objects.all()
@@ -412,3 +688,16 @@ class PromptResponseDetail(generics.RetrieveAPIView, CheckProjectAccessMixin):
     def get_project(self, data: dict[str, str]) -> Project:
         prompt_response = self.get_object()
         return prompt_response.response.feedback_form.project
+
+    @extend_schema(
+        description="Get a response to a prompt.",
+        examples=[
+            OpenApiExample(
+                "Example response",
+                response_only=True,
+                value=PROMPT_RESPONSE_EXAMPLE,
+            )
+        ],
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
