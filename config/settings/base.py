@@ -3,6 +3,7 @@ import os
 from sysconfig import get_path
 
 import dj_database_url
+from csp.constants import NONE, SELF
 
 from config.util import strtobool
 
@@ -24,6 +25,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken",
+    "drf_spectacular",
     "csp",
     "app.api",
     "app.users",
@@ -206,77 +208,44 @@ COOKIE_DOMAIN: str = os.environ.get("COOKIE_DOMAIN", "")
 if "CSRF_TRUSTED_ORIGINS" in os.environ:
     CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
 
-CSP_IMG_SRC: list[str] = os.environ.get("CSP_IMG_SRC", "'self'").split(",")
-CSP_SCRIPT_SRC: list[str] = os.environ.get("CSP_SCRIPT_SRC", "'self'").split(
-    ","
-)
-CSP_SCRIPT_SRC_ELEM: list[str] = os.environ.get(
-    "CSP_SCRIPT_SRC_ELEM", "'self'"
-).split(",")
-CSP_STYLE_SRC: list[str] = os.environ.get("CSP_STYLE_SRC", "'self'").split(",")
-CSP_STYLE_SRC_ELEM: list[str] = os.environ.get(
-    "CSP_STYLE_SRC_ELEM", "'self'"
-).split(",")
-CSP_FONT_SRC: list[str] = os.environ.get("CSP_FONT_SRC", "'self'").split(",")
-CSP_CONNECT_SRC: list[str] = os.environ.get("CSP_CONNECT_SRC", "'self'").split(
-    ","
-)
-CSP_MEDIA_SRC: list[str] = os.environ.get("CSP_MEDIA_SRC", "'self'").split(",")
-CSP_WORKER_SRC: list[str] = os.environ.get("CSP_WORKER_SRC", "'self'").split(
-    ","
-)
-CSP_FRAME_SRC: list[str] = os.environ.get("CSP_FRAME_SRC", "'self'").split(",")
 
-CSP_SELF = "'self'"
-CSP_NONE = "'none'"
-CONTENT_SECURITY_POLICY = (
-    {
-        "DIRECTIVES": {
-            "default-src": CSP_SELF,
-            "base-uri": CSP_NONE,
-            "object-src": CSP_NONE,
-            **({"img-src": CSP_IMG_SRC} if CSP_IMG_SRC != [CSP_SELF] else {}),
-            **(
-                {"script-src": CSP_SCRIPT_SRC}
-                if CSP_SCRIPT_SRC != [CSP_SELF]
-                else {}
-            ),
-            **(
-                {"script-src-elem": CSP_SCRIPT_SRC_ELEM}
-                if CSP_SCRIPT_SRC_ELEM != [CSP_SELF]
-                else {}
-            ),
-            **(
-                {"style-src": CSP_STYLE_SRC}
-                if CSP_STYLE_SRC != [CSP_SELF]
-                else {}
-            ),
-            **(
-                {"font-src": CSP_FONT_SRC} if CSP_FONT_SRC != [CSP_SELF] else {}
-            ),
-            **(
-                {"connect-src": CSP_CONNECT_SRC}
-                if CSP_CONNECT_SRC != [CSP_SELF]
-                else {}
-            ),
-            **(
-                {"media-src": CSP_MEDIA_SRC}
-                if CSP_MEDIA_SRC != [CSP_SELF]
-                else {}
-            ),
-            **(
-                {"worker-src": CSP_WORKER_SRC}
-                if CSP_WORKER_SRC != [CSP_SELF]
-                else {}
-            ),
-            **(
-                {"frame-src": CSP_FRAME_SRC}
-                if CSP_FRAME_SRC != [CSP_SELF]
-                else {}
-            ),
+def get_env_csp(env_name: str) -> list[str]:
+    """
+    Gets a CSP directive from an env variable
+    """
+    return os.environ.get(env_name, SELF).split(",")
+
+
+def trim_default_directives(directives: dict[str, str]) -> dict[str, str]:
+    """
+    Remove directives that are the default value
+    """
+    return {
+        directive: value
+        for directive, value in directives.items()
+        if directive == "default-src" or value != directives["default-src"]
+    }
+
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": trim_default_directives(
+        {
+            "default-src": [SELF],
+            "base-uri": NONE,
+            "object-src": NONE,
+            "img-src": get_env_csp("CSP_IMG_SRC"),
+            "script-src": get_env_csp("CSP_SCRIPT_SRC"),
+            "script-src-elem": get_env_csp("CSP_SCRIPT_SRC_ELEM"),
+            "style-src": get_env_csp("CSP_STYLE_SRC"),
+            "style-src-elem": get_env_csp("CSP_STYLE_SRC_ELEM"),
+            "font-src": get_env_csp("CSP_FONT_SRC"),
+            "connect-src": get_env_csp("CSP_CONNECT_SRC"),
+            "media-src": get_env_csp("CSP_MEDIA_SRC"),
+            "worker-src": get_env_csp("CSP_WORKER_SRC"),
+            "frame-src": get_env_csp("CSP_FRAME_SRC"),
         }
-    },
-)
+    )
+}
 
 GA4_ID = os.environ.get("GA4_ID", "")
 
@@ -293,4 +262,12 @@ REST_FRAMEWORK = {
     "DEFAULT_PARSER_CLASSES": [
         "rest_framework.parsers.JSONParser",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "TNA Feedback API",
+    "DESCRIPTION": "API to collect feedback from users of TNA services.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
