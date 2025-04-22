@@ -4,7 +4,7 @@ Start with [Key Concepts](./key-concepts.md) for an overview of concepts/terms.
 
 ## Data model
 
-You can also explore the data model on the [Mermaid data model diagram](./data-model.mmd).
+You can also explore the data model on the [Mermaid data model diagram](https://github.com/nationalarchives/ds-feedback/blob/main/docs/data-model.mmd).
 
 The data model has been designed to maximise data integrity, however it should be noted that due to the multi-table inhertiance for prompts and responses there is no database-level integrity linking Prompt subclasses and Response subclasses.
 
@@ -40,5 +40,5 @@ Alternative approaches are welome!
   - Update [prefetches in the API](https://github.com/nationalarchives/ds-feedback/blob/main/app/api/views.py)
   - Update [PromptResponseSerializer.to_representation()](https://github.com/nationalarchives/ds-feedback/blob/main/app/api/serializers.py) to propagate prefetched values
 - Create factories and add prompt specific test cases
-- Update the documentation such as [the data model diagram](./data-model.mmd) and [Key Concepts](./key-concepts.md)
+- Update the documentation such as [the data model diagram](https://github.com/nationalarchives/ds-feedback/blob/main/docs/data-model.mmd) and [Key Concepts](./key-concepts.md)
 - Add an example for the Prompt type to API documentation
