@@ -1,6 +1,6 @@
 # DS Feedback Service
 
-This project is An API and administrative tool for collecting quick user feedback across TNA sites, in the style of the [GOV.UK feedback component](https://insidegovuk.blog.gov.uk/2022/03/28/making-the-gov-uk-feedback-component-more-accessible/#:~:text=What%20is%20the%20feedback%20component,also%20can%20demonstrate%20any%20concerns.).
+This project is An API and administrative tool for collecting quick user feedback across TNA sites, in the style of the [GOV.UK feedback component](https://insidegovuk.blog.gov.uk/2022/03/28/making-the-gov-uk-feedback-component-more-accessible/).
 
 See [Key Concepts](/docs/key-concepts.md) for further information.
 
