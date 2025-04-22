@@ -23,7 +23,7 @@ For any page, the feedback form which most specifically matches the URL path wil
 
 ## Projects
 
-Each project is a collection of feedback forms, designed to be used on a site (for example https://beta.nationalarchives.gov.uk/). API access is granted per project.
+Each project is a collection of feedback forms, designed to be used on a site (for example [https://beta.nationalarchives.gov.uk/](https://beta.nationalarchives.gov.uk/)). API access is granted per project.
 
 ## Responses
 
