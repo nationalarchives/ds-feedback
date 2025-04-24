@@ -53,3 +53,30 @@ jobs:
           wiz-client-id: ${{ secrets.WIZ_CLIENT_ID }}
           wiz-client-secret: ${{ secrets.WIZ_CLIENT_SECRET }}
           wiz-project-id: ${{ secrets.WIZ_PROJECT_DIGITALSERVICES }}
+
+  update-ds-infrastructure-web:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - version
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: nationalarchives/ds-infrastructure-web
+          ref: main
+          token: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+      - name: Set up git config
+        run: |
+          git config user.name "${{ github.triggering_actor }}"
+          git config user.email "<>"
+      - name: Install jq
+        run: sudo apt-get install jq
+      - name: Update config
+        run: jq --indent 4 '(.services.feedback.version|="${{ needs.version.outputs.version }}")' config/develop.json > tmp.$$.json && mv tmp.$$.json config/develop.json
+      - name: Push new version
+        run: |
+          git add config/develop.json
+          COMMIT_MESSAGE_HEADER=$(git log -1 --pretty=%B | head -n 1)
+          git commit -m "Update feedback to v${{ needs.version.outputs.version }}" -m "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"
+          git push origin main
