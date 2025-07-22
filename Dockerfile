@@ -7,6 +7,20 @@ ENV NPM_BUILD_COMMAND=compile
 ARG BUILD_VERSION
 ENV BUILD_VERSION="$BUILD_VERSION"
 
+USER root
+
+ARG UID=1000
+ARG GID=1000
+ARG USERNAME=app
+RUN <<EOF
+    # Modify the existing `app` user from the base image to match host UID/GID
+    usermod -u $UID $USERNAME
+    groupmod -g $GID $USERNAME
+    chown -R $UID:$GID /app /home/app
+EOF
+
+USER app
+
 # Copy in the application code
 COPY --chown=app . .
 
