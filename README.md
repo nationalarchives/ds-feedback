@@ -109,4 +109,3 @@ In addition to the [base Docker image variables](https://github.com/nationalarch
 | `CSP_WORKER_SRC`         | A comma separated list of CSP rules for `worker-src`           | `'self'`                                                  |
 | `CSP_FRAME_SRC`          | A comma separated list of CSP rules for `frame-src`            | `'self'`                                                  |
 | `GA4_ID`                 | The Google Analytics 4 ID                                      | _none_                                                    |
-
