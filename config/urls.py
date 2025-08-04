@@ -25,6 +25,7 @@ urlpatterns = [
     path("", include(("app.main.urls", "main"), namespace="main")),
     path("healthcheck/", include("app.healthcheck.urls")),
     path("admin/", admin.site.urls),
+    path("editor/", include("app.editor_ui.urls")),
     path("api/v1/", include("app.api.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
