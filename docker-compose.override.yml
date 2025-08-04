@@ -1,0 +1,8 @@
+services:
+  app:
+    build:
+      args:
+        # Pass host user's UID/GID to avoid permission issues (mainly for Linux/Docker Engine)
+        # These will use the environment variables if set, or default to 1000
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
