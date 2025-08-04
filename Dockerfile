@@ -7,18 +7,26 @@ ENV NPM_BUILD_COMMAND=compile
 ARG BUILD_VERSION
 ENV BUILD_VERSION="$BUILD_VERSION"
 
+######################################################################
+# UID/GID configuration for cross-platform development
+#
+# This section is primarily needed for Linux users running Docker Engine, where
+# file permission issues can occur when mounting volumes. It sets the UID/GID
+# for the 'app' user in the container to match the host system, preventing
+# problems with file ownership.
+#
+# Docker Desktop and OrbStack users usually do not need to set these args, as
+# their Docker implementations handle permissions differently.
+#
+# For more info, see README.md
+######################################################################
 USER root
-
 ARG UID=1000
 ARG GID=1000
 ARG USERNAME=app
-RUN <<EOF
-    # Modify the existing `app` user from the base image to match host UID/GID
-    usermod -u $UID $USERNAME
-    groupmod -g $GID $USERNAME
+RUN usermod -u $UID $USERNAME && \
+    groupmod -g $GID $USERNAME && \
     chown -R $UID:$GID /app /home/app
-EOF
-
 USER app
 
 # Copy in the application code

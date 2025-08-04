@@ -10,6 +10,18 @@ See [Technical Guide](/docs/technical-guide.md) for more technical information.
 
 ## Installation & Usage
 
+### Linux/Docker Engine Users
+
+If you're using Linux with Docker Engine, export your user ID and group ID first to avoid permission issues:
+
+```sh
+# Export your user/group IDs for Docker to use
+export UID=$(id -u)
+export GID=$(id -g)
+```
+
+### Starting the Application
+
 Use docker compose to run the server:
 
 ```sh
@@ -101,3 +113,41 @@ In addition to the [base Docker image variables](https://github.com/nationalarch
 | `CSP_WORKER_SRC`         | A comma separated list of CSP rules for `worker-src`           | `'self'`                                                  |
 | `CSP_FRAME_SRC`          | A comma separated list of CSP rules for `frame-src`            | `'self'`                                                  |
 | `GA4_ID`                 | The Google Analytics 4 ID                                      | _none_                                                    |
+
+## Resolving Docker Build Permissions Issues
+
+If you encounter file permission errors (for example when installing node modules or mounting volumes) during Docker builds, especially on Linux, this project supports setting the UID/GID for the `app` user in the container to match your host system.
+
+### Why?
+
+Docker Engine handles file permissions differently to Docker Desktop and other tools. When mounting your project directory as a volume, files created by the container may be owned by a different user than your host, causing permission issues. Setting the UID/GID ensures files are owned correctly.
+
+### How to Use
+
+#### Docker Engine Users
+
+If you're using Linux with Docker Engine, export your user ID and group ID before building:
+
+```sh
+# Export your UID/GID as environment variables
+export UID=$(id -u)
+export GID=$(id -g)
+
+# Then run docker compose as usual
+docker compose up --build
+```
+
+#### Docker Desktop/OrbStack Users
+
+You usually do not need to set these variables. Simply run:
+
+```sh
+docker compose up --build
+```
+
+The default UID/GID values work for most Mac/Windows setups.
+
+### Troubleshooting
+
+- If you see permission errors (e.g., with `node_modules` or mounted files), check your UID/GID and rebuild as above.
+- For more details, see the relevant section in the `Dockerfile` and `docker-compose.override.yaml` files.
