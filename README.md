@@ -29,7 +29,13 @@ Use docker compose to run the server:
 docker compose up -d
 ```
 
-For development, you will need to create a superuser account:
+For development, you will need to run migrations:
+
+```sh
+docker compose exec app poetry run python /app/manage.py migrate
+```
+
+You will also need to create a superuser account:
 
 ```sh
 docker compose exec app poetry run python /app/manage.py createsuperuser
