@@ -1,11 +1,11 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.views.generic import CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
 
+from app.editor_ui.forms import ProjectForm
 from app.editor_ui.mixins import AdminPrivRequiredMixin
 from app.projects.models import Project
-from app.editor_ui.forms import ProjectForm
 
 
 @login_required(login_url="/auth/login/")
