@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.views.generic import CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from app.editor_ui.mixins import AdminPrivRequiredMixin
 from app.projects.models import Project
 from app.editor_ui.forms import ProjectForm
 
@@ -12,10 +13,11 @@ def index(request):
     return render(request, "editor_ui/index.html")
 
 
-class ProjectCreateView(LoginRequiredMixin, CreateView):
+class ProjectCreateView(LoginRequiredMixin, AdminPrivRequiredMixin, CreateView):
     model = Project
     form_class = ProjectForm
     template_name = "editor_ui/projects/project_create.html"
+    login_url = "/auth/login/"
     success_url = "/projects/"
 
     def form_valid(self, form):
