@@ -1,6 +1,6 @@
 from django import forms
-from app.projects.models import Project
 
+from app.projects.models import Project
 
 shared_text_input_attrs = {
     "class": "tna-text-input",
@@ -23,6 +23,8 @@ class ProjectForm(forms.ModelForm):
         widgets = {
             "name": forms.TextInput(attrs={**shared_text_input_attrs}),
             "domain": forms.TextInput(attrs={**shared_text_input_attrs}),
-            "retention_period_days": forms.Select(attrs={"class": "tna-select"}),
+            "retention_period_days": forms.Select(
+                attrs={"class": "tna-select"}
+            ),
             "owned_by": forms.Select(attrs={"class": "tna-select"}),
         }
