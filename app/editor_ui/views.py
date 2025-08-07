@@ -21,7 +21,7 @@ class ProjectCreateView(LoginRequiredMixin, SuperuserRequiredMixin, CreateView):
 
     def form_valid(self, form):
         project_obj = form.save(commit=False)
-
+        project_obj.owned_by = self.request.user
         project_obj.set_initial_created_by(user=self.request.user)
 
         return super().form_valid(form)

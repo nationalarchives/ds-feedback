@@ -18,7 +18,6 @@ class ProjectForm(forms.ModelForm):
             "name",
             "domain",
             "retention_period_days",
-            "owned_by",
         ]
         widgets = {
             "name": forms.TextInput(attrs={**shared_text_input_attrs}),
@@ -26,5 +25,4 @@ class ProjectForm(forms.ModelForm):
             "retention_period_days": forms.Select(
                 attrs={"class": "tna-select"}
             ),
-            "owned_by": forms.Select(attrs={"class": "tna-select"}),
         }
