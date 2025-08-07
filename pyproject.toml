@@ -8,7 +8,7 @@ packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 dj-database-url = "^2.3.0" # Using dj-database-url for the temporary Heroku dev environment
-django = "^5.0.7"
+django = "^5.2.5"
 django-csp = "^4.0"
 django-model-utils = "^5.0.0"
 djangorestframework = "^3.15.2"
