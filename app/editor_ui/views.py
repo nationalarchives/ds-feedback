@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.views.generic import CreateView
 
 from app.editor_ui.forms import ProjectForm
-from app.editor_ui.mixins import AdminPrivRequiredMixin
+from app.editor_ui.mixins import SuperuserRequiredMixin
 from app.projects.models import Project
 
 
@@ -12,7 +12,7 @@ def index(request):
     return render(request, "editor_ui/index.html")
 
 
-class ProjectCreateView(LoginRequiredMixin, AdminPrivRequiredMixin, CreateView):
+class ProjectCreateView(LoginRequiredMixin, SuperuserRequiredMixin, CreateView):
     model = Project
     form_class = ProjectForm
     template_name = "editor_ui/projects/project_create.html"
