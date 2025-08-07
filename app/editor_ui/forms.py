@@ -29,6 +29,6 @@ class ProjectForm(forms.ModelForm):
         }
 
     def clean_domain(self):
-        domain = self.cleaned_data.get('domain')
+        domain = self.cleaned_data.get("domain")
         validate_domain_name(domain)
         return domain
