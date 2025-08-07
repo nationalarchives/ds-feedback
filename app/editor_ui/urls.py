@@ -1,9 +1,10 @@
 from django.urls import path
 
-from app.editor_ui.views import ProjectCreateView, index
+from app.editor_ui.views import ProjectCreateView, ProjectListView, index
 
 urlpatterns = [
     path("", index, name="index"),
+    path("projects/", ProjectListView.as_view(), name="project_list"),
     path(
         "projects/create/", ProjectCreateView.as_view(), name="project_create"
     ),
