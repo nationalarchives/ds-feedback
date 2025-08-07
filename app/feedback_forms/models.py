@@ -23,7 +23,7 @@ class FeedbackForm(
 ):
     name = models.CharField(max_length=128)
     project = models.ForeignKey(
-        Project, on_delete=models.PROTECT, related_name="+"
+        Project, on_delete=models.PROTECT, related_name="feedback_forms"
     )
 
     def is_enabled(self):
