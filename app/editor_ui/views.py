@@ -49,8 +49,5 @@ class ProjectDetailView(LoginRequiredMixin, SuperuserRequiredMixin, DetailView):
         context["forms_count"] = project.forms_count
         context["responses_count"] = project.responses_count
         context["prompts_count"] = project.prompts_count
-        context["formatted_created_at"] = project.created_at.strftime(
-            "%d %b %Y"
-        )
 
         return context
