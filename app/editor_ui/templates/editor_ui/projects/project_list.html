@@ -23,7 +23,7 @@
                 {% for project in projects %}
                   <tr class="tna-table__row">
                     <th class="tna-table__header">
-                      <a href="#">{{ project.name }}</a>
+                      <a href="{{ url("project_detail", kwargs={"uuid": project.uuid}) }}">{{ project.name }}</a>
                     </th>
                     <td class="tna-table__cell">{{ project.domain }}</td>
                     <td class="tna-table__cell">{{ project.owned_by }}</td>
