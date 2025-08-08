@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% set pageTitle = project.name %}
+{% block content %}
+  <div class="tna-section">
+    <div class="tna-container">
+      <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+        <hgroup class="tna-hgroup-xl">
+          <p class="tna-hgroup__supertitle">Project</p>
+          <h1 class="tna-hgroup__title">{{ project.name }}</h1>
+        </hgroup>
+        <dl class="tna-dl tna-dl--plain">
+          <dt>Domain</dt>
+          <dd>
+            {{ project.domain }}
+          </dd>
+          <dt>Project ID</dt>
+          <dd>
+            <code>{{ project.id }}</code>
+          </dd>
+          <dt>Data retention</dt>
+          <dd>
+            {{ project.retention_period_days }} days
+          </dd>
+          <dt>Created on</dt>
+          <dd>
+            {{ project.created_at|date("d M Y") }}
+          </dd>
+          <dt>Owner</dt>
+          <dd>
+            {{ project.owned_by }}
+          </dd>
+        </dl>
+      </div>
+    </div>
+    <div class="tna-container tna-container--equal-height-contents">
+      <div class="tna-column tna-column--width-1-3 tna-column--full-small tna-column--full-tiny tna-!--margin-top-l">
+        <div class="tna-aside tna-aside--tight tna-background-accent">
+          <h2 class="tna-heading-m">
+            <a href="#">Feedback Forms</a>
+          </h2>
+          <p>
+            <span class="tna-heading-xl">{{ forms_count }}</span>
+            form{{ forms_count|pluralize }}
+          </p>
+        </div>
+      </div>
+      <div class="tna-column tna-column--width-1-3 tna-column--full-small tna-column--full-tiny tna-!--margin-top-l">
+        <div class="tna-aside tna-aside--tight tna-background-accent">
+          <h2 class="tna-heading-m">
+            <a href="#">Prompts</a>
+          </h2>
+          <p>
+            <span class="tna-heading-xl">{{ prompts_count }}</span>
+            prompt{{ prompts_count|pluralize }}
+          </p>
+        </div>
+      </div>
+      <div class="tna-column tna-column--width-1-3 tna-column--full-small tna-column--full-tiny tna-!--margin-top-l">
+        <div class="tna-aside tna-aside--tight tna-background-contrast">
+          <h2 class="tna-heading-m">
+            <a href="#">Responses</a>
+          </h2>
+          <p>
+            <span class="tna-heading-xl">{{ responses_count }}</span>
+            response{{ responses_count|pluralize }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

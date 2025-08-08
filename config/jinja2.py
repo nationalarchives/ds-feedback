@@ -3,6 +3,8 @@ import re
 from datetime import datetime
 
 from django.conf import settings
+from django.template.defaultfilters import date as dj_date
+from django.template.defaultfilters import pluralize as dj_pluralize
 from django.templatetags.static import static
 from django.urls import reverse
 
@@ -25,6 +27,10 @@ def now_iso_8601():
 
 def environment(**options):
     env = Environment(**options)
+
+    # Register Django filters for use with Jinja backend
+    env.filters["pluralize"] = dj_pluralize
+    env.filters["date"] = dj_date
 
     TNA_FRONTEND_VERSION = ""
     try:
