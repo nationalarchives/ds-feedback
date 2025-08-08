@@ -61,7 +61,7 @@ class CustomPasswordResetForm(PasswordResetForm):
 
 
 class CustomSetPasswordForm(SetPasswordForm):
-    password1 = forms.CharField(
+    new_password1 = forms.CharField(
         label="New password",
         required=True,
         strip=False,
@@ -78,7 +78,7 @@ class CustomSetPasswordForm(SetPasswordForm):
         ),
         help_text=password_validation.password_validators_help_text_html(),
     )
-    password2 = forms.CharField(
+    new_password2 = forms.CharField(
         label="New password confirmation",
         required=True,
         widget=forms.PasswordInput(

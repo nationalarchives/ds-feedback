@@ -13,6 +13,7 @@ from django.views.generic import TemplateView
 from app.editor_auth.forms import (
     CustomAuthenticationForm,
     CustomPasswordResetForm,
+    CustomSetPasswordForm,
 )
 
 
@@ -47,6 +48,7 @@ class CustomPasswordResetDoneView(PasswordResetDoneView):
 
 
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    form_class = CustomSetPasswordForm
     template_name = "registration/password_reset_confirm.html"
     success_url = reverse_lazy("password_reset_complete")
 
