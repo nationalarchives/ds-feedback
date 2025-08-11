@@ -22,7 +22,10 @@ class ProjectCreateView(LoginRequiredMixin, SuperuserRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse("editor_ui:project_detail", kwargs={"uuid": self.object.uuid})
+        return reverse(
+            "editor_ui:project_detail", kwargs={"uuid": self.object.uuid}
+        )
+
 
 class ProjectListView(LoginRequiredMixin, ListView):
     model = Project
