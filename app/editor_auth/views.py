@@ -20,7 +20,7 @@ from app.editor_auth.forms import (
 class CustomLoginView(LoginView):
     authentication_form = CustomAuthenticationForm
     template_name = "registration/login.html"
-    next_page = reverse_lazy("editor_ui:index")
+    next_page = reverse_lazy("main:index")
 
 
 class CustomLogoutConfirmationView(TemplateView):

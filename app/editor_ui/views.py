@@ -1,17 +1,11 @@
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q
-from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView
 
 from app.editor_ui.forms import ProjectForm
 from app.editor_ui.mixins import SuperuserRequiredMixin
 from app.projects.models import Project
-
-
-def index(request):
-    return render(request, "editor_ui/index.html")
 
 
 class ProjectCreateView(LoginRequiredMixin, SuperuserRequiredMixin, CreateView):

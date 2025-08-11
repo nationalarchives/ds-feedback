@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.template import loader
 
 
-@login_required(login_url="admin:login")
+@login_required(login_url="editor_auth:login")
 def index(request):
     template = loader.get_template("main/index.html")
     context = {"foo": "bar"}
