@@ -7,6 +7,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 
 from jinja2 import Environment
+from markupsafe import Markup
 
 
 def slugify(s):
@@ -21,6 +22,11 @@ def now_iso_8601():
     now = datetime.now()
     now_date = now.strftime("%Y-%m-%dT%H:%M:%SZ")
     return now_date
+
+
+def jinja_url(name, *args, **kwargs):
+    path = reverse(name, args=args, kwargs=kwargs)
+    return Markup(path)
 
 
 def environment(**options):
@@ -48,7 +54,7 @@ def environment(**options):
                 "BUILD_VERSION": settings.BUILD_VERSION,
                 "COOKIE_DOMAIN": settings.COOKIE_DOMAIN,
             },
-            "url": reverse,
+            "url": jinja_url,
             "now_iso_8601": now_iso_8601,
         }
     )

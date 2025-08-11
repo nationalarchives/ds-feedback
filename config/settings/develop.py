@@ -23,3 +23,6 @@ DEBUG_TOOLBAR_CONFIG = {
 # Adds Django Silk
 MIDDLEWARE.insert(0, "silk.middleware.SilkyMiddleware")  # noqa
 INSTALLED_APPS.append("silk")  # noqa
+
+# Display sent emails in the console while developing locally.
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
