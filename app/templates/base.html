@@ -70,14 +70,17 @@
   <header class="tna-header" data-module="tna-header">
     <div class="tna-container tna-header__contents">
       <div class="tna-column tna-header__logo-wrapper">
-        <span class="tna-header__logo">
+        <a href="{{ url("main:index") }}"
+           class="tna-header__logo tna-header__logo--link"
+           title="The National Archives - Feedback"
+           aria-label="The National Archives - Feedback">
           <span class="tna-logo tna-logo--adornable">
             <svg width="96" height="96" aria-hidden="true" focusable="false">
               <use href="#tna-logo"></use>
             </svg>
           </span>
           <span class="tna-header__logo-strapline">Feedback</span>
-        </span>
+        </a>
       </div>
       <div class="tna-column tna-header__navigation-button-wrapper">
         <button class="tna-header__navigation-button"
@@ -104,6 +107,11 @@
                  tabindex="0"
                  aria-current="page">Login</a>
             {% endif %}
+          </li>
+        </ul>
+        <ul class="tna-header__top-navigation-items">
+          <li>
+            <a href="{{ url("api:schema_swagger") }}">API Documentation</a>
           </li>
         </ul>
       </nav>
