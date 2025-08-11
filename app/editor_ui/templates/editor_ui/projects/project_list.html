@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% set pageTitle = "Projects" %}
+{% block content %}
+  <div class="tna-section">
+    <div class="tna-container">
+      <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+        <h1 class="tna-heading-xl">Projects</h1>
+      </div>
+      <div class="tna-column tna-column--full tna-!--padding-top-m">
+        {% if not projects %}
+          <p>No projects found.</p>
+        {% else %}
+          <div class="tna-table-wrapper">
+            <table class="tna-table">
+              <thead class="tna-table__head">
+                <tr class="tna-table__row">
+                  <th class="tna-table__header">Name</th>
+                  <th class="tna-table__header">Domain</th>
+                  <th class="tna-table__header">Owner</th>
+                </tr>
+              </thead>
+              <tbody class="tna-table__body">
+                {% for project in projects %}
+                  <tr class="tna-table__row">
+                    <th class="tna-table__header">
+                      <a href="{{ url("editor_ui:project_detail", uuid=project.uuid) }}">{{ project.name }}</a>
+                    </th>
+                    <td class="tna-table__cell">{{ project.domain }}</td>
+                    <td class="tna-table__cell">{{ project.owned_by }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+        <a href="{{ url("editor_ui:project_create") }}" class="tna-button">Create a project</a>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

@@ -10,6 +10,8 @@ from app.editor_auth.views import (
     CustomResetPasswordView,
 )
 
+app_name = "editor_auth"
+
 urlpatterns = [
     path("login/", CustomLoginView.as_view(), name="login"),
     path("logout/", CustomLogoutConfirmationView.as_view(), name="logout"),

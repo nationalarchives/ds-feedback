@@ -18,6 +18,9 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
 USE_X_FORWARDED_HOST = strtobool(os.getenv("USE_X_FORWARDED_HOST", "False"))
 
 AUTH_USER_MODEL = "users.User"
+LOGIN_URL = "editor_auth:login"
+LOGIN_REDIRECT_URL = "main:index"
+LOGOUT_REDIRECT_URL = "main:index"
 
 # Application definition
 INSTALLED_APPS = [
