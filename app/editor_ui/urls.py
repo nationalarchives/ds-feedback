@@ -7,6 +7,8 @@ from app.editor_ui.views import (
     index,
 )
 
+app_name = "editor_ui"
+
 urlpatterns = [
     path("", index, name="index"),
     path("projects/", ProjectListView.as_view(), name="project_list"),

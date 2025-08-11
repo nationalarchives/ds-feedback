@@ -20,7 +20,7 @@ from app.editor_auth.forms import (
 class CustomLoginView(LoginView):
     authentication_form = CustomAuthenticationForm
     template_name = "registration/login.html"
-    next_page = reverse_lazy("index")
+    next_page = reverse_lazy("editor_ui:index")
 
 
 class CustomLogoutConfirmationView(TemplateView):
@@ -28,7 +28,7 @@ class CustomLogoutConfirmationView(TemplateView):
 
 
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy("index")
+    next_page = reverse_lazy("main:index")
 
 
 class CustomResetPasswordView(SuccessMessageMixin, PasswordResetView):
@@ -40,7 +40,7 @@ class CustomResetPasswordView(SuccessMessageMixin, PasswordResetView):
         "A link to reset your password has been emailed to you "
         "if an account exists for this address."
     )
-    success_url = reverse_lazy("password_reset_done")
+    success_url = reverse_lazy("editor_auth:password_reset_done")
 
 
 class CustomPasswordResetDoneView(PasswordResetDoneView):
@@ -50,7 +50,7 @@ class CustomPasswordResetDoneView(PasswordResetDoneView):
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
     form_class = CustomSetPasswordForm
     template_name = "registration/password_reset_confirm.html"
-    success_url = reverse_lazy("password_reset_complete")
+    success_url = reverse_lazy("editor_auth:password_reset_complete")
 
 
 class CustomPasswordResetCompleteView(PasswordResetCompleteView):

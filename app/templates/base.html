@@ -93,12 +93,12 @@
         <ul class="tna-header__navigation-items">
           <li class="tna-header__navigation-item">
             {% if request.user.is_authenticated %}
-              <a href="{{ url("logout") }}"
+              <a href="{{ url("editor_auth:logout") }}"
                  class="tna-header__navigation-item-link tna-header__navigation-item-link"
                  tabindex="0"
                  aria-current="page">Log out</a>
             {% else %}
-              <a href="{{ url("login") }}"
+              <a href="{{ url("editor_auth:login") }}"
                  class="tna-header__navigation-item-link tna-header__navigation-item-link"
                  tabindex="0"
                  aria-current="page">Login</a>

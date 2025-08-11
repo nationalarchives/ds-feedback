@@ -8,7 +8,7 @@
             </div>
             <div class="tna-column tna-column--full tna-!--padding-top-m">
                 <p>Are you sure you would like to log out?</p>
-                <form method="post" action="{{ url('logout_action') }}">
+                <form method="post" action="{{ url('editor_auth:logout_action') }}">
                     {{ csrf_input }}
                     <button type="submit" class="tna-button">Log out</button>
                 </form>
