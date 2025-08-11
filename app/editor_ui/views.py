@@ -12,7 +12,6 @@ class ProjectCreateView(LoginRequiredMixin, SuperuserRequiredMixin, CreateView):
     model = Project
     form_class = ProjectForm
     template_name = "editor_ui/projects/project_create.html"
-    login_url = reverse_lazy("editor_auth:login")
     success_url = reverse_lazy("editor_ui:project_list")
 
     def form_valid(self, form):
