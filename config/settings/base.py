@@ -283,13 +283,13 @@ SPECTACULAR_SETTINGS = {
 # Email settings
 # We use SMTP to send emails. We typically use transactional email services
 # that let us use SMTP.
-# https://docs.djangoproject.com/en/2.1/topics/email/
+# https://docs.djangoproject.com/en/5.2/topics/email/
 
-# https://docs.djangoproject.com/en/stable/ref/settings/#email-host
+# https://docs.djangoproject.com/en/5.2/ref/settings/#email-host
 if "EMAIL_HOST" in env:
     EMAIL_HOST = env["EMAIL_HOST"]
 
-# https://docs.djangoproject.com/en/stable/ref/settings/#email-port
+# https://docs.djangoproject.com/en/5.2/ref/settings/#email-port
 # Use a default port of 587, as some services now block the Django default of 25
 try:
     EMAIL_PORT = int(env.get("EMAIL_PORT", 587))
@@ -298,18 +298,18 @@ except ValueError:
         "The setting EMAIL_PORT should be an integer, e.g. 587"
     ) from None
 
-# https://docs.djangoproject.com/en/stable/ref/settings/#email-host-user
+# https://docs.djangoproject.com/en/5.2/ref/settings/#email-host-user
 if "EMAIL_HOST_USER" in env:
     EMAIL_HOST_USER = env["EMAIL_HOST_USER"]
 
-# https://docs.djangoproject.com/en/stable/ref/settings/#email-host-password
+# https://docs.djangoproject.com/en/5.2/ref/settings/#email-host-password
 if "EMAIL_HOST_PASSWORD" in env:
     EMAIL_HOST_PASSWORD = env["EMAIL_HOST_PASSWORD"]
 
-# https://docs.djangoproject.com/en/stable/ref/settings/#email-use-tls
+# https://docs.djangoproject.com/en/5.2/ref/settings/#email-use-tls
 # We always want to use TLS
 EMAIL_USE_TLS = True
 
-# https://docs.djangoproject.com/en/stable/ref/settings/#email-subject-prefix
+# https://docs.djangoproject.com/en/5.2/ref/settings/#email-subject-prefix
 if "EMAIL_SUBJECT_PREFIX" in env:
     EMAIL_SUBJECT_PREFIX = env["EMAIL_SUBJECT_PREFIX"]
