@@ -112,7 +112,7 @@ class FeedbackFormListView(
         context = super().get_context_data(**kwargs)
         # Pass the project uuid from the url kwargs so we can track which project the
         # feedback form creation request came from
-        context["project_uuid"] = self.kwargs.get("uuid")
+        context["project_uuid"] = self.kwargs.get("project_uuid")
 
         return context
 
