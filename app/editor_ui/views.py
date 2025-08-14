@@ -10,18 +10,13 @@ from app.projects.models import Project
 from app.prompts.models import Prompt
 
 
-class ProjectCreateView(LoginRequiredMixin, SuperuserRequiredMixin, CreateView):
+class ProjectCreateView(
+    OwnedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
+):
     model = Project
     form_class = ProjectForm
     template_name = "editor_ui/projects/project_create.html"
     # success_url = reverse_lazy("editor_ui:project_list")
-
-    def form_valid(self, form):
-        project_obj = form.save(commit=False)
-        project_obj.owned_by = self.request.user
-        project_obj.set_initial_created_by(user=self.request.user)
-
-        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse(
@@ -42,7 +37,7 @@ class ProjectListView(LoginRequiredMixin, ListView):
         return qs
 
 
-class ProjectDetailView(LoginRequiredMixin, SuperuserRequiredMixin, DetailView):
+class ProjectDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
     model = Project
     template_name = "editor_ui/projects/project_detail.html"
     slug_field = "uuid"
