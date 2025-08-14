@@ -23,7 +23,7 @@
                 {% for form in feedback_forms %}
                   <tr class="tna-table__row">
                     <th class="tna-table__header">
-                       <a href="#">{{ form.name }}</a>
+                       <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid=project_uuid, feedback_form_uuid=form.uuid) }}">{{ form.name }}</a>
                     </th>
                     <td class="tna-table__cell">
                       {% if form.path_patterns.all() %}

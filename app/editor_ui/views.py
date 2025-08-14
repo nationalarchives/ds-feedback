@@ -7,6 +7,7 @@ from app.editor_ui.forms import FeedbackFormForm, ProjectForm
 from app.editor_ui.mixins import OwnedByUserMixin, SuperuserRequiredMixin
 from app.feedback_forms.models import FeedbackForm
 from app.projects.models import Project
+from app.prompts.models import Prompt
 
 
 class ProjectCreateView(LoginRequiredMixin, SuperuserRequiredMixin, CreateView):
@@ -135,8 +136,35 @@ class FeedbackFormCreateView(
         project_uuid = self.object.project.uuid
 
         return reverse(
-            "editor_ui:project__feedback_form_list",
+            "editor_ui:project__feedback_form_detail",
             kwargs={
                 "project_uuid": project_uuid,
+                "feedback_form_uuid": feedback_form_uuid,
             },
         )
+
+
+class FeedbackFormDetailView(
+    SuperuserRequiredMixin, LoginRequiredMixin, DetailView
+):
+    model = FeedbackForm
+    template_name = "editor_ui/feedback_forms/feedback_form_detail.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "feedback_form_uuid"
+    context_object_name = "feedback_form"
+
+    def get_queryset(self):
+        return (
+            FeedbackForm.objects.all()
+            .prefetch_related("path_patterns")
+            .prefetch_related(
+                Prefetch("prompts", queryset=Prompt.objects.select_subclasses())
+            )
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pass the project uuid from the url kwargs so we can link back to parent
+        # project
+        context["project_uuid"] = self.kwargs.get("project_uuid")
+        return context
