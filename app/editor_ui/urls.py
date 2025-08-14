@@ -1,6 +1,7 @@
 from django.urls import path
 
 from app.editor_ui.views import (
+    FeedbackFormListView,
     ProjectCreateView,
     ProjectDetailView,
     ProjectListView,
@@ -17,5 +18,10 @@ urlpatterns = [
         "projects/<uuid:uuid>/",
         ProjectDetailView.as_view(),
         name="project_detail",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/",
+        FeedbackFormListView.as_view(),
+        name="project__feedback_form_list",
     ),
 ]

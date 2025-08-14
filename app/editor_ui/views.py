@@ -1,10 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count, Q
-from django.urls import reverse, reverse_lazy
+from django.db.models import Count, F, Q
+from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView
 
 from app.editor_ui.forms import ProjectForm
 from app.editor_ui.mixins import SuperuserRequiredMixin
+from app.feedback_forms.models import FeedbackForm
 from app.projects.models import Project
 
 
@@ -76,5 +77,41 @@ class ProjectDetailView(LoginRequiredMixin, SuperuserRequiredMixin, DetailView):
         context["forms_count"] = project.forms_count
         context["responses_count"] = project.responses_count
         context["prompts_count"] = project.prompts_count
+
+        return context
+
+
+class FeedbackFormListView(
+    SuperuserRequiredMixin, LoginRequiredMixin, ListView
+):
+    model = FeedbackForm
+    template_name = "editor_ui/feedback_forms/feedback_form_list.html"
+    context_object_name = "feedback_forms"
+
+    def get_queryset(self):
+        qs = (
+            FeedbackForm.objects.all()
+            .prefetch_related("path_patterns")
+            .select_related("project")
+            .annotate(project_uuid=F("project__uuid"))
+            .annotate(
+                prompts_count=Count(
+                    "prompts",
+                    filter=Q(
+                        disabled_at=None,
+                        prompts__disabled_at=None,
+                    ),
+                ),
+            )
+        )
+        # Filter feedback forms to those belonging to the parent project
+        project_uuid = self.kwargs.get("project_uuid")
+        return qs.filter(project__uuid=project_uuid)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pass the project uuid from the url kwargs so we can track which project the
+        # feedback form creation request came from
+        context["project_uuid"] = self.kwargs.get("uuid")
 
         return context
