@@ -1,10 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count, F, Q
+from django.db.models import Count, F, Prefetch, Q
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView
 
-from app.editor_ui.forms import ProjectForm
-from app.editor_ui.mixins import SuperuserRequiredMixin
+from app.editor_ui.forms import FeedbackFormForm, ProjectForm
+from app.editor_ui.mixins import OwnedByUserMixin, SuperuserRequiredMixin
 from app.feedback_forms.models import FeedbackForm
 from app.projects.models import Project
 
@@ -115,3 +115,28 @@ class FeedbackFormListView(
         context["project_uuid"] = self.kwargs.get("uuid")
 
         return context
+
+
+class FeedbackFormCreateView(
+    OwnedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
+):
+    model = FeedbackForm
+    form_class = FeedbackFormForm
+    template_name = "editor_ui/feedback_forms/feedback_form_create.html"
+
+    def form_valid(self, form):
+        form.instance.project = Project.objects.get(
+            uuid=self.kwargs.get("project_uuid")
+        )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        feedback_form_uuid = self.object.uuid
+        project_uuid = self.object.project.uuid
+
+        return reverse(
+            "editor_ui:project__feedback_form_list",
+            kwargs={
+                "project_uuid": project_uuid,
+            },
+        )

@@ -37,7 +37,7 @@
             </table>
           </div>
         {% endif %}
-        <a href="#" class="tna-button">Create a feedback form</a>
+        <a href="{{ url("editor_ui:feedback_form_create", project_uuid=project_uuid) }}" class="tna-button">Create a feedback form</a>
       </div>
     </div>
   </div>

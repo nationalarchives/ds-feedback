@@ -1,6 +1,7 @@
 from django import forms
 from django.core.validators import validate_domain_name
 
+from app.feedback_forms.models import FeedbackForm
 from app.projects.models import Project
 
 shared_text_input_attrs = {
@@ -32,3 +33,14 @@ class ProjectForm(forms.ModelForm):
         domain = self.cleaned_data.get("domain")
         validate_domain_name(domain)
         return domain
+
+
+class FeedbackFormForm(forms.ModelForm):
+    class Meta:
+        model = FeedbackForm
+        fields = [
+            "name",
+        ]
+        widgets = {
+            "name": forms.TextInput(attrs={**shared_text_input_attrs}),
+        }

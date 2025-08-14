@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% set pageTitle = "Create Feedback Form" %}
+{% block content %}
+    <div class="tna-section">
+        <div class="tna-container">
+            <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+                <h1 class="tna-heading-xl">Create Feedback Form</h1>
+            </div>
+            <div class="tna-column tna-column--full tna-!--padding-top-m">
+                <form method="post" class="tna-form">
+                    {{ csrf_input }}
+                    {% if form.non_field_errors() %}
+                        <div class="tna-error-summary"
+                             data-module="tna-error-summary"
+                             data-disable-autofocus="true">
+                            <div role="alert">
+                                <h2 class="tna-error-summary__heading tna-heading-m">There is a problem</h2>
+                                <ul class="tna-error-summary__list">
+                                    {% for error in form.non_field_errors() %}
+                                        <li class="tna-error-summary__item">
+                                            <a href="#" class="tna-error-summary__link">{{ error }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% for field in form %}
+                        <div class="tna-form__group"
+                             {% if field.field.widget.input_type == "text" %}data-module="tna-text-input"{% endif %}>
+                            <div class="tna-form__group-contents">
+                                <h4 class="tna-form__heading tna-form__heading--m">
+                                    <label class="tna-form__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                </h4>
+                                {% if field.errors %}
+                                    {% for error in field.errors %}
+                                        <p class="tna-form__error-message">
+                                            <span class="tna-!--visually-hidden">Error:</span> {{ error }}
+                                        </p>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            {{ field }}
+                        {% endfor %}
+                        <button type="submit" class="tna-button">Create Feedback Form</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
