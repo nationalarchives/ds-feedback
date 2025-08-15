@@ -17,20 +17,24 @@
                   <th class="tna-table__header">Name</th>
                   <th class="tna-table__header">Path Patterns</th>
                   <th class="tna-table__header">Prompts</th>
+                  <th class="tna-table__header">Active</th>
                 </tr>
               </thead>
               <tbody class="tna-table__body">
-                {% for form in feedback_forms %}
+                {% for feedback_form in feedback_forms %}
                   <tr class="tna-table__row">
                     <th class="tna-table__header">
-                       <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid=project_uuid, feedback_form_uuid=form.uuid) }}">{{ form.name }}</a>
+                       <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid, feedback_form.uuid) }}">{{ feedback_form.name }}</a>
                     </th>
                     <td class="tna-table__cell">
-                      {% if form.path_patterns.all() %}
-                        {{ form.path_patterns.all()|map(attribute='pattern')|join(', ') }}
+                      {% if feedback_form.path_patterns_str %}
+                        {{ feedback_form.path_patterns_str }}
                       {% endif %}
                     </td>
-                    <td class="tna-table__cell">{{ form.prompts_count }}</td>
+                    <td class="tna-table__cell">{{ feedback_form.prompts_count }}</td>
+                    <td class="tna-table__cell">
+                      {{ feedback_form.is_enabled() }}
+                    </td>
                   </tr>
                 {% endfor %}
               </tbody>

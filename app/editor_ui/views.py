@@ -1,7 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.postgres.aggregates import StringAgg
 from django.db.models import Count, F, Prefetch, Q
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView
+from django.contrib.postgres.aggregates import StringAgg
 
 from app.editor_ui.forms import FeedbackFormForm, ProjectForm
 from app.editor_ui.mixins import OwnedByUserMixin, SuperuserRequiredMixin
@@ -92,6 +94,9 @@ class FeedbackFormListView(
             .annotate(project_uuid=F("project__uuid"))
             .annotate(
                 prompts_count=Count("prompts", distinct=True),
+                path_patterns_str=StringAgg(
+                    "path_patterns__pattern", delimiter=", ", distinct=True
+                ),
             )
         )
 
