@@ -54,10 +54,12 @@ class ProjectDetailView(LoginRequiredMixin, SuperuserRequiredMixin, DetailView):
                 forms_count=Count(
                     "feedback_forms",
                     filter=Q(feedback_forms__disabled_at=None),
+                    distinct=True,
                 ),
                 responses_count=Count(
                     "feedback_forms__responses",
                     filter=Q(feedback_forms__disabled_at=None),
+                    distinct=True,
                 ),
                 prompts_count=Count(
                     "feedback_forms__prompts",
@@ -65,6 +67,7 @@ class ProjectDetailView(LoginRequiredMixin, SuperuserRequiredMixin, DetailView):
                         feedback_forms__disabled_at=None,
                         feedback_forms__prompts__disabled_at=None,
                     ),
+                    distinct=True,
                 ),
             )
         )
