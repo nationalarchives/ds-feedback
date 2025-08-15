@@ -139,7 +139,12 @@ class FeedbackFormDetailView(
             FeedbackForm.objects.all()
             .prefetch_related("path_patterns")
             .prefetch_related(
-                Prefetch("prompts", queryset=Prompt.objects.select_subclasses())
+                Prefetch(
+                    "prompts",
+                    queryset=Prompt.objects.select_subclasses().select_related(
+                        "created_by"
+                    ),
+                )
             )
         )
 
