@@ -106,7 +106,8 @@ class FeedbackFormCreateView(
     template_name = "editor_ui/feedback_forms/feedback_form_create.html"
 
     def form_valid(self, form):
-        form.instance.project = Project.objects.get(
+        instance = form.save(commit=False)
+        instance.project = Project.objects.get(
             uuid=self.kwargs.get("project_uuid")
         )
         return super().form_valid(form)
