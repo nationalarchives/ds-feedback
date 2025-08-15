@@ -71,6 +71,15 @@ class ProjectDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
 class FeedbackFormListView(
     SuperuserRequiredMixin, LoginRequiredMixin, ListView
 ):
+    """
+    Displays a list of feedback forms for a given project.
+
+    - Fetches all feedback forms associated with parent project.
+    - Prefetches related path patterns and project data.
+    - Annotates each feedback form with its project UUID and prompt count.
+    - Passes the project UUID to the context for use in links.
+    """
+
     model = FeedbackForm
     template_name = "editor_ui/feedback_forms/feedback_form_list.html"
     context_object_name = "feedback_forms"
@@ -85,14 +94,11 @@ class FeedbackFormListView(
                 prompts_count=Count("prompts", distinct=True),
             )
         )
-        # Filter feedback forms to those belonging to the parent project
-        project_uuid = self.kwargs.get("project_uuid")
-        return qs.filter(project__uuid=project_uuid)
+
+        return qs.filter(project__uuid=self.kwargs.get("project_uuid"))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Pass the project uuid from the url kwargs so we can track which project the
-        # feedback form creation request came from
         context["project_uuid"] = self.kwargs.get("project_uuid")
 
         return context
@@ -101,15 +107,31 @@ class FeedbackFormListView(
 class FeedbackFormCreateView(
     OwnedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
 ):
+    """
+    View for creating a new FeedbackForm within a project.
+
+    - Associates the new feedback form with its parent project using the project UUID
+      from the URL.
+    - Redirects to the new feedback form's detail page upon successful creation.
+
+    Notes:
+        Requires superuser access and authentication
+        Ownership (created_by, owned_by) is handled by OwnedByUserMixin
+    """
+
     model = FeedbackForm
     form_class = FeedbackFormForm
     template_name = "editor_ui/feedback_forms/feedback_form_create.html"
 
     def form_valid(self, form):
+        """
+        Associates the feedback form with its parent project using the project UUID.
+        """
         instance = form.save(commit=False)
         instance.project = Project.objects.get(
             uuid=self.kwargs.get("project_uuid")
         )
+
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -128,6 +150,15 @@ class FeedbackFormCreateView(
 class FeedbackFormDetailView(
     SuperuserRequiredMixin, LoginRequiredMixin, DetailView
 ):
+    """
+    Displays the details of a single FeedbackForm, including its prompts and path
+    patterns.
+
+    - Fetches the feedback form by UUID and prefetches related path patterns and
+      prompts.
+    - Passes project UUID, path patterns, and ordered prompts to the template context.
+    """
+
     model = FeedbackForm
     template_name = "editor_ui/feedback_forms/feedback_form_detail.html"
     slug_field = "uuid"
