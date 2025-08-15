@@ -21,6 +21,14 @@
           <dd>
             {{ feedback_form.created_at|date("d M Y") }}
           </dd>
+          <dt>Active</dt>
+          <dd>
+            {% if feedback_form.disabled_at %}
+              No
+            {% else %}
+              Yes
+            {% endif %}
+          </dd>
           <dt>ID</dt>
           <dd>
             {{ feedback_form.uuid }}
@@ -30,7 +38,7 @@
       <div class="tna-column tna-column--full tna-!--padding-top-m">
         <div class="tna-table-wrapper">
           <p class="tna-hgroup__supertitle">Path Patterns</p>
-          {% if feedback_form.path_patterns.all() %}
+          {% if path_patterns %}
             <table class="tna-table">
               <thead class="tna-table__head">
                 <tr class="tna-table__row">
@@ -39,7 +47,7 @@
                 </tr>
               </thead>
               <tbody class="tna-table__body">
-                {% for path in feedback_form.path_patterns.all() %}
+                {% for path in path_patterns %}
                   <tr class="tna-table__row">
                     <th class="tna-table__header">
                       <a href="">{{ path }}</a>
@@ -57,7 +65,7 @@
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
         <div class="tna-table-wrapper">
-          {% if feedback_form.path_patterns.all() %}
+          {% if prompts %}
             <table class="tna-table">
               <thead class="tna-table__head">
                 <p class="tna-hgroup__supertitle">Prompts</p>
@@ -65,36 +73,32 @@
                   <th class="tna-table__header">Text</th>
                   <th class="tna-table__header">Prompt Type</th>
                   <th class="tna-table__header">Order</th>
-                  <th class="tna-table__header">Enabled</th>
+                  <th class="tna-table__header">Active</th>
                   <th class="tna-table__header">Created by</th>
                 </tr>
               </thead>
               <tbody class="tna-table__body">
-                {% for prompt in feedback_form.prompts.all() %}
+                {% for prompt in prompts %}
                   <tr class="tna-table__row">
                     <th class="tna-table__header">
-                      <a href="#">{{ prompt.text }}</a>
+                      <a href="">{{ prompt.text }}</a>
                     </th>
                     <td class="tna-table__cell">{{ prompt.type() }}</td>
                     <td class="tna-table__cell">{{ prompt.order }}</td>
-                    <td class="tna-table__cell">
-                      {% if prompt.disabled_at %}
-                        No
-                      {% else %}
-                        Yes
-                      {% endif %}
-                    </td>
-                        <td class="tna-table__cell">{{ prompt.created_by }}</td>
-                      </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              {% else %}
-                <p>No prompts</p>
-              {% endif %}
-            </div>
-            <a href="#" class="tna-button">Create a prompt</a>
-          </div>
+                    <td class="tna-table__cell">{{ prompt.is_enabled() }}</td>
+                    <td class="tna-table__cell">{{ prompt.created_by }}</td>
+
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p>No prompts</p>
+          {% endif %}
         </div>
+        <a href=""
+           class="tna-button">Create a prompt</a>
       </div>
-    {% endblock content %}
+    </div>
+  </div>
+{% endblock content %}

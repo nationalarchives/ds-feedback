@@ -181,7 +181,14 @@ class FeedbackFormDetailView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Pass the project uuid from the url kwargs so we can link back to parent
-        # project
-        context["project_uuid"] = self.kwargs.get("project_uuid")
+        context.update(
+            {
+                "project_uuid": self.kwargs.get("project_uuid"),
+                "path_patterns": self.object.path_patterns.all(),
+                "prompts": self.object.prompts.select_subclasses().order_by(
+                    "order"
+                ),
+            }
+        )
+
         return context
