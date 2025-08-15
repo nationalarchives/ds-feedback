@@ -16,7 +16,6 @@ class ProjectCreateView(
     model = Project
     form_class = ProjectForm
     template_name = "editor_ui/projects/project_create.html"
-    # success_url = reverse_lazy("editor_ui:project_list")
 
     def get_success_url(self):
         return reverse(
@@ -31,7 +30,7 @@ class ProjectListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.is_superuser:
-            qs = Project.objects.all()
+            qs = Project.objects.all().select_related("owned_by")
         else:
             qs = Project.objects.filter(owned_by=self.request.user)
         return qs
