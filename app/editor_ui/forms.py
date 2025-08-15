@@ -1,8 +1,10 @@
 from django import forms
 from django.core.validators import validate_domain_name
+from django.utils import timezone
 
 from app.feedback_forms.models import FeedbackForm
 from app.projects.models import Project
+from app.prompts.models import BinaryPrompt, Prompt, RangedPrompt, TextPrompt
 
 shared_text_input_attrs = {
     "class": "tna-text-input",
@@ -43,4 +45,37 @@ class FeedbackFormForm(forms.ModelForm):
         ]
         widgets = {
             "name": forms.TextInput(attrs={**shared_text_input_attrs}),
+        }
+
+
+class PromptForm(forms.ModelForm):
+    PROMPT_TYPES = [
+        ("TextPrompt", "Text Input"),
+        ("BinaryPrompt", "Yes/No Question"),
+        ("RangedPrompt", "Rating Scale"),
+    ]
+
+    prompt_type = forms.ChoiceField(
+        choices=PROMPT_TYPES,
+        widget=forms.Select(attrs={"class": "tna-select"}),
+        required=True,
+        label="Question Type",
+    )
+
+    is_disabled = forms.BooleanField(
+        required=False,
+        initial=False,
+        label="Disable this prompt",
+        help_text="Disabled prompts won't be shown to users",
+        widget=forms.CheckboxInput(attrs={"class": "tna-checkbox"}),
+    )
+
+    class Meta:
+        model = Prompt
+        fields = [
+            "text",
+        ]
+        widgets = {
+            "text": forms.TextInput(attrs={**shared_text_input_attrs}),
+            "order": forms.NumberInput(attrs={"class": "tna-text-input"}),
         }

@@ -1,15 +1,23 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.postgres.aggregates import StringAgg
-from django.db.models import Count, F, Prefetch, Q
+from django.db import transaction
+from django.db.models import Count, F, Max, Prefetch, Q
+from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import CreateView, DetailView, ListView
 from django.contrib.postgres.aggregates import StringAgg
 
-from app.editor_ui.forms import FeedbackFormForm, ProjectForm
+from app.editor_ui.forms import FeedbackFormForm, ProjectForm, PromptForm
 from app.editor_ui.mixins import OwnedByUserMixin, SuperuserRequiredMixin
 from app.feedback_forms.models import FeedbackForm
 from app.projects.models import Project
-from app.prompts.models import Prompt
+from app.prompts.models import (
+    BinaryPrompt,
+    Prompt,
+    RangedPrompt,
+    TextPrompt,
+)
 
 
 class ProjectCreateView(
@@ -195,5 +203,93 @@ class FeedbackFormDetailView(
                 ),
             }
         )
+        return context
+
+
+class PromptCreateView(
+    OwnedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
+):
+    """
+    View for creating a new Prompt (TextPrompt, BinaryPrompt, or RangedPrompt) within a
+    feedback form.
+
+    - Determines the prompt subclass to create based on form input.
+    - Calculates the next order value for the prompt within the feedback form, using a
+      database lock to prevent race conditions.
+    - Sets ownership and creation metadata via mixins and custom form validation.
+    - Redirects to the prompt detail page upon successful creation.
+    """
+
+    model = Prompt
+    form_class = PromptForm
+    template_name = "editor_ui/create.html"
+
+    PROMPT_TYPES = {
+        "TextPrompt": TextPrompt,
+        "BinaryPrompt": BinaryPrompt,
+        "RangedPrompt": RangedPrompt,
+    }
+
+    def get_feedback_form(self):
+        """Helper method to get the feedback form"""
+        return FeedbackForm.objects.get(
+            uuid=self.kwargs.get("feedback_form_uuid")
+        )
+
+    def form_valid(self, form):
+        data = form.cleaned_data
+        feedback_form_uuid = self.kwargs["feedback_form_uuid"]
+        model_cls = self.PROMPT_TYPES[data["prompt_type"]]
+
+        with transaction.atomic():
+            # Lock the feedback form row to prevent race conditions when calculating
+            # order
+            form_locked = FeedbackForm.objects.select_for_update().get(
+                uuid=feedback_form_uuid
+            )
+
+            # Calculate the next order value for the new prompt
+            next_order = (
+                form_locked.prompts.aggregate(m=Max("order"))["m"] or 0
+            ) + 1
+
+            # Create the appropriate Prompt subclass instance with required fields
+            self.object = model_cls(
+                text=data["text"],
+                order=next_order,
+                feedback_form=self.get_feedback_form(),
+                created_by=self.request.user,
+            )
+
+            # If the prompt should be disabled, set the disabled timestamp
+            if data.get("is_disabled"):
+                self.object.disabled_at = timezone.now()
+                self.object.disabled_by = self.request.user
+
+            self.object.save()
+
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
+        project_uuid = self.kwargs.get("project_uuid")
+
+        return reverse(
+            "editor_ui:project__feedback_form_detail",
+            kwargs={
+                "project_uuid": project_uuid,
+                "feedback_form_uuid": feedback_form_uuid,
+            },
+        )
+
+    def get_context_data(self, **kwargs):
+        """
+        Adds the object name to the template context for generic form rendering.
+
+        The object name is used by the generic create template to display
+        appropriate headings and labels.
+        """
+        context = super().get_context_data(**kwargs)
+        context["object_name"] = "Prompt"
 
         return context

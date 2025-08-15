@@ -7,6 +7,7 @@ from app.editor_ui.views import (
     ProjectCreateView,
     ProjectDetailView,
     ProjectListView,
+    PromptCreateView,
 )
 
 app_name = "editor_ui"
@@ -35,5 +36,10 @@ urlpatterns = [
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/",
         FeedbackFormDetailView.as_view(),
         name="project__feedback_form_detail",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/create/",
+        PromptCreateView.as_view(),
+        name="project__feedback_form__prompt_create",
     ),
 ]
