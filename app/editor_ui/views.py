@@ -82,13 +82,7 @@ class FeedbackFormListView(
             .select_related("project")
             .annotate(project_uuid=F("project__uuid"))
             .annotate(
-                prompts_count=Count(
-                    "prompts",
-                    filter=Q(
-                        disabled_at=None,
-                        prompts__disabled_at=None,
-                    ),
-                ),
+                prompts_count=Count("prompts", distinct=True),
             )
         )
         # Filter feedback forms to those belonging to the parent project
