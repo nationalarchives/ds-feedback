@@ -7,7 +7,11 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import CreateView, DetailView, ListView
 
-from app.editor_ui.forms import FeedbackFormForm, ProjectForm, PromptForm
+from app.editor_ui.forms import (
+    FeedbackFormForm,
+    ProjectForm,
+    PromptForm,
+)
 from app.editor_ui.mixins import OwnedByUserMixin, SuperuserRequiredMixin
 from app.feedback_forms.models import FeedbackForm
 from app.projects.models import Project
@@ -321,7 +325,7 @@ class PromptDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
             qs = qs.prefetch_related(
                 Prefetch(
                     "options",
-                    queryset=RangedPromptOption.objects.order_by("value"),
+                    queryset=RangedPromptOption.objects.order_by("-value"),
                     to_attr="ordered_options",
                 )
             )
