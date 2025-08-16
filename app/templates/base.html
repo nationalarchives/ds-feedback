@@ -95,19 +95,28 @@
            id="tna-header__navigation"
            aria-label="Primary">
         <ul class="tna-header__navigation-items">
-          <li class="tna-header__navigation-item">
-            {% if request.user.is_authenticated %}
-              <a href="{{ url("editor_auth:logout") }}"
+          {% if request.user.is_authenticated %}
+            <li class="tna-header__navigation-item">
+              <a href="{{ url("editor_ui:project_list") }}"
                  class="tna-header__navigation-item-link tna-header__navigation-item-link"
                  tabindex="0"
+                 aria-current="page">Projects</a>
+            </li>
+            <li class="tna-header__navigation-item">
+              <a href="{{ url("editor_auth:logout") }}"
+                 class="tna-header__navigation-item-link tna-header__navigation-item-link"
+                 tabindex="1"
                  aria-current="page">Log out</a>
-            {% else %}
+            </li>
+          {% else %}
+            <li class="tna-header__navigation-item">
               <a href="{{ url("editor_auth:login") }}"
                  class="tna-header__navigation-item-link tna-header__navigation-item-link"
                  tabindex="0"
                  aria-current="page">Login</a>
-            {% endif %}
-          </li>
+            </li>
+          {% endif %}
+          {% if request.user.is_authenticated %}{% endif %}
         </ul>
         <ul class="tna-header__top-navigation-items">
           <li>
