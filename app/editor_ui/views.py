@@ -11,6 +11,7 @@ from app.editor_ui.forms import (
     FeedbackFormForm,
     ProjectForm,
     PromptForm,
+    RangedPromptOptionsForm,
 )
 from app.editor_ui.mixins import OwnedByUserMixin, SuperuserRequiredMixin
 from app.feedback_forms.models import FeedbackForm
@@ -347,4 +348,48 @@ class PromptDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
                 "prompt_options": prompt_options,
             }
         )
+        return context
+
+
+class RangedPromptOptionsCreateView(
+    SuperuserRequiredMixin, LoginRequiredMixin, CreateView
+):
+    model = RangedPrompt
+    form_class = RangedPromptOptionsForm
+    template_name = "editor_ui/create.html"
+
+    def get_success_url(self):
+        prompt_uuid = self.kwargs.get("prompt_uuid")
+        feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
+        project_uuid = self.kwargs.get("project_uuid")
+
+        return reverse(
+            "editor_ui:project__feedback_form__prompt_detail",
+            kwargs={
+                "project_uuid": project_uuid,
+                "feedback_form_uuid": feedback_form_uuid,
+                "prompt_uuid": prompt_uuid,
+            },
+        )
+
+    def form_valid(self, form):
+        """
+        Associates the ranged prompt option with its parent prompt using the UUID.
+        """
+        instance = form.save(commit=False)
+        instance.ranged_prompt = Prompt.objects.select_subclasses().get(
+            uuid=self.kwargs.get("prompt_uuid")
+        )
+
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        """
+        Adds the object name to the template context for generic form rendering.
+
+        The object name is used by the generic create template to display
+        appropriate headings and labels.
+        """
+        context = super().get_context_data(**kwargs)
+        context["object_name"] = "Ranged Prompt Options"
         return context

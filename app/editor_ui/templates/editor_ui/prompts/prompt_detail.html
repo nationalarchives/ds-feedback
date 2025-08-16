@@ -93,7 +93,7 @@
                                 <p>No ranged options</p>
                             {% endif %}
                         </div>
-                        <a href="#" class="tna-button">Create ranged option</a>
+                        <a href="{{ url("editor_ui:project__feedback_form__prompt__ranged_prompt_options_create", project_uuid, feedback_form_uuid, prompt.uuid) }}" class="tna-button">Create ranged prompt option</a>
                     </div>
                 {% endif %}
             </div>

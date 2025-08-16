@@ -3,7 +3,7 @@ from django.core.validators import validate_domain_name
 
 from app.feedback_forms.models import FeedbackForm
 from app.projects.models import Project
-from app.prompts.models import Prompt
+from app.prompts.models import Prompt, RangedPromptOption
 
 shared_text_input_attrs = {
     "class": "tna-text-input",
@@ -76,4 +76,17 @@ class PromptForm(forms.ModelForm):
         ]
         widgets = {
             "text": forms.TextInput(attrs={**shared_text_input_attrs}),
+        }
+
+
+class RangedPromptOptionsForm(forms.ModelForm):
+    class Meta:
+        model = RangedPromptOption
+        fields = [
+            "label",
+            "value",
+        ]
+        widgets = {
+            "label": forms.TextInput(attrs={**shared_text_input_attrs}),
+            "value": forms.NumberInput(attrs={"class": "tna-text-input"}),
         }
