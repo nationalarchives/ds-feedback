@@ -6,7 +6,6 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import CreateView, DetailView, ListView
-from django.contrib.postgres.aggregates import StringAgg
 
 from app.editor_ui.forms import FeedbackFormForm, ProjectForm, PromptForm
 from app.editor_ui.mixins import OwnedByUserMixin, SuperuserRequiredMixin
@@ -16,6 +15,7 @@ from app.prompts.models import (
     BinaryPrompt,
     Prompt,
     RangedPrompt,
+    RangedPromptOption,
     TextPrompt,
 )
 
@@ -271,14 +271,16 @@ class PromptCreateView(
         return redirect(self.get_success_url())
 
     def get_success_url(self):
+        prompt_uuid = self.object.uuid
         feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
         project_uuid = self.kwargs.get("project_uuid")
 
         return reverse(
-            "editor_ui:project__feedback_form_detail",
+            "editor_ui:project__feedback_form__prompt_detail",
             kwargs={
                 "project_uuid": project_uuid,
                 "feedback_form_uuid": feedback_form_uuid,
+                "prompt_uuid": prompt_uuid,
             },
         )
 
@@ -291,5 +293,54 @@ class PromptCreateView(
         """
         context = super().get_context_data(**kwargs)
         context["object_name"] = "Prompt"
+        return context
 
+
+class PromptDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
+    """
+    Displays the details of a single Prompt, including its options if it is a RangedPrompt.
+
+    - Fetches the prompt by UUID and, if it is a RangedPrompt, prefetches its options.
+    - Passes project UUID, feedback form UUID, and prompt options to the template
+      context.
+    """
+
+    model = Prompt
+    template_name = "editor_ui/prompts/prompt_detail.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "prompt_uuid"
+    context_object_name = "prompt"
+
+    def get_queryset(self):
+        prompt_uuid = self.kwargs.get("prompt_uuid")
+
+        is_ranged = RangedPrompt.objects.filter(uuid=prompt_uuid).exists()
+        qs = Prompt.objects.filter(uuid=prompt_uuid).select_subclasses()
+
+        if is_ranged:
+            qs = qs.prefetch_related(
+                Prefetch(
+                    "options",
+                    queryset=RangedPromptOption.objects.order_by("value"),
+                    to_attr="ordered_options",
+                )
+            )
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        prompt_options = []
+
+        if self.object.__class__.__name__ == "RangedPrompt":
+            prompt_options = getattr(self.object, "ordered_options", [])
+
+        context.update(
+            {
+                "project_uuid": self.kwargs.get("project_uuid"),
+                "feedback_form_uuid": self.kwargs.get("feedback_form_uuid"),
+                "prompt_options": prompt_options,
+            }
+        )
         return context

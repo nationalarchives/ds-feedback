@@ -81,7 +81,7 @@
                 {% for prompt in prompts %}
                   <tr class="tna-table__row">
                     <th class="tna-table__header">
-                      <a href="">{{ prompt.text }}</a>
+                      <a href="{{ url("editor_ui:project__feedback_form__prompt_detail", project_uuid, feedback_form.uuid, prompt.uuid) }}">{{ prompt.text }}</a>
                     </th>
                     <td class="tna-table__cell">{{ prompt.type() }}</td>
                     <td class="tna-table__cell">{{ prompt.order }}</td>

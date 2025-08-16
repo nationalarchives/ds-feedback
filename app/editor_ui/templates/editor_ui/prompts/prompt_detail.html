@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% set pageTitle = prompt.text %}
+{% set promptType = prompt.type() %}
+{% block content %}
+    <div class="tna-section">
+        <div class="tna-section">
+            <div class="tna-container">
+                <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+                    <hgroup class="tna-hgroup-xl">
+                        <p class="tna-hgroup__supertitle">Prompt</p>
+                        <h1 class="tna-hgroup__title">{{ prompt.text }}</h1>
+                    </hgroup>
+                </div>
+                <div class="tna-column tna-column--width-2-3 tna-column--full-small tna-column--full-tiny tna-!--padding-top-l">
+                    <h2 class="tna-heading-l" id="details">Details</h2>
+                    <dl class="tna-dl">
+                        <dt>Feedback form</dt>
+                        <dd>
+                            <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid, feedback_form_uuid) }}">{{ prompt.feedback_form.name }}</a>
+                        </dd>
+                        <dt>Active</dt>
+                        <dd>
+                            {{ prompt.is_enabled() }}
+                        </dd>
+                        {% if not prompt.is_enabled() %}
+                            <dt>Deactivated by</dt>
+                            <dd>
+                                {{ prompt.disabled_by }}
+                            </dd>
+                            <dt>Deactivated on</dt>
+                            <dd>
+                                {{ prompt.disabled_at }}
+                            </dd>
+                        {% endif %}
+                        <dt>Type</dt>
+                        <dd>
+                            {{ promptType }}
+                        </dd>
+                        <dt>Order</dt>
+                        <dd>
+                            {{ prompt.order }}
+                        </dd>
+                        {% if promptType == "TextPrompt" %}
+                            <dt>Max length</dt>
+                            <dd>
+                                {{ prompt.max_length }}
+                            </dd>
+                        {% endif %}
+                        {% if promptType == "BinaryPrompt" %}
+                            <dt>Positive label</dt>
+                            <dd>
+                                {{ prompt.positive_answer_label }}
+                            </dd>
+                            <dt>Negative label</dt>
+                            <dd>
+                                {{ prompt.negative_answer_label }}
+                            </dd>
+                        {% endif %}
+                        <dt>Created on</dt>
+                        <dd>
+                            {{ prompt.created_at|date("d M Y") }}
+                        </dd>
+                        <dt>Created by</dt>
+                        <dd>
+                            {{ prompt.created_by }}
+                        </dd>
+                    </dl>
+                </div>
+                {% if promptType == "RangedPrompt" %}
+                    <div class="tna-column tna-column--full tna-!--padding-top-m">
+                        <div class="tna-table-wrapper">
+                            <p class="tna-hgroup__supertitle">Ranged prompt options</p>
+                            {% if prompt_options %}
+                                <table class="tna-table">
+                                    <thead class="tna-table__head">
+                                        <tr class="tna-table__row">
+                                            <th class="tna-table__header">Label</th>
+                                            <th class="tna-table__header">Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="tna-table__body">
+                                        {% for option in prompt_options %}
+                                            <tr class="tna-table__row">
+                                                <th class="tna-table__header">
+                                                    <a href="#">{{ option.label }}</a>
+                                                </th>
+                                                <td class="tna-table__cell">{{ option.value }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <p>No ranged options</p>
+                            {% endif %}
+                        </div>
+                        <a href="#" class="tna-button">Create ranged option</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
