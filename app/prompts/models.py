@@ -21,6 +21,8 @@ class Prompt(
     GetSubclassesModelMixin,
     CreateSubclassModelMixin,
 ):
+    PROMPT_MAP = {}
+
     objects = InheritanceManager()
     field_label = "Prompt"
 
@@ -29,6 +31,12 @@ class Prompt(
         FeedbackForm, on_delete=models.CASCADE, related_name="prompts"
     )
     order = models.PositiveSmallIntegerField()
+
+    def __init_subclass__(cls, **kwargs):
+        """Automatically register subclasses in the PROMPT_MAP."""
+        super().__init_subclass__(**kwargs)
+        if hasattr(cls, "field_label"):
+            Prompt.PROMPT_MAP[cls.field_label] = cls
 
     def is_enabled(self):
         return self.disabled_at is None

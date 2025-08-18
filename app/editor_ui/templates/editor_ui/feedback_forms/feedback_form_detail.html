@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% set pageTitle = feedback_form.name %}
+{% block content %}
+  <div class="tna-section">
+    <div class="tna-container">
+      <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+        <hgroup class="tna-hgroup-xl">
+          <p class="tna-hgroup__supertitle">Feedback Form</p>
+          <h1 class="tna-hgroup__title">{{ feedback_form.name }}</h1>
+        </hgroup>
+        <dl class="tna-dl tna-dl--plain">
+          <dt>Name</dt>
+          <dd>
+            {{ feedback_form.name }}
+          </dd>
+          <dt>Project</dt>
+          <dd>
+            <a href="{{ url("editor_ui:project_detail", project_uuid) }}">{{ feedback_form.project }}</a>
+          </dd>
+          <dt>Created</dt>
+          <dd>
+            {{ feedback_form.created_at|date("d M Y") }}
+          </dd>
+          <dt>Active</dt>
+          <dd>
+            {% if feedback_form.disabled_at %}
+              No
+            {% else %}
+              Yes
+            {% endif %}
+          </dd>
+          <dt>ID</dt>
+          <dd>
+            {{ feedback_form.uuid }}
+          </dd>
+        </dl>
+      </div>
+      <div class="tna-column tna-column--full tna-!--padding-top-m">
+        <div class="tna-table-wrapper">
+          <p class="tna-hgroup__supertitle">Path Patterns</p>
+          {% if path_patterns %}
+            <table class="tna-table">
+              <thead class="tna-table__head">
+                <tr class="tna-table__row">
+                  <th class="tna-table__header">Pattern</th>
+                  <th class="tna-table__header">Created by</th>
+                </tr>
+              </thead>
+              <tbody class="tna-table__body">
+                {% for path in path_patterns %}
+                  <tr class="tna-table__row">
+                    <th class="tna-table__header">
+                      <a href="">{{ path }}</a>
+                    </th>
+                    <td class="tna-table__cell">{{ path.created_by }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p>No path patterns</p>
+          {% endif %}
+        </div>
+        <a href="{{ url("editor_ui:project__feedback_form__path_pattern_create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}" class="tna-button">Create a path pattern</a>
+      </div>
+      <div class="tna-column tna-column--full tna-!--padding-top-m">
+        <div class="tna-table-wrapper">
+          {% if prompts %}
+            <table class="tna-table">
+              <thead class="tna-table__head">
+                <p class="tna-hgroup__supertitle">Prompts</p>
+                <tr class="tna-table__row">
+                  <th class="tna-table__header">Text</th>
+                  <th class="tna-table__header">Prompt Type</th>
+                  <th class="tna-table__header">Order</th>
+                  <th class="tna-table__header">Active</th>
+                  <th class="tna-table__header">Created by</th>
+                </tr>
+              </thead>
+              <tbody class="tna-table__body">
+                {% for prompt in prompts %}
+                  <tr class="tna-table__row">
+                    <th class="tna-table__header">
+                      <a href="{{ url("editor_ui:project__feedback_form__prompt_detail", project_uuid, feedback_form.uuid, prompt.uuid) }}">{{ prompt.text }}</a>
+                    </th>
+                    <td class="tna-table__cell">{{ prompt.field_label }}</td>
+                    <td class="tna-table__cell">{{ prompt.order }}</td>
+                    <td class="tna-table__cell">{{ prompt.is_enabled() }}</td>
+                    <td class="tna-table__cell">{{ prompt.created_by }}</td>
+
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p>No prompts</p>
+          {% endif %}
+        </div>
+        <a href="{{ url("editor_ui:project__feedback_form__prompt_create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
+           class="tna-button">Create a prompt</a>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

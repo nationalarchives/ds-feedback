@@ -1,9 +1,16 @@
 from django.urls import path
 
 from app.editor_ui.views import (
+    FeedbackFormCreateView,
+    FeedbackFormDetailView,
+    FeedbackFormListView,
+    PathPatternCreateView,
     ProjectCreateView,
     ProjectDetailView,
     ProjectListView,
+    PromptCreateView,
+    PromptDetailView,
+    RangedPromptOptionsCreateView,
 )
 
 app_name = "editor_ui"
@@ -17,5 +24,40 @@ urlpatterns = [
         "projects/<uuid:uuid>/",
         ProjectDetailView.as_view(),
         name="project_detail",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/",
+        FeedbackFormListView.as_view(),
+        name="project__feedback_form_list",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/create/",
+        FeedbackFormCreateView.as_view(),
+        name="feedback_form_create",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/",
+        FeedbackFormDetailView.as_view(),
+        name="project__feedback_form_detail",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/path-pattern/create",
+        PathPatternCreateView.as_view(),
+        name="project__feedback_form__path_pattern_create",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/create/",
+        PromptCreateView.as_view(),
+        name="project__feedback_form__prompt_create",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/",
+        PromptDetailView.as_view(),
+        name="project__feedback_form__prompt_detail",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/ranged-prompt-options/create",
+        RangedPromptOptionsCreateView.as_view(),
+        name="project__feedback_form__prompt__ranged_prompt_options_create",
     ),
 ]

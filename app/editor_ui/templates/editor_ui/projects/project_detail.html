@@ -36,22 +36,11 @@
       <div class="tna-column tna-column--width-1-3 tna-column--full-small tna-column--full-tiny tna-!--margin-top-l">
         <div class="tna-aside tna-aside--tight tna-background-accent">
           <h2 class="tna-heading-m">
-            <a href="#">Feedback Forms</a>
+            <a href="{{ url("editor_ui:project__feedback_form_list", project_uuid=project.uuid) }}">Feedback Forms</a>
           </h2>
           <p>
             <span class="tna-heading-xl">{{ forms_count }}</span>
             form{{ forms_count|pluralize }}
-          </p>
-        </div>
-      </div>
-      <div class="tna-column tna-column--width-1-3 tna-column--full-small tna-column--full-tiny tna-!--margin-top-l">
-        <div class="tna-aside tna-aside--tight tna-background-accent">
-          <h2 class="tna-heading-m">
-            <a href="#">Prompts</a>
-          </h2>
-          <p>
-            <span class="tna-heading-xl">{{ prompts_count }}</span>
-            prompt{{ prompts_count|pluralize }}
           </p>
         </div>
       </div>
