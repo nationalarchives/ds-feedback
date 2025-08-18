@@ -41,20 +41,10 @@
                             {{ prompt.order }}
                         </dd>
                         {% if promptType == "TextPrompt" %}
-                            <dt>Max length</dt>
-                            <dd>
-                                {{ prompt.max_length }}
-                            </dd>
+                            {% include "editor_ui/prompts/blocks/text_prompt_detail.html" %}
                         {% endif %}
                         {% if promptType == "BinaryPrompt" %}
-                            <dt>Positive label</dt>
-                            <dd>
-                                {{ prompt.positive_answer_label }}
-                            </dd>
-                            <dt>Negative label</dt>
-                            <dd>
-                                {{ prompt.negative_answer_label }}
-                            </dd>
+                            {% include "editor_ui/prompts/blocks/binary_prompt_detail.html" %}
                         {% endif %}
                         <dt>Created on</dt>
                         <dd>
@@ -67,34 +57,7 @@
                     </dl>
                 </div>
                 {% if promptType == "RangedPrompt" %}
-                    <div class="tna-column tna-column--full tna-!--padding-top-m">
-                        <div class="tna-table-wrapper">
-                            <p class="tna-hgroup__supertitle">Ranged prompt options</p>
-                            {% if prompt_options %}
-                                <table class="tna-table">
-                                    <thead class="tna-table__head">
-                                        <tr class="tna-table__row">
-                                            <th class="tna-table__header">Label</th>
-                                            <th class="tna-table__header">Value</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="tna-table__body">
-                                        {% for option in prompt_options %}
-                                            <tr class="tna-table__row">
-                                                <th class="tna-table__header">
-                                                    <a href="#">{{ option.label }}</a>
-                                                </th>
-                                                <td class="tna-table__cell">{{ option.value }}</td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            {% else %}
-                                <p>No ranged options</p>
-                            {% endif %}
-                        </div>
-                        <a href="{{ url("editor_ui:project__feedback_form__prompt__ranged_prompt_options_create", project_uuid, feedback_form_uuid, prompt.uuid) }}" class="tna-button">Create ranged prompt option</a>
-                    </div>
+                    {% include "editor_ui/prompts/blocks/ranged_prompt_detail.html" %}
                 {% endif %}
             </div>
         </div>
