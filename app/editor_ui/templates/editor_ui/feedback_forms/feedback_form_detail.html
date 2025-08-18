@@ -83,7 +83,7 @@
                     <th class="tna-table__header">
                       <a href="{{ url("editor_ui:project__feedback_form__prompt_detail", project_uuid, feedback_form.uuid, prompt.uuid) }}">{{ prompt.text }}</a>
                     </th>
-                    <td class="tna-table__cell">{{ prompt.type() }}</td>
+                    <td class="tna-table__cell">{{ prompt.field_label }}</td>
                     <td class="tna-table__cell">{{ prompt.order }}</td>
                     <td class="tna-table__cell">{{ prompt.is_enabled() }}</td>
                     <td class="tna-table__cell">{{ prompt.created_by }}</td>

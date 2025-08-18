@@ -67,9 +67,7 @@ class PathPatternForm(forms.ModelForm):
 
 class PromptForm(forms.ModelForm):
     PROMPT_TYPES = [
-        ("TextPrompt", "Text Input"),
-        ("BinaryPrompt", "Yes/No Question"),
-        ("RangedPrompt", "Rating Scale"),
+        (name, cls.field_label) for name, cls in Prompt.PROMPT_MAP.items()
     ]
 
     prompt_type = forms.ChoiceField(

@@ -282,12 +282,6 @@ class PromptCreateView(
 
     MAX_ACTIVE_PROMPTS = 3
 
-    PROMPT_TYPES = {
-        "TextPrompt": TextPrompt,
-        "BinaryPrompt": BinaryPrompt,
-        "RangedPrompt": RangedPrompt,
-    }
-
     def get_feedback_form(self):
         """Helper method to get the feedback form"""
         return FeedbackForm.objects.get(
@@ -297,7 +291,7 @@ class PromptCreateView(
     def form_valid(self, form):
         data = form.cleaned_data
         feedback_form_uuid = self.kwargs["feedback_form_uuid"]
-        model_cls = self.PROMPT_TYPES[data["prompt_type"]]
+        model_cls = Prompt.PROMPT_MAP[data["prompt_type"]]
 
         with transaction.atomic():
             # Lock the feedback form row to prevent race conditions when calculating
