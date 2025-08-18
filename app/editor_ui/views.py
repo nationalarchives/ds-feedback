@@ -1,7 +1,15 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.postgres.aggregates import StringAgg
 from django.db import transaction
-from django.db.models import Count, F, Max, Prefetch, Q
+from django.db.models import (
+    BooleanField,
+    Count,
+    ExpressionWrapper,
+    F,
+    Max,
+    Prefetch,
+    Q,
+)
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -164,7 +172,7 @@ class FeedbackFormCreateView(
                 "feedback_form_uuid": feedback_form_uuid,
             },
         )
-    
+
 
 class PathPatternCreateView(
     OwnedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
@@ -183,7 +191,6 @@ class PathPatternCreateView(
         )
 
         return super().form_valid(form)
-    
 
     def get_success_url(self):
         feedback_form_uuid = self.object.feedback_form.uuid
@@ -207,6 +214,7 @@ class PathPatternCreateView(
         context = super().get_context_data(**kwargs)
         context["object_name"] = "Path Pattern"
         return context
+
 
 class FeedbackFormDetailView(
     SuperuserRequiredMixin, LoginRequiredMixin, DetailView
@@ -363,7 +371,17 @@ class PromptDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
         prompt_uuid = self.kwargs.get("prompt_uuid")
 
         is_ranged = RangedPrompt.objects.filter(uuid=prompt_uuid).exists()
-        qs = Prompt.objects.filter(uuid=prompt_uuid).select_subclasses()
+        qs = (
+            Prompt.objects.filter(uuid=prompt_uuid)
+            .annotate(
+                is_enabled=ExpressionWrapper(
+                    Q(disabled_at__isnull=True), output_field=BooleanField()
+                )
+            )
+            .select_related("created_by")
+            .select_related("disabled_by")
+            .select_subclasses()
+        )
 
         if is_ranged:
             qs = qs.prefetch_related(

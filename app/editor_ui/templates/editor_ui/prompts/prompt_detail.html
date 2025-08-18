@@ -20,9 +20,9 @@
                         </dd>
                         <dt>Active</dt>
                         <dd>
-                            {{ prompt.is_enabled() }}
+                            {{ prompt.is_enabled }}
                         </dd>
-                        {% if not prompt.is_enabled() %}
+                        {% if not prompt.is_enabled %}
                             <dt>Deactivated by</dt>
                             <dd>
                                 {{ prompt.disabled_by }}
