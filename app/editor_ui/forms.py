@@ -1,5 +1,5 @@
 from django import forms
-from django.core.validators import validate_domain_name, URLValidator
+from django.core.validators import URLValidator, validate_domain_name
 
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.models import Project
