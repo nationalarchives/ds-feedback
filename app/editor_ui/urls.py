@@ -4,6 +4,7 @@ from app.editor_ui.views import (
     FeedbackFormCreateView,
     FeedbackFormDetailView,
     FeedbackFormListView,
+    PathPatternCreateView,
     ProjectCreateView,
     ProjectDetailView,
     ProjectListView,
@@ -38,6 +39,11 @@ urlpatterns = [
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/",
         FeedbackFormDetailView.as_view(),
         name="project__feedback_form_detail",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/path-pattern/create",
+        PathPatternCreateView.as_view(),
+        name="project__feedback_form__path_pattern_create",
     ),
     path(
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/create/",

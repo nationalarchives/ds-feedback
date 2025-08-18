@@ -9,12 +9,13 @@ from django.views.generic import CreateView, DetailView, ListView
 
 from app.editor_ui.forms import (
     FeedbackFormForm,
+    PathPatternForm,
     ProjectForm,
     PromptForm,
     RangedPromptOptionsForm,
 )
 from app.editor_ui.mixins import OwnedByUserMixin, SuperuserRequiredMixin
-from app.feedback_forms.models import FeedbackForm
+from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.models import Project
 from app.prompts.models import (
     BinaryPrompt,
@@ -163,7 +164,49 @@ class FeedbackFormCreateView(
                 "feedback_form_uuid": feedback_form_uuid,
             },
         )
+    
 
+class PathPatternCreateView(
+    OwnedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
+):
+    model = PathPattern
+    form_class = PathPatternForm
+    template_name = "editor_ui/create.html"
+
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        instance.feedback_form = FeedbackForm.objects.get(
+            uuid=self.kwargs.get("feedback_form_uuid")
+        )
+        instance.project = Project.objects.get(
+            uuid=self.kwargs.get("project_uuid")
+        )
+
+        return super().form_valid(form)
+    
+
+    def get_success_url(self):
+        feedback_form_uuid = self.object.feedback_form.uuid
+        project_uuid = self.object.project.uuid
+
+        return reverse(
+            "editor_ui:project__feedback_form_detail",
+            kwargs={
+                "project_uuid": project_uuid,
+                "feedback_form_uuid": feedback_form_uuid,
+            },
+        )
+
+    def get_context_data(self, **kwargs):
+        """
+        Adds the object name to the template context for generic form rendering.
+
+        The object name is used by the generic create template to display
+        appropriate headings and labels.
+        """
+        context = super().get_context_data(**kwargs)
+        context["object_name"] = "Path Pattern"
+        return context
 
 class FeedbackFormDetailView(
     SuperuserRequiredMixin, LoginRequiredMixin, DetailView

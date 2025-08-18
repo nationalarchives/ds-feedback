@@ -61,7 +61,7 @@
             <p>No path patterns</p>
           {% endif %}
         </div>
-        <a href="#" class="tna-button">Create a path pattern</a>
+        <a href="{{ url("editor_ui:project__feedback_form__path_pattern_create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}" class="tna-button">Create a path pattern</a>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
         <div class="tna-table-wrapper">
