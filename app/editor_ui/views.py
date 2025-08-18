@@ -280,6 +280,8 @@ class PromptCreateView(
     form_class = PromptForm
     template_name = "editor_ui/create.html"
 
+    MAX_ACTIVE_PROMPTS = 3
+
     PROMPT_TYPES = {
         "TextPrompt": TextPrompt,
         "BinaryPrompt": BinaryPrompt,
@@ -303,6 +305,18 @@ class PromptCreateView(
             form_locked = FeedbackForm.objects.select_for_update().get(
                 uuid=feedback_form_uuid
             )
+
+            # Count active prompts (not disabled) **after** acquiring the lock
+            active_count = form_locked.prompts.filter(
+                disabled_at__isnull=True
+            ).count()
+            will_be_active = not data.get("is_disabled", False)
+            if will_be_active and active_count >= self.MAX_ACTIVE_PROMPTS:
+                form.add_error(
+                    None,
+                    f"Cannot have more than {self.MAX_ACTIVE_PROMPTS} active prompts.",
+                )
+                return self.form_invalid(form)
 
             # Calculate the next order value for the new prompt
             next_order = (
