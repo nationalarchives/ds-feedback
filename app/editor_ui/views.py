@@ -22,7 +22,7 @@ from app.editor_ui.forms import (
     PromptForm,
     RangedPromptOptionsForm,
 )
-from app.editor_ui.mixins import OwnedByUserMixin, SuperuserRequiredMixin
+from app.editor_ui.mixins import CreatedByUserMixin, SuperuserRequiredMixin
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.models import Project
 from app.prompts.models import (
@@ -35,7 +35,7 @@ from app.prompts.models import (
 
 
 class ProjectCreateView(
-    OwnedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
+    CreatedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
 ):
     model = Project
     form_class = ProjectForm
@@ -132,7 +132,7 @@ class FeedbackFormListView(
 
 
 class FeedbackFormCreateView(
-    OwnedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
+    CreatedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
 ):
     """
     View for creating a new FeedbackForm within a project.
@@ -143,7 +143,7 @@ class FeedbackFormCreateView(
 
     Notes:
         Requires superuser access and authentication
-        Ownership (created_by, owned_by) is handled by OwnedByUserMixin
+        Ownership (created_by, owned_by) is handled by CreatedByUserMixin
     """
 
     model = FeedbackForm
@@ -175,7 +175,7 @@ class FeedbackFormCreateView(
 
 
 class PathPatternCreateView(
-    OwnedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
+    CreatedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
 ):
     model = PathPattern
     form_class = PathPatternForm
@@ -263,7 +263,7 @@ class FeedbackFormDetailView(
 
 
 class PromptCreateView(
-    OwnedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
+    CreatedByUserMixin, SuperuserRequiredMixin, LoginRequiredMixin, CreateView
 ):
     """
     View for creating a new Prompt (TextPrompt, BinaryPrompt, or RangedPrompt) within a
