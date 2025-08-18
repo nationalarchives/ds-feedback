@@ -29,6 +29,11 @@ class ProjectForm(forms.ModelForm):
                 attrs={"class": "tna-select"}
             ),
         }
+        help_texts = {
+            "name": "A memorable name for your project",
+            "domain": "Enter the full domain you project will target, e.g. https://example.com",
+            "retention_period_days": "Data older than this will be periodically deleted",
+        }
 
     def clean_domain(self):
         domain = self.cleaned_data.get("domain")
@@ -90,6 +95,7 @@ class PromptForm(forms.ModelForm):
         widgets = {
             "text": forms.TextInput(attrs={**shared_text_input_attrs}),
         }
+        help_texts = {"text": "The prompt to display to users"}
 
 
 class RangedPromptOptionsForm(forms.ModelForm):
