@@ -48,16 +48,6 @@ class FeedbackFormForm(forms.ModelForm):
 
 
 class PathPatternForm(forms.ModelForm):
-    url_validator = URLValidator()
-
-    def clean_pattern(self):
-        pattern = self.cleaned_data.get("pattern")
-        self.url_validator(pattern)
-
-        if pattern[-1] != "/":
-            pattern += "/"
-        return pattern
-
     class Meta:
         model = PathPattern
         fields = [
@@ -65,7 +55,7 @@ class PathPatternForm(forms.ModelForm):
             "is_wildcard",
         ]
         widgets = {
-            "pattern": forms.URLInput(attrs={**shared_text_input_attrs}),
+            "pattern": forms.TextInput(attrs={**shared_text_input_attrs}),
             "is_wildcard": forms.CheckboxInput(attrs={"class": "tna-checkbox"}),
         }
 
