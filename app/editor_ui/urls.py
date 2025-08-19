@@ -1,13 +1,17 @@
 from django.urls import path
 
-from app.editor_ui.views import (
+from app.editor_ui.views.feedback_form_views import (
     FeedbackFormCreateView,
     FeedbackFormDetailView,
     FeedbackFormListView,
-    PathPatternCreateView,
+)
+from app.editor_ui.views.path_pattern_views import PathPatternCreateView
+from app.editor_ui.views.project_views import (
     ProjectCreateView,
     ProjectDetailView,
     ProjectListView,
+)
+from app.editor_ui.views.prompt_views import (
     PromptCreateView,
     PromptDetailView,
     RangedPromptOptionsCreateView,
