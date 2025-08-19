@@ -11,6 +11,7 @@ class BaseCreateView(CreateView):
     - Raises ImproperlyConfigured if 'object_name' is not set or not a string.
     - Uses a default template 'editor_ui/create.html'.
     """
+
     object_name = None
     template_name = "editor_ui/create.html"
 
