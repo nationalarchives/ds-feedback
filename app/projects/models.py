@@ -42,7 +42,7 @@ class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
         User, on_delete=models.PROTECT, related_name="+"
     )
     members = models.ManyToManyField(
-        User, through="ProjectMembership", related_name="members"
+        User, through="ProjectMembership", related_name="project_memberships"
     )
 
     class Meta:
