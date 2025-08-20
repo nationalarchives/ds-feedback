@@ -1,5 +1,7 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 
+from app.projects.models import Project, ProjectMembership
+
 
 class SuperuserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
@@ -20,3 +22,24 @@ class CreatedByUserMixin:
         instance.created_by = self.request.user
 
         return super().form_valid(form)
+
+
+class ProjectOwnerMembershipMixin:
+    """
+    Mixin to automatically create a ProjectMembership for the user as the project owner
+    when a Project is created (unless the user is a superuser).
+    """
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        user = self.request.user
+        instance = self.object
+
+        if isinstance(instance, Project) and not user.is_superuser:
+            ProjectMembership.objects.get_or_create(
+                user=user,
+                project=instance,
+                defaults={"role": "owner"},
+            )
+
+        return response

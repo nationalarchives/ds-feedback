@@ -9,7 +9,11 @@ from django.views.generic import DetailView, ListView
 from app.editor_ui.forms import (
     ProjectForm,
 )
-from app.editor_ui.mixins import CreatedByUserMixin, SuperuserRequiredMixin
+from app.editor_ui.mixins import (
+    CreatedByUserMixin,
+    ProjectOwnerMembershipMixin,
+    SuperuserRequiredMixin,
+)
 from app.editor_ui.views.base_views import BaseCreateView
 from app.projects.models import Project
 
@@ -18,6 +22,7 @@ class ProjectCreateView(
     LoginRequiredMixin,
     PermissionRequiredMixin,
     CreatedByUserMixin,
+    ProjectOwnerMembershipMixin,
     BaseCreateView,
 ):
     model = Project
