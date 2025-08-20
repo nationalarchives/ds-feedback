@@ -1,10 +1,24 @@
 from django.contrib import admin
 
-from app.projects.models import Project
+from app.projects.models import Project, ProjectMembership
 from app.utils.admin import (
     HideReadOnlyOnCreationAdmin,
     SetCreatedByOnCreationAdmin,
 )
+
+
+class ProjectMembershipAdmin(admin.ModelAdmin):
+    model = Project
+    fields = [
+        "project",
+        "user",
+        "role",
+    ]
+    list_display = [
+        "project",
+        "user",
+        "role",
+    ]
 
 
 class ProjectAdmin(HideReadOnlyOnCreationAdmin, SetCreatedByOnCreationAdmin):
@@ -30,3 +44,4 @@ class ProjectAdmin(HideReadOnlyOnCreationAdmin, SetCreatedByOnCreationAdmin):
 
 
 admin.site.register(Project, ProjectAdmin)
+admin.site.register(ProjectMembership, ProjectMembershipAdmin)

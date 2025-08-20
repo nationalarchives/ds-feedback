@@ -10,6 +10,20 @@ from app.utils.models import (
 
 RETENTION_PERIOD_CHOICES: list[int] = [30, 60, 180]
 
+ROLE_CHOICES = [
+    ("owner", "Owner"),
+    ("editor", "Editor"),
+]
+
+
+class ProjectMembership(models.Model):
+    project = models.ForeignKey("Project", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=32, choices=ROLE_CHOICES)
+
+    class Meta:
+        unique_together = ("user", "project")
+
 
 class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
     """
@@ -26,6 +40,9 @@ class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
     )
     owned_by = models.ForeignKey(
         User, on_delete=models.PROTECT, related_name="+"
+    )
+    members = models.ManyToManyField(
+        User, through="ProjectMembership", related_name="members"
     )
 
     class Meta:
