@@ -5,6 +5,8 @@ from django.views.generic import DeleteView, DetailView, UpdateView
 
 from app.projects.models import Project, ProjectMembership
 
+from app.projects.models import Project, ProjectMembership
+
 
 class SuperuserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
