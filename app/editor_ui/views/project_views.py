@@ -26,7 +26,8 @@ class ProjectCreateView(
 
     def get_success_url(self):
         return reverse(
-            "editor_ui:project_detail", kwargs={"uuid": self.object.uuid}
+            "editor_ui:project_detail",
+            kwargs={"project_uuid": self.object.uuid},
         )
 
 
@@ -47,7 +48,7 @@ class ProjectDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
     model = Project
     template_name = "editor_ui/projects/project_detail.html"
     slug_field = "uuid"
-    slug_url_kwarg = "uuid"
+    slug_url_kwarg = "project_uuid"
 
     def get_queryset(self):
         return (

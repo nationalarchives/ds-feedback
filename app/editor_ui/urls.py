@@ -25,7 +25,7 @@ urlpatterns = [
         "projects/create/", ProjectCreateView.as_view(), name="project_create"
     ),
     path(
-        "projects/<uuid:uuid>/",
+        "projects/<uuid:project_uuid>/",
         ProjectDetailView.as_view(),
         name="project_detail",
     ),
