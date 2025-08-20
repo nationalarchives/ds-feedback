@@ -31,18 +31,31 @@ class ProjectCreateView(
         )
 
 
-class ProjectListView(LoginRequiredMixin, ListView):
+class ProjectListView(
+    LoginRequiredMixin,
+    ListView,
+):
     model = Project
     template_name = "editor_ui/projects/project_list.html"
     context_object_name = "projects"
+    required_project_roles = ["editor", "owner"]
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            qs = Project.objects.all().select_related("owned_by")
-        else:
-            qs = Project.objects.filter(owned_by=self.request.user)
-        return qs
+        """
+        Filter objects to only those where the user has one of the `required_project_roles`
+        """
+        user = self.request.user
+        qs = super().get_queryset()
 
+        if user.is_superuser:
+            return qs
+
+        filter_kwargs = {
+            "projectmembership__user": user,
+            "projectmembership__role__in": self.required_project_roles,
+        }
+
+        return qs.filter(**filter_kwargs).distinct()
 
 class ProjectDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
     model = Project
