@@ -48,6 +48,9 @@ class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
         through_fields=("project", "user"),
         related_name="project_memberships",
     )
+    members = models.ManyToManyField(
+        User, through="ProjectMembership", related_name="members"
+    )
 
     class Meta:
         constraints = [
