@@ -4,21 +4,25 @@ from django.urls import reverse
 from app.editor_ui.forms import (
     PathPatternForm,
 )
-from app.editor_ui.mixins import CreatedByUserMixin, SuperuserRequiredMixin
+from app.editor_ui.mixins import (
+    CreatedByUserMixin,
+    ProjectMembershipRequiredMixin,
+)
 from app.editor_ui.views.base_views import BaseCreateView
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.models import Project
 
 
 class PathPatternCreateView(
-    CreatedByUserMixin,
-    SuperuserRequiredMixin,
     LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    CreatedByUserMixin,
     BaseCreateView,
 ):
     model = PathPattern
     form_class = PathPatternForm
     object_name = "Path Pattern"
+    required_project_roles = ["editor", "owner"]
 
     def form_valid(self, form):
         instance = form.save(commit=False)

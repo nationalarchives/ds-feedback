@@ -11,8 +11,8 @@ from app.editor_ui.forms import (
 )
 from app.editor_ui.mixins import (
     CreatedByUserMixin,
+    ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
-    SuperuserRequiredMixin,
 )
 from app.editor_ui.views.base_views import BaseCreateView
 from app.projects.models import Project
@@ -63,11 +63,17 @@ class ProjectListView(
 
         return qs.filter(**filter_kwargs).distinct()
 
-class ProjectDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
+
+class ProjectDetailView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    DetailView,
+):
     model = Project
     template_name = "editor_ui/projects/project_detail.html"
     slug_field = "uuid"
     slug_url_kwarg = "project_uuid"
+    required_project_roles = ["editor", "owner"]
 
     def get_queryset(self):
         return (
