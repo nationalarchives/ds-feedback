@@ -48,6 +48,7 @@ class PromptCreateView(
 
     form_class = PromptForm
     object_name = "Prompt"
+    required_project_roles = ["editor", "owner"]
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
@@ -206,6 +207,7 @@ class RangedPromptOptionsCreateView(
 ):
     form_class = RangedPromptOptionsForm
     object_name = "Range Prompt Option"
+    required_project_roles = ["editor", "owner"]
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]

@@ -21,6 +21,7 @@ class PathPatternCreateView(
 ):
     form_class = PathPatternForm
     object_name = "Path Pattern"
+    required_project_roles = ["editor", "owner"]
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
