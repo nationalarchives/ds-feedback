@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import (
     Count,
     Q,
@@ -15,14 +15,15 @@ from app.projects.models import Project
 
 
 class ProjectCreateView(
-    CreatedByUserMixin,
-    SuperuserRequiredMixin,
     LoginRequiredMixin,
+    PermissionRequiredMixin,
+    CreatedByUserMixin,
     BaseCreateView,
 ):
     model = Project
     form_class = ProjectForm
     object_name = "Project"
+    permission_required = ["projects.add_project"]
 
     def get_success_url(self):
         return reverse(
