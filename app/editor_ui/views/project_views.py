@@ -21,6 +21,10 @@ from app.editor_ui.mixins import (
 )
 from app.editor_ui.views.base_views import BaseCreateView
 from app.projects.models import Project
+from django.db.models import Prefetch
+from django.contrib.auth import get_user_model
+
+from app.users.models import User
 
 
 class ProjectCreateView(
@@ -78,6 +82,16 @@ class ProjectListView(
         }
 
         return qs.filter(**filter_kwargs).distinct()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        projects = context.get("projects", [])
+
+        for project in projects:
+            owners = [str(owner) for owner in getattr(project, "owner_members", [])]
+            project.owners = ", ".join(owners)
+        
+        return context
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
