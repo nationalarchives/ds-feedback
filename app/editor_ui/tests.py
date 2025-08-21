@@ -2,7 +2,11 @@ from django.test import TestCase
 from django.urls import reverse
 
 from app.editor_ui.factories import UserFactory
-from app.projects.models import RETENTION_PERIOD_CHOICES, Project
+from app.projects.models import (
+    RETENTION_PERIOD_CHOICES,
+    Project,
+    ProjectMembership,
+)
 
 
 class ProjectCreationTests(TestCase):
@@ -78,4 +82,52 @@ class ProjectCreationTests(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(
             Project.objects.count(), 0, "No projects should be created"
+        )
+
+
+class ProjectMembershipTests(TestCase):
+    """Tests for project membership assignment and access."""
+
+    def setUp(self):
+        """Set up users and project creation URL for each test."""
+        self.creator_user = UserFactory(add_project_creation_permission=True)
+        self.other_user = UserFactory()
+        self.project_create_url = reverse("editor_ui:project_create")
+
+    def test_project_creator_gets_owner_membership_on_creation(self):
+        """
+        Project creator is assigned an 'owner' ProjectMembership
+        when a project is created.
+        """
+        self.assertTrue(
+            self.creator_user.has_perm("projects.add_project"),
+            "creator_user should have the 'projects.add_project' permission",
+        )
+
+        self.client.force_login(self.creator_user)
+
+        response = self.client.post(
+            self.project_create_url,
+            {
+                "name": "Owner Project",
+                "domain": "owner.domain.com",
+                "retention_period_days": 30,
+            },
+        )
+
+        self.assertEqual(
+            Project.objects.count(),
+            1,
+            "Project count should be 1 after creation",
+        )
+        self.assertEqual(response.status_code, 302)
+
+        project = Project.objects.get(name="Owner Project")
+        membership_exists = ProjectMembership.objects.filter(
+            user=self.creator_user, project=project, role="owner"
+        ).exists()
+
+        self.assertTrue(
+            membership_exists,
+            "Project creator should have an 'owner' ProjectMembership for the new project",
         )
