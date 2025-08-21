@@ -46,7 +46,7 @@ class ProjectOwnerMembershipMixin:
 class ProjectMembershipRequiredMixin:
     """
     Mixin to restrict access to views based on project membership and required roles.
-    
+
     - For CreateView/ListView, expects 'project_uuid' in URL kwargs.
     - Project CreateView/ListView currently handled by views
     - Set `required_project_roles` as a class attribute (e.g., ["editor"]).

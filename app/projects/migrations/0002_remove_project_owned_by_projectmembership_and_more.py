@@ -8,30 +8,60 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0001_initial'),
+        ("projects", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='project',
-            name='owned_by',
+            model_name="project",
+            name="owned_by",
         ),
         migrations.CreateModel(
-            name='ProjectMembership',
+            name="ProjectMembership",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.CharField(choices=[('owner', 'Owner'), ('editor', 'Editor')], max_length=32)),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='projects.project')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "role",
+                    models.CharField(
+                        choices=[("owner", "Owner"), ("editor", "Editor")],
+                        max_length=32,
+                    ),
+                ),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="projects.project",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('user', 'project')},
+                "unique_together": {("user", "project")},
             },
         ),
         migrations.AddField(
-            model_name='project',
-            name='members',
-            field=models.ManyToManyField(related_name='project_memberships', through='projects.ProjectMembership', to=settings.AUTH_USER_MODEL),
+            model_name="project",
+            name="members",
+            field=models.ManyToManyField(
+                related_name="project_memberships",
+                through="projects.ProjectMembership",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]
