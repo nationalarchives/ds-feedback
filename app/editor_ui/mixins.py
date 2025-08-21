@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.shortcuts import get_object_or_404
 
 from app.projects.models import Project, ProjectMembership
 
@@ -55,16 +56,21 @@ class ProjectMembershipRequiredMixin:
     required_project_roles = None
     project_url_kwarg = "project_uuid"
 
-    def get_project(self):
+    def get_project(self, kwargs=None):
         """
         Returns the Project instance to check permissions against.
         """
+        # Accept kwargs as an argument for testing
+        if kwargs is None:
+            kwargs = self.kwargs
+
         project_uuid = self.kwargs.get(self.project_url_kwarg)
         if not project_uuid:
             raise ImproperlyConfigured(
                 f"No project UUID found in URL kwargs (expected '{self.project_url_kwarg}')."
             )
-        return Project.objects.get(uuid=project_uuid)
+
+        return get_object_or_404(Project, uuid=project_uuid)
 
     def dispatch(self, request, *args, **kwargs):
         """
@@ -88,6 +94,7 @@ class ProjectMembershipRequiredMixin:
         if user.is_superuser:
             return super().dispatch(request, *args, **kwargs)
 
+        print(self.object())
         project = self.get_project()
         roles = self.required_project_roles
 
