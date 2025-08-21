@@ -7,12 +7,18 @@ from app.utils.admin import (
 )
 
 
-class ProjectMembershipAdmin(admin.ModelAdmin):
-    model = Project
+class ProjectMembershipAdmin(
+    HideReadOnlyOnCreationAdmin,
+    SetCreatedByOnCreationAdmin,
+):
+    model = ProjectMembership
+    ordering = ["-created_at"]
+    readonly_fields = ["created_by"]
     fields = [
         "project",
         "user",
         "role",
+        "created_by",
     ]
     list_display = [
         "project",

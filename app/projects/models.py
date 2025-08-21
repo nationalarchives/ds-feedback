@@ -16,7 +16,7 @@ ROLE_CHOICES = [
 ]
 
 
-class ProjectMembership(models.Model):
+class ProjectMembership(TimestampedModelMixin, CreatedByModelMixin):
     project = models.ForeignKey("Project", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=32, choices=ROLE_CHOICES)
@@ -39,7 +39,10 @@ class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
         },
     )
     members = models.ManyToManyField(
-        User, through="ProjectMembership", related_name="project_memberships"
+        User,
+        through="ProjectMembership",
+        through_fields=("project", "user"),
+        related_name="project_memberships",
     )
 
     class Meta:
