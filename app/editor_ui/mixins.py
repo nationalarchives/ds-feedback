@@ -17,9 +17,6 @@ class CreatedByUserMixin:
 
     def form_valid(self, form):
         instance = form.save(commit=False)
-        instance.owned_by = (
-            self.request.user
-        )  # Temp set project owner until auth implementation
         instance.created_by = self.request.user
 
         return super().form_valid(form)

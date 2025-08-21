@@ -19,6 +19,10 @@ from app.editor_ui.mixins import (
 )
 from app.editor_ui.views.base_views import BaseCreateView
 from app.projects.models import Project
+from django.db.models import Prefetch
+from django.contrib.auth import get_user_model
+
+from app.users.models import User
 
 
 class ProjectCreateView(
@@ -53,8 +57,18 @@ class ProjectListView(
         """
         Filter objects to only those where the user has one of the `required_project_roles`
         """
+        UserModel = get_user_model()
+
         user = self.request.user
         qs = super().get_queryset()
+
+        qs = qs.prefetch_related(
+            Prefetch(
+                "members",
+                queryset=UserModel.objects.filter(projectmembership__role="owner"),
+                to_attr="owner_members",
+            )
+        )
 
         if user.is_superuser:
             return qs
@@ -65,6 +79,16 @@ class ProjectListView(
         }
 
         return qs.filter(**filter_kwargs).distinct()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        projects = context.get("projects", [])
+
+        for project in projects:
+            owners = [str(owner) for owner in getattr(project, "owner_members", [])]
+            project.owners = ", ".join(owners)
+        
+        return context
 
 
 class ProjectDetailView(
@@ -79,9 +103,10 @@ class ProjectDetailView(
     required_project_roles = ["editor", "owner"]
 
     def get_queryset(self):
+        UserModel = get_user_model()
+
         return (
             Project.objects.all()
-            .select_related("owned_by")
             .annotate(
                 forms_count=Count(
                     "feedback_forms",
@@ -94,13 +119,22 @@ class ProjectDetailView(
                     distinct=True,
                 ),
             )
+            .prefetch_related(
+                Prefetch(
+                    "members",
+                    queryset=UserModel.objects.filter(projectmembership__role="owner"),
+                    to_attr="owner_members",
+                )
+            )
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project = self.object
+        owners = [str(owner) for owner in getattr(self.object, "owner_members", [])]
 
         context["forms_count"] = project.forms_count
         context["responses_count"] = project.responses_count
+        context["owners"] = ", ".join(owners)
 
         return context

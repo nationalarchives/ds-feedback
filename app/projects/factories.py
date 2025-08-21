@@ -11,4 +11,3 @@ class ProjectFactory(DjangoModelFactory):
     name = Sequence(lambda i: f"Test project {i}")
     domain = Sequence(lambda i: f"test{i}.domain.com")
     retention_period_days = RETENTION_PERIOD_CHOICES[0]
-    owned_by = LazyAttribute(lambda project: project.created_by)

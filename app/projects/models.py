@@ -38,9 +38,6 @@ class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
             choice: f"{choice} days" for choice in RETENTION_PERIOD_CHOICES
         },
     )
-    owned_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, related_name="+"
-    )
     members = models.ManyToManyField(
         User, through="ProjectMembership", related_name="project_memberships"
     )

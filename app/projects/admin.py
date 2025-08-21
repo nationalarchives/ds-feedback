@@ -30,16 +30,14 @@ class ProjectAdmin(HideReadOnlyOnCreationAdmin, SetCreatedByOnCreationAdmin):
         "name",
         "domain",
         "retention_period_days",
-        "owned_by",
         "created_by",
     ]
     list_display = [
         "name",
         "domain",
-        "owned_by",
         "uuid",
     ]
-    list_filter = ["retention_period_days", "owned_by"]
+    list_filter = ["retention_period_days"]
     search_fields = ["name", "uuid"]
 
 
