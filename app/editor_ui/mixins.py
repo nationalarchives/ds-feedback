@@ -38,6 +38,7 @@ class ProjectOwnerMembershipMixin:
             ProjectMembership.objects.get_or_create(
                 user=user,
                 project=instance,
+                created_by=user,
                 defaults={"role": "owner"},
             )
 
@@ -94,7 +95,6 @@ class ProjectMembershipRequiredMixin:
         if user.is_superuser:
             return super().dispatch(request, *args, **kwargs)
 
-        print(self.object())
         project = self.get_project()
         roles = self.required_project_roles
 
