@@ -41,7 +41,6 @@ class TestAdminProjectsView(ResetFactorySequencesMixin, TestCase):
                 "name": "Test Project",
                 "domain": "test.domain.com",
                 "retention_period_days": 60,
-                "owned_by": self.admin_user.id,
             },
         )
         self.assertRedirects(
