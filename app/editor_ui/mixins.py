@@ -99,7 +99,7 @@ class ProjectMembershipRequiredMixin:
         roles = self.required_project_roles
 
         if not ProjectMembership.objects.filter(
-            user=user, project=project, role__in=roles, created_by=user
+            user=user, project=project, role__in=roles
         ).exists():
             raise PermissionDenied(
                 "You do not have permission for this project."
