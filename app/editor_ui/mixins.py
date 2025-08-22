@@ -34,7 +34,7 @@ class ProjectOwnerMembershipMixin:
         user = self.request.user
         instance = self.object
 
-        if isinstance(instance, Project) and not user.is_superuser:
+        if isinstance(instance, Project):
             ProjectMembership.objects.get_or_create(
                 user=user,
                 project=instance,
