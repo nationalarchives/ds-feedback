@@ -5,6 +5,7 @@ from app.editor_ui.views.feedback_form_views import (
     FeedbackFormDetailView,
     FeedbackFormListView,
 )
+from app.editor_ui.views.membership_views import ProjectMembershipListView
 from app.editor_ui.views.path_pattern_views import PathPatternCreateView
 from app.editor_ui.views.project_views import (
     ProjectCreateView,
@@ -28,6 +29,11 @@ urlpatterns = [
         "projects/<uuid:project_uuid>/",
         ProjectDetailView.as_view(),
         name="project_detail",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/members",
+        ProjectMembershipListView.as_view(),
+        name="project_memberships",
     ),
     path(
         "projects/<uuid:project_uuid>/feedback-forms/",
