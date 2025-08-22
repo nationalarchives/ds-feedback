@@ -26,7 +26,7 @@ class CreatedByUserMixin:
 class ProjectOwnerMembershipMixin:
     """
     Mixin to automatically create a ProjectMembership for the user as the project owner
-    when a Project is created (unless the user is a superuser).
+    when a Project is created.
     """
 
     def form_valid(self, form):
