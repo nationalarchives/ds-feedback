@@ -50,11 +50,11 @@ class ProjectListView(
     model = Project
     template_name = "editor_ui/projects/project_list.html"
     context_object_name = "projects"
-    required_project_roles = ["editor", "owner"]
+    project_roles_required = ["editor", "owner"]
 
     def get_queryset(self):
         """
-        Filter objects to only those where the user has one of the `required_project_roles`
+        Filter objects to only those where the user has one of the `project_roles_required`
         """
         UserModel = get_user_model()
 
@@ -76,7 +76,7 @@ class ProjectListView(
 
         filter_kwargs = {
             "projectmembership__user": user,
-            "projectmembership__role__in": self.required_project_roles,
+            "projectmembership__role__in": self.project_roles_required,
         }
 
         return qs.filter(**filter_kwargs).distinct()
@@ -103,7 +103,10 @@ class ProjectDetailView(
     template_name = "editor_ui/projects/project_detail.html"
     slug_field = "uuid"
     slug_url_kwarg = "project_uuid"
-    required_project_roles = ["editor", "owner"]
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+    project_lookup_path_from_parent = None
 
     def get_queryset(self):
         UserModel = get_user_model()

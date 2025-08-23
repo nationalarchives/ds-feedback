@@ -1,14 +1,15 @@
-from django.http import Http404
 from django.test import TestCase
 from django.urls import reverse
 
-from app.editor_ui.factories import ProjectFactory, UserFactory
-from app.editor_ui.mixins import ProjectMembershipRequiredMixin
+from app.editor_ui.factories import UserFactory
+from app.feedback_forms.factories import FeedbackFormFactory
+from app.projects.factories import ProjectFactory
 from app.projects.models import (
     RETENTION_PERIOD_CHOICES,
     Project,
     ProjectMembership,
 )
+from app.prompts.factories import TextPromptFactory
 
 
 class ProjectCreationTests(TestCase):
@@ -87,8 +88,8 @@ class ProjectCreationTests(TestCase):
         )
 
 
-class ProjectMembershipTests(TestCase):
-    """Tests for project membership assignment and access."""
+class ProjectMembershipAssignmentTests(TestCase):
+    """Tests for project membership assignment."""
 
     def setUp(self):
         """Set up users and project creation URL for each test."""
@@ -135,47 +136,57 @@ class ProjectMembershipTests(TestCase):
         )
 
 
-class DummyView(ProjectMembershipRequiredMixin):
-    """
-    Dummy view class for directly testing ProjectMembershipRequiredMixin methods.
-    """
+class ProjectMembershipAccessTests(TestCase):
+    def setUp(self):
+        # User1 owns project1 and its feedback form
+        self.project_1_owner = UserFactory()
+        self.project_1 = ProjectFactory(created_by=self.project_1_owner)
+        self.project_1_form = FeedbackFormFactory(
+            project=self.project_1, created_by=self.project_1_owner
+        )
+        ProjectMembership.objects.create(
+            project=self.project_1,
+            user=self.project_1_owner,
+            role="owner",
+            created_by=self.project_1_owner,
+        )
 
-    def __init__(self, kwargs):
-        self.kwargs = kwargs
+        # User2 owns project2 and its feedback form
+        self.project_2_owner = UserFactory()
+        self.project_2 = ProjectFactory(created_by=self.project_2_owner)
+        self.project_2_form = FeedbackFormFactory(
+            project=self.project_2, created_by=self.project_2_owner
+        )
+        ProjectMembership.objects.create(
+            project=self.project_2,
+            user=self.project_2_owner,
+            role="owner",
+            created_by=self.project_2_owner,
+        )
 
+        # Add a prompt to form2 (which owner should NOT be able to access)
+        self.project_2_form_prompt = TextPromptFactory(
+            feedback_form=self.project_2_form, created_by=self.project_2_owner
+        )
 
-class ProjectMembershipRequiredMixinTests(TestCase):
-    """Tests for the project resolution logic in ProjectMembershipRequiredMixin."""
-
-    @classmethod
-    def setUpTestData(cls):
-        """Set up a user and a project for all tests in this class."""
-        cls.creator_user = UserFactory(add_project_creation_permission=True)
-        cls.project = ProjectFactory.create(created_by=cls.creator_user)
-
-    def test_get_project_returns_correct_project_with_valid_uuid(self):
+    def test_user_cannot_access_prompt_from_other_project(self):
         """
-        get_project returns the correct Project instance when given a valid UUID.
+        Ensure a user cannot access a prompt from a feedback form in a project they do not belong to,
+        even if they know the prompt's and feedback form's UUIDs.
         """
-        view = DummyView(kwargs={"project_uuid": self.project.uuid})
-        resolved_project = view.get_project()
-        self.assertEqual(resolved_project, self.project)
-
-    def test_get_project_raises_404_project_test_with_non_matching_uuid(self):
-        """
-        get_project raises Http404 when given a UUID that does not match any project.
-        """
-        non_matching_uuid = "00000000-0000-0000-0000-000000000000"
-        view = DummyView(kwargs={"project_uuid": non_matching_uuid})
-        with self.assertRaises(Http404):
-            view.get_project()
-
-    def test_get_project_raises_if_uuid_missing(self):
-        """
-        get_project raises ImproperlyConfigured if the UUID is missing from the kwargs.
-        """
-        view = DummyView(kwargs={})
-        with self.assertRaisesMessage(
-            Exception, "No project UUID found in URL kwargs"
-        ):
-            view.get_project(kwargs={})
+        self.client.force_login(self.project_1_owner)
+        # Try to access prompt2 (from project2) using project1's UUID in the URL
+        url = reverse(
+            "editor_ui:project__feedback_form__prompt_detail",
+            args=[
+                str(self.project_1.uuid),
+                str(self.project_2_form.uuid),
+                str(self.project_2_form_prompt.uuid),
+            ],
+        )
+        response = self.client.get(url)
+        self.assertIn(
+            response.status_code,
+            (403, 404),
+            "Should not allow cross-project access to nested resources",
+        )

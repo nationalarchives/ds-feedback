@@ -44,7 +44,11 @@ class FeedbackFormCreateView(
     model = FeedbackForm
     form_class = FeedbackFormForm
     object_name = "Feedback Form"
-    required_project_roles = ["editor", "owner"]
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+    parent_model = Project
+    parent_lookup_kwarg = "project_uuid"
 
     def form_valid(self, form):
         """
@@ -87,7 +91,11 @@ class FeedbackFormListView(
     model = FeedbackForm
     template_name = "editor_ui/feedback_forms/feedback_form_list.html"
     context_object_name = "feedback_forms"
-    required_project_roles = ["editor", "owner"]
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+    parent_model = Project
+    parent_lookup_kwarg = "project_uuid"
 
     def get_queryset(self):
         qs = (
@@ -131,7 +139,10 @@ class FeedbackFormDetailView(
     slug_field = "uuid"
     slug_url_kwarg = "feedback_form_uuid"
     context_object_name = "feedback_form"
-    required_project_roles = ["editor", "owner"]
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+    project_lookup_path_from_parent = "project"
 
     def get_queryset(self):
         return (

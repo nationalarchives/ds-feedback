@@ -25,13 +25,3 @@ class UserFactory(factory.django.DjangoModelFactory):
         if extracted:
             perm = Permission.objects.get(codename="add_project")
             self.user_permissions.add(perm)
-
-
-class ProjectFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Project
-
-    name = factory.Faker("sentence", nb_words=3)
-    domain = factory.Faker("url")
-    retention_period_days = factory.fuzzy.FuzzyChoice(RETENTION_PERIOD_CHOICES)
-    created_by = factory.SubFactory(UserFactory)
