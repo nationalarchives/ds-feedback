@@ -117,7 +117,6 @@ class ProjectMembershipRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
         """
         Allow access only if the user has the required role on the resolved Project.
-
         Superusers are always allowed. Raises PermissionDenied if the user lacks the
         required role.
         """

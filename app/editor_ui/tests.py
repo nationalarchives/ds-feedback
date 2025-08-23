@@ -1,4 +1,3 @@
-from django.http import Http404
 from django.test import TestCase
 from django.urls import reverse
 

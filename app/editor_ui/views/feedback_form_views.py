@@ -43,7 +43,11 @@ class FeedbackFormCreateView(
 
     form_class = FeedbackFormForm
     object_name = "Feedback Form"
-    required_project_roles = ["editor", "owner"]
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+    parent_model = Project
+    parent_lookup_kwarg = "project_uuid"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
@@ -91,7 +95,11 @@ class FeedbackFormListView(
     model = FeedbackForm
     template_name = "editor_ui/feedback_forms/feedback_form_list.html"
     context_object_name = "feedback_forms"
-    required_project_roles = ["editor", "owner"]
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+    parent_model = Project
+    parent_lookup_kwarg = "project_uuid"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]

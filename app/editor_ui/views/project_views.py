@@ -114,7 +114,10 @@ class ProjectDetailView(
     template_name = "editor_ui/projects/project_detail.html"
     slug_field = "uuid"
     slug_url_kwarg = "project_uuid"
-    required_project_roles = ["editor", "owner"]
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+    project_lookup_path_from_parent = None
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
