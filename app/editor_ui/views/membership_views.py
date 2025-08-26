@@ -105,7 +105,7 @@ class ProjectMembershipCreateView(
     object_name = "Project Membership"
 
     # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
+    project_roles_required = ["owner"]
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
 
