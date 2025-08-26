@@ -97,8 +97,8 @@ class ProjectMembershipRequiredMixin:
 
         if isinstance(self, (DetailView, UpdateView, DeleteView)):
             obj = self.get_object()
-        # For list views
         else:
+            # For list and create views
             obj = self.get_parent_object()
 
         if hasattr(obj, "get_parent_project") and callable(
