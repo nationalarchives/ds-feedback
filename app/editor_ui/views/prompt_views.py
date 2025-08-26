@@ -53,7 +53,6 @@ class PromptCreateView(
     project_roles_required = ["editor", "owner"]
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
-    project_lookup_path_from_parent = "project"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
@@ -217,7 +216,6 @@ class RangedPromptOptionsCreateView(
     project_roles_required = ["editor", "owner"]
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
-    project_lookup_path_from_parent = "project"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
