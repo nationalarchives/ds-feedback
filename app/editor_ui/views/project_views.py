@@ -30,7 +30,6 @@ class ProjectCreateView(
     ProjectOwnerMembershipMixin,
     BaseCreateView,
 ):
-    model = Project
     form_class = ProjectForm
     object_name = "Project"
     permission_required = ["projects.add_project"]

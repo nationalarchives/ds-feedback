@@ -41,7 +41,6 @@ class FeedbackFormCreateView(
         Ownership (created_by, owned_by) is handled by CreatedByUserMixin
     """
 
-    model = FeedbackForm
     form_class = FeedbackFormForm
     object_name = "Feedback Form"
 

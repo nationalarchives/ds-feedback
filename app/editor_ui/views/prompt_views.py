@@ -46,7 +46,6 @@ class PromptCreateView(
     - Redirects to the prompt detail page upon successful creation.
     """
 
-    model = Prompt
     form_class = PromptForm
     object_name = "Prompt"
 
@@ -205,7 +204,6 @@ class RangedPromptOptionsCreateView(
     ProjectMembershipRequiredMixin,
     BaseCreateView,
 ):
-    model = RangedPrompt
     form_class = RangedPromptOptionsForm
     object_name = "Range Prompt Option"
 
