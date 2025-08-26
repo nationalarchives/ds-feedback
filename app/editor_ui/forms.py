@@ -1,8 +1,9 @@
 from django import forms
-from django.core.validators import URLValidator, validate_domain_name
+from django.contrib.auth import get_user_model
+from django.core.validators import validate_domain_name
 
 from app.feedback_forms.models import FeedbackForm, PathPattern
-from app.projects.models import Project
+from app.projects.models import Project, ProjectMembership
 from app.prompts.models import Prompt, RangedPromptOption
 
 shared_text_input_attrs = {
@@ -107,3 +108,35 @@ class RangedPromptOptionsForm(forms.ModelForm):
             "label": forms.TextInput(attrs={**shared_text_input_attrs}),
             "value": forms.NumberInput(attrs={"class": "tna-text-input"}),
         }
+
+
+class ProjectMembershipCreateForm(forms.ModelForm):
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={**shared_text_input_attrs}),
+        label="User Email",
+        help_text="Enter the email address of the user you want to assign the permission.",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.order_fields(["email", "role"])
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+
+        try:
+            user = get_user_model().objects.get(email=email)
+        except get_user_model().DoesNotExist:
+            raise forms.ValidationError("User not found.")
+
+        self.cleaned_data["user_obj"] = user
+        return email
+
+    class Meta:
+        model = ProjectMembership
+        fields = [
+            "email",
+            "role",
+        ]
+
+        help_texts = {"role": "Select the role you want to assign to the user."}
