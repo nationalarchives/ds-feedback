@@ -19,7 +19,6 @@ class PathPatternCreateView(
     CreatedByUserMixin,
     BaseCreateView,
 ):
-    model = PathPattern
     form_class = PathPatternForm
     object_name = "Path Pattern"
 
