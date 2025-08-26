@@ -81,7 +81,7 @@ class ProjectMembershipListView(
 
         # Ensure only project members can edit membership listing
         if not self.request.user.is_superuser:
-            if not is_owner or not is_editor:
+            if not is_owner and not is_editor:
                 raise PermissionDenied(
                     "You do not have permission to edit memberships for this project."
                 )
