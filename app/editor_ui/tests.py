@@ -10,6 +10,7 @@ from app.projects.models import (
     ProjectMembership,
 )
 from app.prompts.factories import TextPromptFactory
+from app.prompts.models import Prompt, TextPrompt
 
 
 class ProjectCreationTests(TestCase):
@@ -137,56 +138,179 @@ class ProjectMembershipAssignmentTests(TestCase):
 
 
 class ProjectMembershipAccessTests(TestCase):
-    def setUp(self):
-        # User1 owns project1 and its feedback form
-        self.project_1_owner = UserFactory()
-        self.project_1 = ProjectFactory(created_by=self.project_1_owner)
-        self.project_1_form = FeedbackFormFactory(
-            project=self.project_1, created_by=self.project_1_owner
+    @classmethod
+    def setUpTestData(cls):
+        # Users
+        cls.owner = UserFactory()
+        cls.editor = UserFactory()
+        cls.other_user = UserFactory()
+        cls.superuser = UserFactory(is_superuser=True)
+
+        # Project and membership
+        cls.project = ProjectFactory(created_by=cls.superuser)
+        ProjectMembership.objects.create(
+            project=cls.project,
+            user=cls.owner,
+            role="owner",
+            created_by=cls.superuser,
         )
         ProjectMembership.objects.create(
-            project=self.project_1,
-            user=self.project_1_owner,
-            role="owner",
-            created_by=self.project_1_owner,
+            project=cls.project,
+            user=cls.editor,
+            role="editor",
+            created_by=cls.superuser,
         )
 
-        # User2 owns project2 and its feedback form
-        self.project_2_owner = UserFactory()
-        self.project_2 = ProjectFactory(created_by=self.project_2_owner)
-        self.project_2_form = FeedbackFormFactory(
-            project=self.project_2, created_by=self.project_2_owner
+        # Feedback form and prompt
+        cls.feedback_form = FeedbackFormFactory(
+            project=cls.project, created_by=cls.owner
         )
-        ProjectMembership.objects.create(
-            project=self.project_2,
-            user=self.project_2_owner,
-            role="owner",
-            created_by=self.project_2_owner,
+        cls.prompt = TextPromptFactory(
+            text="Standard Prompt",
+            feedback_form=cls.feedback_form,
+            created_by=cls.owner,
         )
 
-        # Add a prompt to form2 (which owner should NOT be able to access)
-        self.project_2_form_prompt = TextPromptFactory(
-            feedback_form=self.project_2_form, created_by=self.project_2_owner
+        # Another project/feedback form/prompt for cross-project access tests
+        cls.other_project = ProjectFactory(created_by=cls.superuser)
+        cls.other_feedback_form = FeedbackFormFactory(
+            project=cls.other_project, created_by=cls.superuser
+        )
+        cls.other_prompt = TextPromptFactory(
+            text="Other Prompt",
+            feedback_form=cls.other_feedback_form,
+            created_by=cls.superuser,
         )
 
-    def test_user_cannot_access_prompt_from_other_project(self):
-        """
-        Ensure a user cannot access a prompt from a feedback form in a project they do not belong to,
-        even if they know the prompt's and feedback form's UUIDs.
-        """
-        self.client.force_login(self.project_1_owner)
-        # Try to access prompt2 (from project2) using project1's UUID in the URL
-        url = reverse(
+    def prompt_detail_url(self, project, form, prompt: Prompt | str):
+        return reverse(
             "editor_ui:project__feedback_form__prompt_detail",
             args=[
-                str(self.project_1.uuid),
-                str(self.project_2_form.uuid),
-                str(self.project_2_form_prompt.uuid),
+                str(project.uuid),
+                str(form.uuid),
+                str(prompt.uuid) if isinstance(prompt, TextPrompt) else prompt,
             ],
         )
-        response = self.client.get(url)
-        self.assertIn(
-            response.status_code,
-            (403, 404),
-            "Should not allow cross-project access to nested resources",
+
+    def prompt_create_url(self, project, form):
+        return reverse(
+            "editor_ui:project__feedback_form__prompt_create",
+            args=[str(project.uuid), str(form.uuid)],
         )
+
+    def feedback_form_detail_url(self, project, form):
+        return reverse(
+            "editor_ui:project__feedback_form_detail",
+            args=[
+                str(project.uuid),
+                str(form.uuid),
+            ],
+        )
+
+    def test_owner_can_access_prompt_detail(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(
+            self.prompt_detail_url(
+                self.project, self.feedback_form, self.prompt
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_editor_can_access_prompt_detail(self):
+        self.client.force_login(self.editor)
+        response = self.client.get(
+            self.prompt_detail_url(
+                self.project, self.feedback_form, self.prompt
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_other_user_cannot_access_prompt_detail(self):
+        self.client.force_login(self.other_user)
+        response = self.client.get(
+            self.prompt_detail_url(
+                self.project, self.feedback_form, self.prompt
+            )
+        )
+        self.assertIn(response.status_code, (403, 404))
+
+    def test_superuser_can_access_prompt_detail(self):
+        self.client.force_login(self.superuser)
+        response = self.client.get(
+            self.prompt_detail_url(
+                self.project, self.feedback_form, self.prompt
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_anonymous_user_redirected(self):
+        response = self.client.get(
+            self.prompt_detail_url(
+                self.project, self.feedback_form, self.prompt
+            )
+        )
+        self.assertIn(response.status_code, (302, 403))
+
+    def test_owner_cannot_access_prompt_from_other_project_with_no_membership(
+        self,
+    ):
+        self.client.force_login(self.owner)
+        response = self.client.get(
+            self.prompt_detail_url(
+                self.project, self.other_feedback_form, self.other_prompt
+            )
+        )
+        self.assertIn(response.status_code, (403, 404))
+
+    def test_nonexistent_prompt_returns_404(self):
+        self.client.force_login(self.owner)
+        url = self.prompt_detail_url(
+            self.project,
+            self.feedback_form,
+            prompt="00000000-0000-0000-0000-000000000000",
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_owner_can_view_prompt_in_feedback_form_detail_view(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(
+            self.feedback_form_detail_url(self.project, self.feedback_form)
+        )
+        self.assertContains(response, self.prompt.text, status_code=200)
+
+    def test_owner_can_only_view_related_prompts_in_feedback_form_detail_view(
+        self,
+    ):
+        self.client.force_login(self.owner)
+        response = self.client.get(
+            self.feedback_form_detail_url(self.project, self.feedback_form)
+        )
+        self.assertNotContains(response, self.other_prompt, 200)
+
+    def test_owner_can_access_prompt_create(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(
+            self.prompt_create_url(self.project, self.feedback_form)
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_other_user_cannot_access_prompt_create(self):
+        self.client.force_login(self.other_user)
+        response = self.client.get(
+            self.prompt_create_url(self.project, self.feedback_form)
+        )
+        self.assertIn(response.status_code, (403, 404))
+
+    def test_removed_user_loses_access(self):
+        ProjectMembership.objects.filter(
+            user=self.editor, project=self.project
+        ).delete()
+        self.client.force_login(self.editor)
+        response = self.client.get(
+            self.prompt_detail_url(
+                self.project, self.feedback_form, self.prompt
+            )
+        )
+        self.assertIn(response.status_code, (403, 404))
