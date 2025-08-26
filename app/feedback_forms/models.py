@@ -29,6 +29,9 @@ class FeedbackForm(
     def is_enabled(self):
         return self.disabled_at is None
 
+    def get_parent_project(self):
+        return self.project
+
     def __str__(self):
         return self.name
 
@@ -51,6 +54,9 @@ class PathPattern(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
     def pattern_with_wildcard(self, pattern):
         self.is_wildcard = pattern.endswith("*")
         self.pattern = pattern[:-1] if self.is_wildcard else pattern
+
+    def get_parent_project(self):
+        return self.feedback_form.project
 
     def clean(self):
         super().clean()

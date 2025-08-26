@@ -54,7 +54,6 @@ class PromptCreateView(
     project_roles_required = ["editor", "owner"]
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
-    project_lookup_path_from_parent = "project"
 
     MAX_ACTIVE_PROMPTS = 3
 
@@ -154,10 +153,7 @@ class PromptDetailView(
     slug_field = "uuid"
     slug_url_kwarg = "prompt_uuid"
     context_object_name = "prompt"
-
-    # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
-    project_lookup_path_from_parent = "feedback_form__project"
 
     def get_queryset(self):
         prompt_uuid = self.kwargs.get("prompt_uuid")
@@ -217,7 +213,6 @@ class RangedPromptOptionsCreateView(
     project_roles_required = ["editor", "owner"]
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
-    project_lookup_path_from_parent = "project"
 
     def get_success_url(self):
         prompt_uuid = self.kwargs.get("prompt_uuid")

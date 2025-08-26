@@ -21,7 +21,6 @@ from app.editor_ui.mixins import (
 )
 from app.editor_ui.views.base_views import BaseCreateView
 from app.projects.models import Project
-from app.users.models import User
 
 
 class ProjectCreateView(
@@ -106,7 +105,6 @@ class ProjectDetailView(
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
-    project_lookup_path_from_parent = None
 
     def get_queryset(self):
         UserModel = get_user_model()

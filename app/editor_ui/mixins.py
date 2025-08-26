@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.shortcuts import get_object_or_404
 from django.views.generic import DeleteView, DetailView, UpdateView
 
 from app.projects.models import Project, ProjectMembership
@@ -51,22 +52,14 @@ class ProjectMembershipRequiredMixin:
 
     Usage:
 
-    - For Detail/Update/Delete views: uses `get_object()` and traverses the relationship
-      specified by `project_lookup_path_from_parent` (e.g., "project" or
-      "feedback_form__project") to find the Project. If the object has a direct FK to
-      Project named 'project', you may omit `project_lookup_path_from_parent` (defaults
-      to "project").
-    - For List/Create views: uses `parent_lookup_kwarg` and `parent_model` to fetch the
-      parent object (e.g., a FeedbackForm), then traverses
-      `project_lookup_path_from_parent` from that object to find the Project.
-    - Set `project_roles_required` to the allowed roles (e.g., ["editor", "owner"]).
-
-    Note: For any nested resource (where the parent is not directly a Project), you must
-    set `project_lookup_path_from_parent` to specify the path to the Project.
+    - For detail/edit/delete views: uses `get_object()` and calls `get_parent_project()`
+      on it.
+    - For list/create views: set `parent_lookup_kwarg` and `parent_model` to fetch the
+      parent object, then call `get_parent_project()` on that object.
+    - Set `project_roles_required` (a list of allowed roles, e.g., ["editor", "owner"]).
     """
 
     project_roles_required = None
-    project_lookup_path_from_parent = None
     parent_lookup_kwarg = None
     parent_model = None
 
@@ -78,10 +71,13 @@ class ProjectMembershipRequiredMixin:
 
         - For list/create views to resolve the object from which to traverse to Project.
         """
-        if not self.parent_lookup_kwarg or not self.parent_model:
+        if not self.parent_lookup_kwarg:
             raise ImproperlyConfigured(
-                f"{self.__class__.__name__} needs 'parent_lookup_kwarg' and "
-                "'parent_model'."
+                f"{self.__class__.__name__} needs 'parent_lookup_kwarg' to be set."
+            )
+        if not self.parent_model:
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} needs 'parent_model' to be set."
             )
 
         lookup_value = self.kwargs.get(self.parent_lookup_kwarg)
@@ -91,41 +87,30 @@ class ProjectMembershipRequiredMixin:
                 f"Missing '{self.parent_lookup_kwarg}' in URL kwargs."
             )
 
-        return self.parent_model.objects.get(uuid=lookup_value)
+        return get_object_or_404(self.parent_model, uuid=lookup_value)
 
     def get_project_for_permission_check(self):
         """
-        Resolve the related Project for permission checks.
-
-        Usage:
-
-        - For detail/edit/delete views, starts from the object returned by
-          `get_object()`.
-        - For list/create views, starts from the parent object returned by
-          `get_parent_object()`. Traverses the path specified by
-          `project_lookup_path_from_parent` to reach the Project.
+        Returns the related Project for permission checks by calling
+        `get_parent_project()` on the relevant object.
         """
-        # For detail/edit views
+
         if isinstance(self, (DetailView, UpdateView, DeleteView)):
             obj = self.get_object()
         # For list views
         else:
             obj = self.get_parent_object()
 
-        # Traverse relationships to get the project
-        relation = getattr(self, "project_lookup_path_from_parent", None)
-        if not relation:
-            # If the object is already a Project, just return it
-            if isinstance(obj, Project):
-                return obj
+        if hasattr(obj, "get_parent_project") and callable(
+            obj.get_parent_project
+        ):
+            return obj.get_parent_project()
+        elif isinstance(obj, Project):
+            return obj
+        else:
             raise ImproperlyConfigured(
-                f"{self.__class__.__name__} requires 'project_lookup_path_from_parent' "
-                "for nested resources."
+                f"{obj.__class__.__name__} must implement get_parent_project()."
             )
-
-        for part in relation.split("__"):
-            obj = getattr(obj, part)
-        return obj
 
     def dispatch(self, request, *args, **kwargs):
         """
@@ -145,10 +130,9 @@ class ProjectMembershipRequiredMixin:
             return super().dispatch(request, *args, **kwargs)
 
         project = self.get_project_for_permission_check()
-        roles = self.project_roles_required
 
         if not ProjectMembership.objects.filter(
-            user=user, project=project, role__in=roles
+            user=user, project=project, role__in=self.project_roles_required
         ).exists():
             raise PermissionDenied(
                 "You do not have permission for this project."

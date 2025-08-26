@@ -21,6 +21,9 @@ class ProjectMembership(TimestampedModelMixin, CreatedByModelMixin):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=32, choices=ROLE_CHOICES)
 
+    def get_parent_project(self):
+        return self.project
+
     class Meta:
         unique_together = ("user", "project")
 

@@ -139,10 +139,7 @@ class FeedbackFormDetailView(
     slug_field = "uuid"
     slug_url_kwarg = "feedback_form_uuid"
     context_object_name = "feedback_form"
-
-    # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
-    project_lookup_path_from_parent = "project"
 
     def get_queryset(self):
         return (

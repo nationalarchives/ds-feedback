@@ -41,6 +41,9 @@ class Prompt(
     def is_enabled(self):
         return self.disabled_at is None
 
+    def get_parent_project(self):
+        return self.feedback_form.project
+
     def __str__(self):
         return self.text
 
