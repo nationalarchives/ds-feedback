@@ -10,6 +10,7 @@ from app.projects.models import RETENTION_PERIOD_CHOICES, Project
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = get_user_model()
+        skip_postgeneration_save = True
 
     email = factory.Faker("email")
     password = factory.django.Password("changeMe")
@@ -23,5 +24,6 @@ class UserFactory(factory.django.DjangoModelFactory):
         if not create:
             return
         if extracted:
-            perm = Permission.objects.get(codename="add_project")
-            self.user_permissions.add(perm)
+            perm_instance = Permission.objects.get(codename="add_project")
+            self.user_permissions.add(perm_instance)
+            self.save()
