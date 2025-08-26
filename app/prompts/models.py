@@ -42,6 +42,7 @@ class Prompt(
         return self.disabled_at is None
 
     def get_parent_project(self):
+        """Helper to get the parent Project for use in mixins."""
         return self.feedback_form.project
 
     def __str__(self):

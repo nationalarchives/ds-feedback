@@ -22,6 +22,7 @@ class ProjectMembership(TimestampedModelMixin, CreatedByModelMixin):
     role = models.CharField(max_length=32, choices=ROLE_CHOICES)
 
     def get_parent_project(self):
+        """Helper to get the parent Project for use in mixins."""
         return self.project
 
     class Meta:

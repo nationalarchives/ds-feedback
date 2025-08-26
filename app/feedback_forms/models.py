@@ -30,6 +30,7 @@ class FeedbackForm(
         return self.disabled_at is None
 
     def get_parent_project(self):
+        """Helper to get the parent Project for use in mixins."""
         return self.project
 
     def __str__(self):
@@ -56,6 +57,7 @@ class PathPattern(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
         self.pattern = pattern[:-1] if self.is_wildcard else pattern
 
     def get_parent_project(self):
+        """Helper to get the parent Project for use in mixins."""
         return self.feedback_form.project
 
     def clean(self):
