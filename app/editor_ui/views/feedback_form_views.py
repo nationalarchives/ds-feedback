@@ -105,7 +105,7 @@ class FeedbackFormListView(
             .annotate(
                 prompts_count=Count("prompts", distinct=True),
                 path_patterns_str=StringAgg(
-                    "path_patterns__pattern", delimiter=", ", distinct=True
+                    "path_patterns__pattern", delimiter=", "
                 ),
             )
         )
