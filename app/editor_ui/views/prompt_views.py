@@ -209,8 +209,8 @@ class RangedPromptOptionsCreateView(
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
-    parent_model = FeedbackForm
-    parent_lookup_kwarg = "feedback_form_uuid"
+    parent_model = RangedPrompt
+    parent_lookup_kwarg = "prompt_uuid"
 
     def get_success_url(self):
         prompt_uuid = self.kwargs.get("prompt_uuid")
