@@ -49,11 +49,6 @@ class FeedbackFormCreateView(
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
-    parent_model = Project
-    parent_lookup_kwarg = "project_uuid"
-
     def form_valid(self, form):
         """
         Associates the feedback form with its parent project using the project UUID.
@@ -95,11 +90,6 @@ class FeedbackFormListView(
     model = FeedbackForm
     template_name = "editor_ui/feedback_forms/feedback_form_list.html"
     context_object_name = "feedback_forms"
-
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
-    parent_model = Project
-    parent_lookup_kwarg = "project_uuid"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]

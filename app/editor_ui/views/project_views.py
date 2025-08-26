@@ -91,18 +91,6 @@ class ProjectListView(
 
         return context
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        projects = context.get("projects", [])
-
-        for project in projects:
-            owners = [
-                str(owner) for owner in getattr(project, "owner_members", [])
-            ]
-            project.owners = ", ".join(owners)
-
-        return context
-
 
 class ProjectDetailView(
     LoginRequiredMixin,
@@ -113,9 +101,6 @@ class ProjectDetailView(
     template_name = "editor_ui/projects/project_detail.html"
     slug_field = "uuid"
     slug_url_kwarg = "project_uuid"
-
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]

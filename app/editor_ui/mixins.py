@@ -5,8 +5,6 @@ from django.views.generic import DeleteView, DetailView, UpdateView
 
 from app.projects.models import Project, ProjectMembership
 
-from app.projects.models import Project, ProjectMembership
-
 
 class SuperuserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
@@ -117,6 +115,7 @@ class ProjectMembershipRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
         """
         Allow access only if the user has the required role on the resolved Project.
+
         Superusers are always allowed. Raises PermissionDenied if the user lacks the
         required role.
         """

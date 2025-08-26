@@ -54,11 +54,6 @@ class PromptCreateView(
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
-    parent_model = FeedbackForm
-    parent_lookup_kwarg = "feedback_form_uuid"
-
     MAX_ACTIVE_PROMPTS = 3
 
     def get_feedback_form(self):
@@ -211,11 +206,6 @@ class RangedPromptOptionsCreateView(
 ):
     form_class = RangedPromptOptionsForm
     object_name = "Range Prompt Option"
-
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
-    parent_model = RangedPrompt
-    parent_lookup_kwarg = "prompt_uuid"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
