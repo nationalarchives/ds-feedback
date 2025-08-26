@@ -25,7 +25,7 @@ urlpatterns = [
         "projects/create/", ProjectCreateView.as_view(), name="project_create"
     ),
     path(
-        "projects/<uuid:uuid>/",
+        "projects/<uuid:project_uuid>/",
         ProjectDetailView.as_view(),
         name="project_detail",
     ),
@@ -37,7 +37,7 @@ urlpatterns = [
     path(
         "projects/<uuid:project_uuid>/feedback-forms/create/",
         FeedbackFormCreateView.as_view(),
-        name="feedback_form_create",
+        name="project__feedback_form_create",
     ),
     path(
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/",

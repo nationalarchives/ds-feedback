@@ -11,7 +11,10 @@ from django.views.generic import DetailView, ListView
 from app.editor_ui.forms import (
     FeedbackFormForm,
 )
-from app.editor_ui.mixins import CreatedByUserMixin, SuperuserRequiredMixin
+from app.editor_ui.mixins import (
+    CreatedByUserMixin,
+    ProjectMembershipRequiredMixin,
+)
 from app.editor_ui.views.base_views import BaseCreateView
 from app.feedback_forms.models import FeedbackForm
 from app.projects.models import Project
@@ -21,9 +24,9 @@ from app.prompts.models import (
 
 
 class FeedbackFormCreateView(
-    CreatedByUserMixin,
-    SuperuserRequiredMixin,
     LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    CreatedByUserMixin,
     BaseCreateView,
 ):
     """
@@ -38,9 +41,13 @@ class FeedbackFormCreateView(
         Ownership (created_by, owned_by) is handled by CreatedByUserMixin
     """
 
-    model = FeedbackForm
     form_class = FeedbackFormForm
     object_name = "Feedback Form"
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+    parent_model = Project
+    parent_lookup_kwarg = "project_uuid"
 
     def form_valid(self, form):
         """
@@ -67,7 +74,9 @@ class FeedbackFormCreateView(
 
 
 class FeedbackFormListView(
-    SuperuserRequiredMixin, LoginRequiredMixin, ListView
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    ListView,
 ):
     """
     Displays a list of feedback forms for a given project.
@@ -82,6 +91,11 @@ class FeedbackFormListView(
     template_name = "editor_ui/feedback_forms/feedback_form_list.html"
     context_object_name = "feedback_forms"
 
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+    parent_model = Project
+    parent_lookup_kwarg = "project_uuid"
+
     def get_queryset(self):
         qs = (
             FeedbackForm.objects.all()
@@ -91,7 +105,7 @@ class FeedbackFormListView(
             .annotate(
                 prompts_count=Count("prompts", distinct=True),
                 path_patterns_str=StringAgg(
-                    "path_patterns__pattern", delimiter=", ", distinct=True
+                    "path_patterns__pattern", delimiter=", "
                 ),
             )
         )
@@ -106,7 +120,9 @@ class FeedbackFormListView(
 
 
 class FeedbackFormDetailView(
-    SuperuserRequiredMixin, LoginRequiredMixin, DetailView
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    DetailView,
 ):
     """
     Displays the details of a single FeedbackForm, including its prompts and path
@@ -122,6 +138,7 @@ class FeedbackFormDetailView(
     slug_field = "uuid"
     slug_url_kwarg = "feedback_form_uuid"
     context_object_name = "feedback_form"
+    project_roles_required = ["editor", "owner"]
 
     def get_queryset(self):
         return (

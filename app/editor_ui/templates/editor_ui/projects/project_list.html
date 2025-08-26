@@ -16,17 +16,17 @@
                 <tr class="tna-table__row">
                   <th class="tna-table__header">Name</th>
                   <th class="tna-table__header">Domain</th>
-                  <th class="tna-table__header">Owner</th>
+                  <th class="tna-table__header">Owners</th>
                 </tr>
               </thead>
               <tbody class="tna-table__body">
                 {% for project in projects %}
                   <tr class="tna-table__row">
                     <th class="tna-table__header">
-                      <a href="{{ url("editor_ui:project_detail", uuid=project.uuid) }}">{{ project.name }}</a>
+                      <a href="{{ url("editor_ui:project_detail", project_uuid=project.uuid) }}">{{ project.name }}</a>
                     </th>
                     <td class="tna-table__cell">{{ project.domain }}</td>
-                    <td class="tna-table__cell">{{ project.owned_by }}</td>
+                    <td class="tna-table__cell">{{ project.owners }}</td>
                   </tr>
                 {% endfor %}
               </tbody>

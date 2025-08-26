@@ -10,6 +10,16 @@ erDiagram
         timestamp created_at "NOT NULL"
         timestamp modified_at "NOT NULL"
     }
+    ProjectMembership {
+        int id PK "NOT NULL"
+        int user FK "NOT NULL"
+        int project FK "NOT NULL"
+        char role "NOT NULL"
+        int created_by_id FK "NOT NULL"
+        int owned_by_id FK "NOT NULL"
+        timestamp created_at "NOT NULL"
+        timestamp modified_at "NOT NULL"
+    }
     FeedbackForm {
         int id PK "NOT NULL"
         uuid uuid "NOT NULL"
@@ -109,6 +119,8 @@ erDiagram
     }
     ProjectAPIAccess }o--|| Project : "belongs to"
     ProjectAPIAccess }o--|| User : "has many"
+    User ||--o{ ProjectMembership: "has many"
+    Project ||--o{ ProjectMembership: "has many"
     Prompt ||--o| TextPrompt : "is a type of"
     Prompt ||--o| BinaryPrompt : "is a type of"
     Prompt ||--o| RangedPrompt : "is a type of"

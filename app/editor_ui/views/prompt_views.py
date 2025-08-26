@@ -16,7 +16,10 @@ from app.editor_ui.forms import (
     PromptForm,
     RangedPromptOptionsForm,
 )
-from app.editor_ui.mixins import CreatedByUserMixin, SuperuserRequiredMixin
+from app.editor_ui.mixins import (
+    CreatedByUserMixin,
+    ProjectMembershipRequiredMixin,
+)
 from app.editor_ui.views.base_views import BaseCreateView
 from app.feedback_forms.models import FeedbackForm
 from app.prompts.models import (
@@ -27,9 +30,9 @@ from app.prompts.models import (
 
 
 class PromptCreateView(
-    CreatedByUserMixin,
-    SuperuserRequiredMixin,
     LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    CreatedByUserMixin,
     BaseCreateView,
 ):
     """
@@ -43,9 +46,13 @@ class PromptCreateView(
     - Redirects to the prompt detail page upon successful creation.
     """
 
-    model = Prompt
     form_class = PromptForm
     object_name = "Prompt"
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+    parent_model = FeedbackForm
+    parent_lookup_kwarg = "feedback_form_uuid"
 
     MAX_ACTIVE_PROMPTS = 3
 
@@ -127,7 +134,11 @@ class PromptCreateView(
         return context
 
 
-class PromptDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
+class PromptDetailView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    DetailView,
+):
     """
     Displays the details of a single Prompt, including its options if it is a RangedPrompt.
 
@@ -141,6 +152,7 @@ class PromptDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
     slug_field = "uuid"
     slug_url_kwarg = "prompt_uuid"
     context_object_name = "prompt"
+    project_roles_required = ["editor", "owner"]
 
     def get_queryset(self):
         prompt_uuid = self.kwargs.get("prompt_uuid")
@@ -188,11 +200,17 @@ class PromptDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
 
 
 class RangedPromptOptionsCreateView(
-    SuperuserRequiredMixin, LoginRequiredMixin, BaseCreateView
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    BaseCreateView,
 ):
-    model = RangedPrompt
     form_class = RangedPromptOptionsForm
     object_name = "Range Prompt Option"
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+    parent_model = RangedPrompt
+    parent_lookup_kwarg = "prompt_uuid"
 
     def get_success_url(self):
         prompt_uuid = self.kwargs.get("prompt_uuid")

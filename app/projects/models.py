@@ -10,6 +10,24 @@ from app.utils.models import (
 
 RETENTION_PERIOD_CHOICES: list[int] = [30, 60, 180]
 
+ROLE_CHOICES = [
+    ("owner", "Owner"),
+    ("editor", "Editor"),
+]
+
+
+class ProjectMembership(TimestampedModelMixin, CreatedByModelMixin):
+    project = models.ForeignKey("Project", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=32, choices=ROLE_CHOICES)
+
+    def get_parent_project(self):
+        """Helper to get the parent Project for use in mixins."""
+        return self.project
+
+    class Meta:
+        unique_together = ("user", "project")
+
 
 class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
     """
@@ -24,8 +42,11 @@ class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
             choice: f"{choice} days" for choice in RETENTION_PERIOD_CHOICES
         },
     )
-    owned_by = models.ForeignKey(
-        User, on_delete=models.PROTECT, related_name="+"
+    members = models.ManyToManyField(
+        User,
+        through="ProjectMembership",
+        through_fields=("project", "user"),
+        related_name="project_memberships",
     )
 
     class Meta:

@@ -1,6 +1,11 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+)
 from django.db.models import (
     Count,
+    Prefetch,
     Q,
 )
 from django.urls import reverse
@@ -9,50 +14,102 @@ from django.views.generic import DetailView, ListView
 from app.editor_ui.forms import (
     ProjectForm,
 )
-from app.editor_ui.mixins import CreatedByUserMixin, SuperuserRequiredMixin
+from app.editor_ui.mixins import (
+    CreatedByUserMixin,
+    ProjectMembershipRequiredMixin,
+    ProjectOwnerMembershipMixin,
+)
 from app.editor_ui.views.base_views import BaseCreateView
 from app.projects.models import Project
 
 
 class ProjectCreateView(
-    CreatedByUserMixin,
-    SuperuserRequiredMixin,
     LoginRequiredMixin,
+    PermissionRequiredMixin,
+    CreatedByUserMixin,
+    ProjectOwnerMembershipMixin,
     BaseCreateView,
 ):
-    model = Project
     form_class = ProjectForm
     object_name = "Project"
+    permission_required = ["projects.add_project"]
 
     def get_success_url(self):
         return reverse(
-            "editor_ui:project_detail", kwargs={"uuid": self.object.uuid}
+            "editor_ui:project_detail",
+            kwargs={"project_uuid": self.object.uuid},
         )
 
 
-class ProjectListView(LoginRequiredMixin, ListView):
+class ProjectListView(
+    LoginRequiredMixin,
+    ListView,
+):
     model = Project
     template_name = "editor_ui/projects/project_list.html"
     context_object_name = "projects"
+    project_roles_required = ["editor", "owner"]
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            qs = Project.objects.all().select_related("owned_by")
-        else:
-            qs = Project.objects.filter(owned_by=self.request.user)
-        return qs
+        """
+        Filter objects to only those where the user has one of the `project_roles_required`
+        """
+        UserModel = get_user_model()
+
+        user = self.request.user
+        qs = super().get_queryset()
+
+        qs = qs.prefetch_related(
+            Prefetch(
+                "members",
+                queryset=UserModel.objects.filter(
+                    projectmembership__role="owner"
+                ),
+                to_attr="owner_members",
+            )
+        )
+
+        if user.is_superuser:
+            return qs
+
+        filter_kwargs = {
+            "projectmembership__user": user,
+            "projectmembership__role__in": self.project_roles_required,
+        }
+
+        return qs.filter(**filter_kwargs).distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        projects = context.get("projects", [])
+
+        for project in projects:
+            owners = [
+                str(owner) for owner in getattr(project, "owner_members", [])
+            ]
+            project.owners = ", ".join(owners)
+
+        return context
 
 
-class ProjectDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
+class ProjectDetailView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    DetailView,
+):
     model = Project
     template_name = "editor_ui/projects/project_detail.html"
     slug_field = "uuid"
-    slug_url_kwarg = "uuid"
+    slug_url_kwarg = "project_uuid"
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
 
     def get_queryset(self):
+        UserModel = get_user_model()
+
         return (
             Project.objects.all()
-            .select_related("owned_by")
             .annotate(
                 forms_count=Count(
                     "feedback_forms",
@@ -65,13 +122,26 @@ class ProjectDetailView(SuperuserRequiredMixin, LoginRequiredMixin, DetailView):
                     distinct=True,
                 ),
             )
+            .prefetch_related(
+                Prefetch(
+                    "members",
+                    queryset=UserModel.objects.filter(
+                        projectmembership__role="owner"
+                    ),
+                    to_attr="owner_members",
+                )
+            )
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project = self.object
+        owners = [
+            str(owner) for owner in getattr(self.object, "owner_members", [])
+        ]
 
         context["forms_count"] = project.forms_count
         context["responses_count"] = project.responses_count
+        context["owners"] = ", ".join(owners)
 
         return context
