@@ -1,7 +1,6 @@
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
 )
-from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import BooleanField, Case, Value, When
 from django.urls import reverse
@@ -54,7 +53,6 @@ class ProjectMembershipListView(
         user = self.request.user
         project_uuid = self.kwargs.get("project_uuid")
 
-        # Determine if the current user is a member of the project
         current_user_is_member = ProjectMembership.objects.filter(
             project__uuid=project_uuid, user=user
         ).exists()
@@ -75,24 +73,6 @@ class ProjectMembershipListView(
 
         return context
 
-    def dispatch(self, request, *args, **kwargs):
-        project_uuid = self.kwargs.get("project_uuid")
-
-        # Get the user's roles for the project
-        roles = ProjectMembership.objects.filter(
-            project__uuid=project_uuid, user=request.user
-        ).values_list("role", flat=True)
-        is_owner = "owner" in roles
-        is_editor = "editor" in roles
-
-        # Ensure only project members can edit membership listing
-        if not self.request.user.is_superuser:
-            if not is_owner and not is_editor:
-                raise PermissionDenied(
-                    "You do not have permission to edit memberships for this project."
-                )
-        return super().dispatch(request, *args, **kwargs)
-
 
 class ProjectMembershipCreateView(
     LoginRequiredMixin,
@@ -100,9 +80,7 @@ class ProjectMembershipCreateView(
     ProjectOwnerMembershipMixin,
     BaseCreateView,
 ):
-    model = ProjectMembership
     form_class = ProjectMembershipCreateForm
-    template_name = "editor_ui/create.html"
     object_name = "Project Membership"
 
     # ProjectMembershipRequiredMixin mixin attributes
@@ -113,18 +91,6 @@ class ProjectMembershipCreateView(
     def form_valid(self, form):
         project_uuid = self.kwargs.get("project_uuid")
         user = self.request.user
-
-        # Ensure only project owners can add memberships
-        roles = ProjectMembership.objects.filter(
-            project__uuid=project_uuid, user=user
-        ).values_list("role", flat=True)
-        is_owner = "owner" in roles
-
-        if not self.request.user.is_superuser:
-            if not is_owner:
-                raise PermissionDenied(
-                    "You do not have permission to add memberships for this project."
-                )
 
         project = Project.objects.get(uuid=project_uuid)
         form.instance.project = project
