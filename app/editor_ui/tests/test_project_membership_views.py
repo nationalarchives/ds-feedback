@@ -34,7 +34,9 @@ class ProjectListViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        self.assertContains(response, '<a href="#" class="tna-button">Edit</a>', 2)
+        self.assertContains(
+            response, '<a href="#" class="tna-button">Edit</a>', 2
+        )
 
     def test_owner_sees_all_user_management_actions(self):
         self.client.force_login(self.owner)
@@ -42,8 +44,12 @@ class ProjectListViewTests(TestCase):
             reverse("editor_ui:project_memberships", args=[self.project.uuid])
         )
 
-        self.assertContains(response, '<a href="#" class="tna-button">Edit</a>', 2)
-        self.assertContains(response, '<a href="#" class="tna-button">Leave</a>', 1)
+        self.assertContains(
+            response, '<a href="#" class="tna-button">Edit</a>', 2
+        )
+        self.assertContains(
+            response, '<a href="#" class="tna-button">Leave</a>', 1
+        )
 
     def test_editor_sees_limited_user_management_actions(self):
         self.client.force_login(self.editor)
@@ -52,5 +58,9 @@ class ProjectListViewTests(TestCase):
         )
 
         self.assertNotContains(response, "Edit")
-        self.assertNotContains(response, '<a href="#" class="tna-button">Edit</a>')
-        self.assertContains(response, '<a href="#" class="tna-button">Leave</a>', 1)
+        self.assertNotContains(
+            response, '<a href="#" class="tna-button">Edit</a>'
+        )
+        self.assertContains(
+            response, '<a href="#" class="tna-button">Leave</a>', 1
+        )
