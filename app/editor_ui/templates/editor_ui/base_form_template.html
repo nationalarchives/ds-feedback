@@ -1,12 +1,15 @@
 {% extends "base.html" %}
-{% set pageTitle = "Create " + object_name %}
 {% block content %}
     <div class="tna-section">
         <div class="tna-container">
             <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
-                <h1 class="tna-heading-xl">Create {{ object_name }}</h1>
+                <h1 class="tna-heading-xl">
+                    {% block heading %}{% endblock heading %}
+                </h1>
             </div>
             <div class="tna-column tna-column--full tna-!--padding-top-m">
+                {% block heading_text %}
+                {% endblock heading_text %}
                 <form method="post" class="tna-form">
                     {{ csrf_input }}
                     {% if form.non_field_errors() %}
@@ -43,7 +46,12 @@
                             </div>
                             {{ field }}
                         {% endfor %}
-                        <button type="submit" class="tna-button">Create {{ object_name }}</button>
+                        <button type="submit" class="tna-button">
+                            {% block submit_button_text %}
+                            {% endblock submit_button_text %}
+                        </button>
+                        {% block additional_buttons %}
+                        {% endblock additional_buttons %}
                     </form>
                 </div>
             </div>
