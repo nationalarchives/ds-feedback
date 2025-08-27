@@ -7,6 +7,7 @@ from app.editor_ui.views.feedback_form_views import (
 )
 from app.editor_ui.views.membership_views import (
     ProjectMembershipCreateView,
+    ProjectMembershipDeleteView,
     ProjectMembershipListView,
     ProjectMembershipUpdateView,
 )
@@ -48,6 +49,11 @@ urlpatterns = [
         "projects/<uuid:project_uuid>/members/<uuid:membership_uuid>/edit",
         ProjectMembershipUpdateView.as_view(),
         name="project_memberships_edit",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/members/<uuid:membership_uuid>/delete",
+        ProjectMembershipDeleteView.as_view(),
+        name="project_memberships_delete",
     ),
     path(
         "projects/<uuid:project_uuid>/feedback-forms/",

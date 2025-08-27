@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import (
 from django.db import IntegrityError
 from django.db.models import BooleanField, Case, Value, When
 from django.urls import reverse
-from django.views.generic import ListView, UpdateView
+from django.views.generic import DeleteView, ListView, UpdateView
 
 from app.editor_ui.forms import (
     ProjectMembershipCreateForm,
@@ -162,6 +162,56 @@ class ProjectMembershipUpdateView(
         return context
 
     def get_success_url(self):
+        project_uuid = self.kwargs.get("project_uuid")
+        return reverse(
+            "editor_ui:project_memberships",
+            kwargs={"project_uuid": project_uuid},
+        )
+
+
+class ProjectMembershipDeleteView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    DeleteView,
+):
+    model = ProjectMembership
+    template_name = "editor_ui/projects/project_membership_confirm_delete.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "membership_uuid"
+    object_name = "Project Membership Removal"
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["owner"]
+    parent_model = Project
+    parent_lookup_kwarg = "project_uuid"
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Allow users to delete their own membership if they are an editor.
+        Otherwise, require owner role.
+        """
+        self.object = self.get_object()
+        object_user = self.object.user
+        authenticated_user = request.user
+
+        if object_user == authenticated_user:
+            # Bypass role checks for self-deleting users
+            self.project_roles_required = ["editor", "owner"]
+        else:
+            self.project_roles_required = ["owner"]
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        project_uuid = self.kwargs.get("project_uuid")
+        return ProjectMembership.objects.filter(
+            project__uuid=project_uuid
+        ).select_related("user", "project")
+
+    def get_success_url(self):
+        # If a user left the project, redirect to the project list
+        if self.object.user == self.request.user:
+            return reverse("editor_ui:project_list")
+        # Otherwise, redirect to the project members list
         project_uuid = self.kwargs.get("project_uuid")
         return reverse(
             "editor_ui:project_memberships",
