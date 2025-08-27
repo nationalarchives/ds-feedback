@@ -1,3 +1,4 @@
+from django.urls import Resolver404, resolve
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.shortcuts import get_object_or_404
@@ -139,3 +140,44 @@ class ProjectMembershipRequiredMixin:
             )
 
         return super().dispatch(request, *args, **kwargs)
+
+
+class BreadCrumbsMixin:
+    """
+    A mixin to help with the display of breadcrumbs
+
+    Usage:
+    - Set the `breadcrumb` property in the views
+    """
+
+    breadcrumb = "Error"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["breadcrumbs"] = self._breadcrumb_calculator()
+
+    def _breadcrumb_calculator(self):
+        parts = self.request.path.split("/")
+        breadcrumbs = []
+
+        parsed_url = ""
+
+        for url_part in parts[:-1]:
+            parsed_url += f"{url_part}/"
+            resolved = self._breadcrumb_inner(parsed_url)
+            if resolved:
+                breadcrumbs.append(resolved)
+
+        return breadcrumbs
+
+    def _breadcrumb_inner(self, url):
+        try:
+            resolved = resolve(url)
+
+            target = resolved.func.view_class
+            if issubclass(target, BreadCrumbsMixin):
+                return {"url": url, "slug": target.breadcrumb}
+            else:
+                return None
+        except Resolver404:
+            return None
