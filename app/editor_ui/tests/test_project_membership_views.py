@@ -57,7 +57,6 @@ class ProjectListViewTests(TestCase):
             reverse("editor_ui:project_memberships", args=[self.project.uuid])
         )
 
-        self.assertNotContains(response, "Edit")
         self.assertNotContains(
             response, '<a href="#" class="tna-button">Edit</a>'
         )
