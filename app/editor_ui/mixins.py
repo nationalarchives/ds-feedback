@@ -144,10 +144,15 @@ class ProjectMembershipRequiredMixin:
 
 class BreadCrumbsMixin:
     """
-    A mixin to help with the display of breadcrumbs
+    A mixin to help with the display of breadcrumbs via the TNA Breadcrumbs component
 
     Usage:
-    - Set the `breadcrumb` property in the views
+    - Add BreadCrumbsMixin to your view class
+    - Set the `breadcrumb` property in the view class
+
+    Note:
+    - The implicit assumption is that all view urls are suffixed with '/'. All urls for views must have the '/' suffix,
+    if the BreadCrumbsMixin is to work.
     """
 
     breadcrumb = "Error"
@@ -158,7 +163,14 @@ class BreadCrumbsMixin:
         return context
 
     def _breadcrumb_calculator(self):
+        """
+        Calculate the breadcrumbs from the url, from root to the current path.
+
+        Only views that have the BreadCrumbsMixin and self.breadcrumbs
+        will be added to the list of breadcrumbs.
+        """
         parts = self.request.path.split("/")
+
         breadcrumbs = []
 
         parsed_url = ""
@@ -172,15 +184,24 @@ class BreadCrumbsMixin:
         return breadcrumbs
 
     def _breadcrumb_inner(self, url):
+        """
+        Extract breadcrumb from a url
+
+        If the required criteria aren't met, or the url isn't using a BreadCrumbsMixin,
+        then no breadcrumbs are extracted.
+        """
         try:
+            # extract relevant view class or function, from the url
             resolved = resolve(url)
 
             # Check if it's a class-based view
-            if hasattr(resolved.func, 'view_class'):
+            if hasattr(resolved.func, "view_class"):
                 target = resolved.func.view_class
-                if issubclass(target, BreadCrumbsMixin):
+                # if view class has BreadCrumbsMixin, extract breadcrumb and url
+                if issubclass(target, BreadCrumbsMixin) and target.breadcrumb:
+                    # match format required by TNA Breadcrumbs component
                     return {"href": url, "text": target.breadcrumb}
-            
+
             return None
         except Resolver404:
             return None

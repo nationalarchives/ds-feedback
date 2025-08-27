@@ -17,6 +17,7 @@ from app.editor_ui.forms import (
     RangedPromptOptionsForm,
 )
 from app.editor_ui.mixins import (
+    BreadCrumbsMixin,
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
 )
@@ -33,6 +34,7 @@ class PromptCreateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     CreatedByUserMixin,
+    BreadCrumbsMixin,
     BaseCreateView,
 ):
     """
@@ -53,6 +55,8 @@ class PromptCreateView(
     project_roles_required = ["editor", "owner"]
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
+
+    breadcrumb = "Create a Prompt"
 
     MAX_ACTIVE_PROMPTS = 3
 
@@ -137,6 +141,7 @@ class PromptCreateView(
 class PromptDetailView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     DetailView,
 ):
     """
@@ -153,6 +158,8 @@ class PromptDetailView(
     slug_url_kwarg = "prompt_uuid"
     context_object_name = "prompt"
     project_roles_required = ["editor", "owner"]
+
+    breadcrumb = "Prompt Details"
 
     def get_queryset(self):
         prompt_uuid = self.kwargs.get("prompt_uuid")
@@ -202,6 +209,7 @@ class PromptDetailView(
 class RangedPromptOptionsCreateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     BaseCreateView,
 ):
     form_class = RangedPromptOptionsForm
@@ -211,6 +219,8 @@ class RangedPromptOptionsCreateView(
     project_roles_required = ["editor", "owner"]
     parent_model = RangedPrompt
     parent_lookup_kwarg = "prompt_uuid"
+
+    breadcrumb = "Create a Ranged Prompt Option"
 
     def get_success_url(self):
         prompt_uuid = self.kwargs.get("prompt_uuid")

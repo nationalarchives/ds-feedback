@@ -53,6 +53,7 @@ class ProjectListView(
     template_name = "editor_ui/projects/project_list.html"
     context_object_name = "projects"
     project_roles_required = ["editor", "owner"]
+
     breadcrumb = "Projects"
 
     def get_queryset(self):
@@ -100,6 +101,7 @@ class ProjectListView(
 class ProjectDetailView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     DetailView,
 ):
     model = Project
@@ -109,6 +111,8 @@ class ProjectDetailView(
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
+
+    breadcrumb = "Project Details"
 
     def get_queryset(self):
         UserModel = get_user_model()
