@@ -33,7 +33,6 @@ class ProjectListViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-
         self.assertContains(
             response, '<a href="#" class="tna-button">Edit</a>', 2
         )
@@ -44,6 +43,7 @@ class ProjectListViewTests(TestCase):
             reverse("editor_ui:project_memberships", args=[self.project.uuid])
         )
 
+        self.assertEqual(response.status_code, 200)
         self.assertContains(
             response, '<a href="#" class="tna-button">Edit</a>', 2
         )
@@ -57,9 +57,20 @@ class ProjectListViewTests(TestCase):
             reverse("editor_ui:project_memberships", args=[self.project.uuid])
         )
 
+        self.assertEqual(response.status_code, 200)
         self.assertNotContains(
             response, '<a href="#" class="tna-button">Edit</a>'
         )
         self.assertContains(
             response, '<a href="#" class="tna-button">Leave</a>', 1
         )
+
+    def test_editor_with_project_membership_cannot_add_users(self):
+        self.client.force_login(self.editor)
+        response = self.client.get(
+            reverse(
+                "editor_ui:project_memberships_add", args=[self.project.uuid]
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
