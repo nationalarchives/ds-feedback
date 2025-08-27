@@ -140,3 +140,13 @@ class ProjectMembershipCreateForm(forms.ModelForm):
         ]
 
         help_texts = {"role": "Select the role you want to assign to the user."}
+
+
+class ProjectMembershipUpdateForm(forms.ModelForm):
+    class Meta:
+        model = ProjectMembership
+        fields = [
+            "role",
+        ]
+
+        help_texts = {"role": "Select the role you want to assign to the user."}

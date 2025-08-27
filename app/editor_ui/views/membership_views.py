@@ -4,9 +4,12 @@ from django.contrib.auth.mixins import (
 from django.db import IntegrityError
 from django.db.models import BooleanField, Case, Value, When
 from django.urls import reverse
-from django.views.generic import ListView
+from django.views.generic import ListView, UpdateView
 
-from app.editor_ui.forms import ProjectMembershipCreateForm
+from app.editor_ui.forms import (
+    ProjectMembershipCreateForm,
+    ProjectMembershipUpdateForm,
+)
 from app.editor_ui.mixins import (
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
@@ -120,6 +123,43 @@ class ProjectMembershipCreateView(
             )
 
             return response
+
+    def get_success_url(self):
+        project_uuid = self.kwargs.get("project_uuid")
+        return reverse(
+            "editor_ui:project_memberships",
+            kwargs={"project_uuid": project_uuid},
+        )
+
+
+class ProjectMembershipUpdateView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    ProjectOwnerMembershipMixin,
+    UpdateView,
+):
+    form_class = ProjectMembershipUpdateForm
+    template_name = "editor_ui/projects/project_membership_update.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "membership_uuid"
+    object_name = "Project Membership"
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["owner"]
+    parent_model = Project
+    parent_lookup_kwarg = "project_uuid"
+
+    def get_queryset(self):
+        # Limit the queryset to memberships of the specified project
+        project_uuid = self.kwargs.get("project_uuid")
+        return ProjectMembership.objects.filter(
+            project__uuid=project_uuid
+        ).select_related("user", "project")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["object_name"] = self.object_name
+        return context
 
     def get_success_url(self):
         project_uuid = self.kwargs.get("project_uuid")
