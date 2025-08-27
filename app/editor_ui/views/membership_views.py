@@ -12,6 +12,7 @@ from app.editor_ui.mixins import (
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
 )
+from app.editor_ui.utils import send_email_util
 from app.editor_ui.views.base_views import BaseCreateView
 from app.projects.models import Project, ProjectMembership
 
@@ -131,12 +132,28 @@ class ProjectMembershipCreateView(
         form.instance.user = form.cleaned_data["user_obj"]
 
         try:
-            return super().form_valid(form)
+            response = super().form_valid(form)
         except IntegrityError:
             form.add_error(
                 "email", "This user is already a member of the project."
             )
             return self.form_invalid(form)
+        else:
+            send_email_util(
+                subject_template_name="editor_ui/emails/project_membership_subject.txt",
+                email_template_name="editor_ui/emails/project_membership_added_email.html",
+                context={
+                    "project": project,
+                    "role": form.cleaned_data["role"],
+                    "added_by": user,
+                    "new_member": form.instance.user,
+                },
+                from_email=None,
+                to_email=form.instance.user.email,
+                request=self.request,
+            )
+
+            return response
 
     def get_success_url(self):
         project_uuid = self.kwargs.get("project_uuid")
