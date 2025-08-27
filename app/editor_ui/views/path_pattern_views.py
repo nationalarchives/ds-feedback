@@ -27,11 +27,6 @@ class PathPatternCreateView(
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
-    parent_model = FeedbackForm
-    parent_lookup_kwarg = "feedback_form_uuid"
-
     def form_valid(self, form):
         instance = form.save(commit=False)
         instance.feedback_form = FeedbackForm.objects.get(
