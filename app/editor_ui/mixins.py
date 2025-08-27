@@ -1,7 +1,7 @@
-from django.urls import Resolver404, resolve
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.shortcuts import get_object_or_404
+from django.urls import Resolver404, resolve
 from django.views.generic import DeleteView, DetailView, UpdateView
 
 from app.projects.models import Project, ProjectMembership
