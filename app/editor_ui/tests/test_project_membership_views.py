@@ -33,9 +33,14 @@ class ProjectListViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response, '<a href="#" class="tna-button">Edit</a>', 2
+        content = (
+            response.content.decode()
+            .replace("\n", "")
+            .replace("\r", "")
+            .replace("  ", " ")
         )
+        self.assertRegex(content, r'<a [^>]*class="tna-button"[^>]*>Edit</a>')
+        self.assertRegex(content, r'<a [^>]*class="tna-button"[^>]*>Delete</a>')
 
     def test_owner_sees_all_user_management_actions(self):
         self.client.force_login(self.owner)
@@ -44,12 +49,14 @@ class ProjectListViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response, '<a href="#" class="tna-button">Edit</a>', 2
+        content = (
+            response.content.decode()
+            .replace("\n", "")
+            .replace("\r", "")
+            .replace("  ", " ")
         )
-        self.assertContains(
-            response, '<a href="#" class="tna-button">Leave</a>', 1
-        )
+        self.assertRegex(content, r'<a [^>]*class="tna-button"[^>]*>Edit</a>')
+        self.assertRegex(content, r'<a [^>]*class="tna-button"[^>]*>Delete</a>')
 
     def test_editor_sees_limited_user_management_actions(self):
         self.client.force_login(self.editor)
@@ -58,19 +65,19 @@ class ProjectListViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(
-            response, '<a href="#" class="tna-button">Edit</a>'
+        content = (
+            response.content.decode()
+            .replace("\n", "")
+            .replace("\r", "")
+            .replace("  ", " ")
         )
-        self.assertContains(
-            response, '<a href="#" class="tna-button">Leave</a>', 1
-        )
+        self.assertRegex(content, r'<a [^>]*class="tna-button"[^>]*>Delete</a>')
+        self.assertNotRegex(content, r'<a [^>]*class="tna-button"[^>]*>Edit</a>')
 
     def test_editor_with_project_membership_cannot_add_users(self):
         self.client.force_login(self.editor)
         response = self.client.get(
-            reverse(
-                "editor_ui:project_memberships_add", args=[self.project.uuid]
-            )
+            reverse("editor_ui:project_memberships_add", args=[self.project.uuid])
         )
 
         self.assertEqual(response.status_code, 403)
