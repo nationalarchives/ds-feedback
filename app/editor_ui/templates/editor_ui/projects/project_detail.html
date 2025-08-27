@@ -8,6 +8,7 @@
           <p class="tna-hgroup__supertitle">Project</p>
           <h1 class="tna-hgroup__title">{{ project.name }}</h1>
         </hgroup>
+        <a href="{{ url("editor_ui:project_memberships", project_uuid=project.uuid) }}" class="tna-button">Manage users</a>
         <dl class="tna-dl tna-dl--plain">
           <dt>Domain</dt>
           <dd>
