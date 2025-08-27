@@ -155,6 +155,7 @@ class BreadCrumbsMixin:
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["breadcrumbs"] = self._breadcrumb_calculator()
+        return context
 
     def _breadcrumb_calculator(self):
         parts = self.request.path.split("/")
@@ -174,10 +175,12 @@ class BreadCrumbsMixin:
         try:
             resolved = resolve(url)
 
-            target = resolved.func.view_class
-            if issubclass(target, BreadCrumbsMixin):
-                return {"url": url, "slug": target.breadcrumb}
-            else:
-                return None
+            # Check if it's a class-based view
+            if hasattr(resolved.func, 'view_class'):
+                target = resolved.func.view_class
+                if issubclass(target, BreadCrumbsMixin):
+                    return {"href": url, "text": target.breadcrumb}
+            
+            return None
         except Resolver404:
             return None
