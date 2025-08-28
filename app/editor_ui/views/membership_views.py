@@ -1,13 +1,17 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
 )
-from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models import BooleanField, Case, Value, When
+from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import ListView
+from django.views.generic import DeleteView, ListView, UpdateView
 
-from app.editor_ui.forms import ProjectMembershipCreateForm
+from app.editor_ui.forms import (
+    ProjectMembershipCreateForm,
+    ProjectMembershipUpdateForm,
+)
 from app.editor_ui.mixins import (
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
@@ -54,7 +58,6 @@ class ProjectMembershipListView(
         user = self.request.user
         project_uuid = self.kwargs.get("project_uuid")
 
-        # Determine if the current user is a member of the project
         current_user_is_member = ProjectMembership.objects.filter(
             project__uuid=project_uuid, user=user
         ).exists()
@@ -75,24 +78,6 @@ class ProjectMembershipListView(
 
         return context
 
-    def dispatch(self, request, *args, **kwargs):
-        project_uuid = self.kwargs.get("project_uuid")
-
-        # Get the user's roles for the project
-        roles = ProjectMembership.objects.filter(
-            project__uuid=project_uuid, user=request.user
-        ).values_list("role", flat=True)
-        is_owner = "owner" in roles
-        is_editor = "editor" in roles
-
-        # Ensure only project members can edit membership listing
-        if not self.request.user.is_superuser:
-            if not is_owner and not is_editor:
-                raise PermissionDenied(
-                    "You do not have permission to edit memberships for this project."
-                )
-        return super().dispatch(request, *args, **kwargs)
-
 
 class ProjectMembershipCreateView(
     LoginRequiredMixin,
@@ -100,9 +85,7 @@ class ProjectMembershipCreateView(
     ProjectOwnerMembershipMixin,
     BaseCreateView,
 ):
-    model = ProjectMembership
     form_class = ProjectMembershipCreateForm
-    template_name = "editor_ui/create.html"
     object_name = "Project Membership"
 
     # ProjectMembershipRequiredMixin mixin attributes
@@ -113,18 +96,6 @@ class ProjectMembershipCreateView(
     def form_valid(self, form):
         project_uuid = self.kwargs.get("project_uuid")
         user = self.request.user
-
-        # Ensure only project owners can add memberships
-        roles = ProjectMembership.objects.filter(
-            project__uuid=project_uuid, user=user
-        ).values_list("role", flat=True)
-        is_owner = "owner" in roles
-
-        if not self.request.user.is_superuser:
-            if not is_owner:
-                raise PermissionDenied(
-                    "You do not have permission to add memberships for this project."
-                )
 
         project = Project.objects.get(uuid=project_uuid)
         form.instance.project = project
@@ -161,3 +132,109 @@ class ProjectMembershipCreateView(
             "editor_ui:project_memberships",
             kwargs={"project_uuid": project_uuid},
         )
+
+
+class ProjectMembershipUpdateView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    ProjectOwnerMembershipMixin,
+    UpdateView,
+):
+    form_class = ProjectMembershipUpdateForm
+    template_name = "editor_ui/projects/project_membership_update.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "membership_uuid"
+    object_name = "Project Membership"
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["owner"]
+    parent_model = Project
+    parent_lookup_kwarg = "project_uuid"
+
+    def get_queryset(self):
+        # Limit the queryset to memberships of the specified project
+        project_uuid = self.kwargs.get("project_uuid")
+        return ProjectMembership.objects.filter(
+            project__uuid=project_uuid
+        ).select_related("user", "project")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["object_name"] = self.object_name
+        return context
+
+    def get_success_url(self):
+        project_uuid = self.kwargs.get("project_uuid")
+        return reverse(
+            "editor_ui:project_memberships",
+            kwargs={"project_uuid": project_uuid},
+        )
+
+
+class ProjectMembershipDeleteView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    DeleteView,
+):
+    model = ProjectMembership
+    template_name = "editor_ui/projects/project_membership_confirm_delete.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "membership_uuid"
+    object_name = "Project Membership Removal"
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["owner"]
+    parent_model = Project
+    parent_lookup_kwarg = "project_uuid"
+
+    def get_queryset(self):
+        project_uuid = self.kwargs.get("project_uuid")
+        return ProjectMembership.objects.filter(
+            project__uuid=project_uuid
+        ).select_related("user", "project")
+
+    def get_success_url(self):
+        # If a user left the project, redirect to the project list
+        if self.object.user == self.request.user:
+            return reverse("editor_ui:project_list")
+        # Otherwise, redirect to the project members list
+        project_uuid = self.kwargs.get("project_uuid")
+        return reverse(
+            "editor_ui:project_memberships",
+            kwargs={"project_uuid": project_uuid},
+        )
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Allow users to delete their own membership if they are an editor.
+        Otherwise, require owner role.
+        """
+        self.object = self.get_object()
+        object_user = self.object.user
+        authenticated_user = request.user
+
+        # Bypass role checks for self-deleting users
+        if object_user == authenticated_user:
+            self.project_roles_required = ["editor", "owner"]
+        else:
+            self.project_roles_required = ["owner"]
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        # Ensure there is always at least one owner assigned to a project
+        owners_count = ProjectMembership.objects.filter(
+            project=self.object.project, role="owner"
+        ).count()
+
+        if self.object.role == "owner" and owners_count <= 1:
+            messages.error(
+                self.request,
+                f"Cannot delete {self.object.user}. Each project must have at least one owner.",
+            )
+            return redirect(
+                "editor_ui:project_memberships",
+                project_uuid=self.object.project.uuid,
+            )
+
+        return super().form_valid(form)
