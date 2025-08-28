@@ -1,8 +1,10 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
 )
 from django.db import IntegrityError
 from django.db.models import BooleanField, Case, Value, When
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DeleteView, ListView, UpdateView
 
@@ -194,11 +196,27 @@ class ProjectMembershipDeleteView(
         object_user = self.object.user
         authenticated_user = request.user
 
+        # Bypass role checks for self-deleting users
         if object_user == authenticated_user:
-            # Bypass role checks for self-deleting users
             self.project_roles_required = ["editor", "owner"]
         else:
             self.project_roles_required = ["owner"]
+
+        # Ensure there is always at least one owner assigned to a project
+        owners_count = ProjectMembership.objects.filter(
+            project=self.object.project, role="owner"
+        ).count()
+        if self.object.role == "owner" and owners_count <= 1:
+            # Prevent deletion of the last owner
+            messages.error(
+                self.request,
+                f"Cannot delete {self.object.user}. Each project must have at least one owner.",
+            )
+            return redirect(
+                "editor_ui:project_memberships",
+                project_uuid=self.object.project.uuid,
+            )
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
