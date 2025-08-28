@@ -22,7 +22,7 @@
       {% endif %}
       <div class="tna-column tna-column--full tna-!--padding-top-m">
         {% if current_user_is_project_owner_or_admin %}
-          <a href="{{ url("editor_ui:project_memberships_add", project_uuid=project_uuid) }}"
+          <a href="{{ url("editor_ui:project__memberships_add", project_uuid=project_uuid) }}"
              class="tna-button">Add users</a>
         {% endif %}
         {% if not members %}
@@ -48,11 +48,11 @@
                     <td class="tna-table__cell">{{ member.created_by }}</td>
                     <td class="tna-table__cell">
                       {% if current_user_is_project_owner_or_admin %}
-                        <a href="{{ url('editor_ui:project_memberships_edit', project_uuid=project_uuid, membership_uuid=member.uuid) }}"
+                        <a href="{{ url('editor_ui:project__memberships_edit', project_uuid=project_uuid, membership_uuid=member.uuid) }}"
                            class="tna-button">Edit</a>
                       {% endif %}
                       {% if current_user_is_project_owner_or_admin or member.is_current_user %}
-                        <a href="{{ url('editor_ui:project_memberships_delete', project_uuid=member.project.uuid, membership_uuid=member.uuid) }}"
+                        <a href="{{ url('editor_ui:project__memberships_delete', project_uuid=member.project.uuid, membership_uuid=member.uuid) }}"
                            class="tna-button">Delete</a>
                       {% endif %}
                     </td>

@@ -10,5 +10,5 @@
   Update Membership
 {% endblock submit_button_text %}
 {% block additional_buttons %}
-  <a href="{{ url('editor_ui:project_memberships', project_uuid=object.project.uuid) }}" class="tna-button">Cancel</a>
+  <a href="{{ url('editor_ui:project__memberships', project_uuid=object.project.uuid) }}" class="tna-button">Cancel</a>
 {% endblock additional_buttons %}

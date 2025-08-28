@@ -29,7 +29,7 @@ class ProjectListViewTests(TestCase):
     def test_admin_sees_all_user_management_actions(self):
         self.client.force_login(self.admin)
         response = self.client.get(
-            reverse("editor_ui:project_memberships", args=[self.project.uuid])
+            reverse("editor_ui:project__memberships", args=[self.project.uuid])
         )
 
         self.assertEqual(response.status_code, 200)
@@ -45,7 +45,7 @@ class ProjectListViewTests(TestCase):
     def test_owner_sees_all_user_management_actions(self):
         self.client.force_login(self.owner)
         response = self.client.get(
-            reverse("editor_ui:project_memberships", args=[self.project.uuid])
+            reverse("editor_ui:project__memberships", args=[self.project.uuid])
         )
 
         self.assertEqual(response.status_code, 200)
@@ -61,7 +61,7 @@ class ProjectListViewTests(TestCase):
     def test_editor_sees_limited_user_management_actions(self):
         self.client.force_login(self.editor)
         response = self.client.get(
-            reverse("editor_ui:project_memberships", args=[self.project.uuid])
+            reverse("editor_ui:project__memberships", args=[self.project.uuid])
         )
 
         self.assertEqual(response.status_code, 200)
@@ -80,7 +80,7 @@ class ProjectListViewTests(TestCase):
         self.client.force_login(self.editor)
         response = self.client.get(
             reverse(
-                "editor_ui:project_memberships_add", args=[self.project.uuid]
+                "editor_ui:project__memberships_add", args=[self.project.uuid]
             )
         )
 
@@ -93,7 +93,7 @@ class ProjectListViewTests(TestCase):
         )
         response = self.client.post(
             reverse(
-                "editor_ui:project_memberships_delete",
+                "editor_ui:project__memberships_delete",
                 args=[self.project.uuid, editor_membership.uuid],
             ),
             follow=True,
@@ -114,7 +114,7 @@ class ProjectListViewTests(TestCase):
         )
         response = self.client.post(
             reverse(
-                "editor_ui:project_memberships_delete",
+                "editor_ui:project__memberships_delete",
                 args=[self.project.uuid, owner_membership.uuid],
             ),
             follow=True,
@@ -134,7 +134,7 @@ class ProjectListViewTests(TestCase):
         )
         response = self.client.post(
             reverse(
-                "editor_ui:project_memberships_delete",
+                "editor_ui:project__memberships_delete",
                 args=[self.project.uuid, owner_membership.uuid],
             ),
             follow=True,
@@ -143,7 +143,7 @@ class ProjectListViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertRedirects(
             response,
-            reverse("editor_ui:project_memberships", args=[self.project.uuid]),
+            reverse("editor_ui:project__memberships", args=[self.project.uuid]),
         )
         self.assertContains(
             response, "Each project must have at least one owner."

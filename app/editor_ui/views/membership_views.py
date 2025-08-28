@@ -129,7 +129,7 @@ class ProjectMembershipCreateView(
     def get_success_url(self):
         project_uuid = self.kwargs.get("project_uuid")
         return reverse(
-            "editor_ui:project_memberships",
+            "editor_ui:project__memberships",
             kwargs={"project_uuid": project_uuid},
         )
 
@@ -166,7 +166,7 @@ class ProjectMembershipUpdateView(
     def get_success_url(self):
         project_uuid = self.kwargs.get("project_uuid")
         return reverse(
-            "editor_ui:project_memberships",
+            "editor_ui:project__memberships",
             kwargs={"project_uuid": project_uuid},
         )
 
@@ -200,7 +200,7 @@ class ProjectMembershipDeleteView(
         # Otherwise, redirect to the project members list
         project_uuid = self.kwargs.get("project_uuid")
         return reverse(
-            "editor_ui:project_memberships",
+            "editor_ui:project__memberships",
             kwargs={"project_uuid": project_uuid},
         )
 
@@ -233,7 +233,7 @@ class ProjectMembershipDeleteView(
                 f"Cannot delete {self.object.user}. Each project must have at least one owner.",
             )
             return redirect(
-                "editor_ui:project_memberships",
+                "editor_ui:project__memberships",
                 project_uuid=self.object.project.uuid,
             )
 
