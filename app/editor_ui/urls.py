@@ -36,22 +36,22 @@ urlpatterns = [
         name="project_detail",
     ),
     path(
-        "projects/<uuid:project_uuid>/members",
+        "projects/<uuid:project_uuid>/members/",
         ProjectMembershipListView.as_view(),
         name="project__memberships",
     ),
     path(
-        "projects/<uuid:project_uuid>/members/add",
+        "projects/<uuid:project_uuid>/members/add/",
         ProjectMembershipCreateView.as_view(),
         name="project__memberships_add",
     ),
     path(
-        "projects/<uuid:project_uuid>/members/<uuid:membership_uuid>/edit",
+        "projects/<uuid:project_uuid>/members/<uuid:membership_uuid>/edit/",
         ProjectMembershipUpdateView.as_view(),
         name="project__memberships_edit",
     ),
     path(
-        "projects/<uuid:project_uuid>/members/<uuid:membership_uuid>/delete",
+        "projects/<uuid:project_uuid>/members/<uuid:membership_uuid>/delete/",
         ProjectMembershipDeleteView.as_view(),
         name="project__memberships_delete",
     ),
@@ -71,7 +71,7 @@ urlpatterns = [
         name="project__feedback_form_detail",
     ),
     path(
-        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/path-pattern/create",
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/path-pattern/create/",
         PathPatternCreateView.as_view(),
         name="project__feedback_form__path_pattern_create",
     ),
@@ -86,7 +86,7 @@ urlpatterns = [
         name="project__feedback_form__prompt_detail",
     ),
     path(
-        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/ranged-prompt-options/create",
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/ranged-prompt-options/create/",
         RangedPromptOptionsCreateView.as_view(),
         name="project__feedback_form__prompt__ranged_prompt_options_create",
     ),

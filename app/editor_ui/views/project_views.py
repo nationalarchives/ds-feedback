@@ -15,6 +15,7 @@ from app.editor_ui.forms import (
     ProjectForm,
 )
 from app.editor_ui.mixins import (
+    BreadCrumbsMixin,
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
@@ -28,11 +29,13 @@ class ProjectCreateView(
     PermissionRequiredMixin,
     CreatedByUserMixin,
     ProjectOwnerMembershipMixin,
+    BreadCrumbsMixin,
     BaseCreateView,
 ):
     form_class = ProjectForm
     object_name = "Project"
     permission_required = ["projects.add_project"]
+    breadcrumb = "Create a Project"
 
     def get_success_url(self):
         return reverse(
@@ -43,12 +46,15 @@ class ProjectCreateView(
 
 class ProjectListView(
     LoginRequiredMixin,
+    BreadCrumbsMixin,
     ListView,
 ):
     model = Project
     template_name = "editor_ui/projects/project_list.html"
     context_object_name = "projects"
     project_roles_required = ["editor", "owner"]
+
+    breadcrumb = "Projects"
 
     def get_queryset(self):
         """
@@ -95,6 +101,7 @@ class ProjectListView(
 class ProjectDetailView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     DetailView,
 ):
     model = Project
@@ -104,6 +111,8 @@ class ProjectDetailView(
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
+
+    breadcrumb = "Project Details"
 
     def get_queryset(self):
         UserModel = get_user_model()

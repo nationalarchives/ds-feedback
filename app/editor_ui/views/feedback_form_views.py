@@ -12,6 +12,7 @@ from app.editor_ui.forms import (
     FeedbackFormForm,
 )
 from app.editor_ui.mixins import (
+    BreadCrumbsMixin,
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
 )
@@ -27,6 +28,7 @@ class FeedbackFormCreateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     CreatedByUserMixin,
+    BreadCrumbsMixin,
     BaseCreateView,
 ):
     """
@@ -48,6 +50,8 @@ class FeedbackFormCreateView(
     project_roles_required = ["editor", "owner"]
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+
+    breadcrumb = "Create a Feedback Form"
 
     def form_valid(self, form):
         """
@@ -76,6 +80,7 @@ class FeedbackFormCreateView(
 class FeedbackFormListView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     ListView,
 ):
     """
@@ -95,6 +100,8 @@ class FeedbackFormListView(
     project_roles_required = ["editor", "owner"]
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+
+    breadcrumb = "Feedback Forms"
 
     def get_queryset(self):
         qs = (
@@ -122,6 +129,7 @@ class FeedbackFormListView(
 class FeedbackFormDetailView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     DetailView,
 ):
     """
@@ -139,6 +147,8 @@ class FeedbackFormDetailView(
     slug_url_kwarg = "feedback_form_uuid"
     context_object_name = "feedback_form"
     project_roles_required = ["editor", "owner"]
+
+    breadcrumb = "Feedback Form Details"
 
     def get_queryset(self):
         return (

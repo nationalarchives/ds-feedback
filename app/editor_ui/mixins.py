@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.shortcuts import get_object_or_404
+from django.urls import Resolver404, resolve
 from django.views.generic import DeleteView, DetailView, UpdateView
 
 from app.projects.models import Project, ProjectMembership
@@ -139,3 +140,74 @@ class ProjectMembershipRequiredMixin:
             )
 
         return super().dispatch(request, *args, **kwargs)
+
+
+class BreadCrumbsMixin:
+    """
+    A mixin to help with the display of breadcrumbs via the TNA Breadcrumbs component
+
+    Usage:
+    - Add BreadCrumbsMixin to your view class
+    - Set the `breadcrumb` property in the view class
+
+    Note:
+    - The implicit assumption is that all view urls are suffixed with '/'. All urls for views must have the '/' suffix,
+    if the BreadCrumbsMixin is to work.
+    """
+
+    def __init__(self) -> None:
+        if not hasattr(self, "breadcrumb"):
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} requires 'breadcrumbs' to be set, as it's using the BreadCrumbsMixin."
+            )
+
+        super().__init__()
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["breadcrumbs"] = self._breadcrumb_calculator()
+        return context
+
+    def _breadcrumb_calculator(self):
+        """
+        Calculate the breadcrumbs from the url, from root to the current path.
+
+        Only views that have the BreadCrumbsMixin and self.breadcrumbs
+        will be added to the list of breadcrumbs.
+        """
+        parts = self.request.path.split("/")
+
+        breadcrumbs = []
+
+        parsed_url = ""
+
+        for url_part in parts[:-1]:
+            parsed_url += f"{url_part}/"
+            resolved = self._breadcrumb_inner(parsed_url)
+            if resolved:
+                breadcrumbs.append(resolved)
+
+        return breadcrumbs
+
+    def _breadcrumb_inner(self, url):
+        """
+        Extract breadcrumb from a url
+
+        If the required criteria aren't met, or the url isn't using a BreadCrumbsMixin,
+        then no breadcrumbs are extracted.
+        """
+        try:
+            # extract relevant view class or function, from the url
+            resolved = resolve(url)
+
+            # Check if it's a class-based view
+            if hasattr(resolved.func, "view_class"):
+                target = resolved.func.view_class
+                # if view class has BreadCrumbsMixin, extract breadcrumb and url
+                if issubclass(target, BreadCrumbsMixin) and target.breadcrumb:
+                    # match format required by TNA Breadcrumbs component
+                    return {"href": url, "text": target.breadcrumb}
+
+            return None
+        except Resolver404:
+            return None

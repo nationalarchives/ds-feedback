@@ -5,11 +5,12 @@ from app.editor_ui.forms import (
     PathPatternForm,
 )
 from app.editor_ui.mixins import (
+    BreadCrumbsMixin,
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
 )
 from app.editor_ui.views.base_views import BaseCreateView
-from app.feedback_forms.models import FeedbackForm, PathPattern
+from app.feedback_forms.models import FeedbackForm
 from app.projects.models import Project
 
 
@@ -17,6 +18,7 @@ class PathPatternCreateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     CreatedByUserMixin,
+    BreadCrumbsMixin,
     BaseCreateView,
 ):
     form_class = PathPatternForm
@@ -26,6 +28,8 @@ class PathPatternCreateView(
     project_roles_required = ["editor", "owner"]
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
+
+    breadcrumb = "Create a Path Pattern"
 
     def form_valid(self, form):
         instance = form.save(commit=False)
