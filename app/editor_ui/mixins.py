@@ -155,7 +155,13 @@ class BreadCrumbsMixin:
     if the BreadCrumbsMixin is to work.
     """
 
-    breadcrumb = "Error"
+    def __init__(self) -> None:
+        if not hasattr(self, "breadcrumb"):
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} requires 'breadcrumbs' to be set, as it's using the BreadCrumbsMixin."
+            )
+
+        super().__init__()
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
