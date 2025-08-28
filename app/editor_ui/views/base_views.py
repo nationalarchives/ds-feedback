@@ -9,11 +9,11 @@ class BaseCreateView(CreateView):
     - Ensures that an 'object_name' attribute is set as a string on the subclass.
     - Adds 'object_name' to the template context for use in generic create templates.
     - Raises ImproperlyConfigured if 'object_name' is not set or not a string.
-    - Uses a default template 'editor_ui/create.html'.
+    - Uses a default template 'editor_ui/generic_creation_template.html'.
     """
 
     object_name = None
-    template_name = "editor_ui/create.html"
+    template_name = "editor_ui/generic_creation_template.html"
 
     def get_context_data(self, **kwargs):
         if not self.object_name or type(self.object_name) is not str:

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% set pageTitle = "Project Members" %}
+{% block content %}
+  <div class="tna-section">
+    <div class="tna-container">
+      <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+        <h1 class="tna-heading-xl">Project Members</h1>
+      </div>
+      {% if messages %}
+        <div class="tna-error-summary"
+             data-module="tna-error-summary"
+             data-disable-autofocus="true">
+          <div role="alert">
+            <h2 class="tna-error-summary__heading tna-heading-m">There is a problem</h2>
+            <ul class="tna-error-summary__list">
+              {% for message in messages %}
+                <li class="tna-error-summary__link {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+      <div class="tna-column tna-column--full tna-!--padding-top-m">
+        {% if current_user_is_project_owner_or_admin %}
+          <a href="{{ url("editor_ui:project__memberships_add", project_uuid=project_uuid) }}"
+             class="tna-button">Add users</a>
+        {% endif %}
+        {% if not members %}
+          <p>No members found.</p>
+        {% else %}
+          <div class="tna-table-wrapper">
+            <table class="tna-table">
+              <thead class="tna-table__head">
+                <tr class="tna-table__row">
+                  <th class="tna-table__header">User</th>
+                  <th class="tna-table__header">Role</th>
+                  <th class="tna-table__header">Created at</th>
+                  <th class="tna-table__header">Created by</th>
+                  {% if current_user_is_project_member_or_admin %}<th class="tna-table__header"></th>{% endif %}
+                </tr>
+              </thead>
+              <tbody class="tna-table__body">
+                {% for member in members %}
+                  <tr class="tna-table__row">
+                    <td class="tna-table__cell">{{ member.user }}</td>
+                    <td class="tna-table__cell">{{ member.role }}</td>
+                    <td class="tna-table__cell">{{ member.created_at }}</td>
+                    <td class="tna-table__cell">{{ member.created_by }}</td>
+                    <td class="tna-table__cell">
+                      {% if current_user_is_project_owner_or_admin %}
+                      <a 
+                        href="{{ url('editor_ui:project__memberships_edit', project_uuid=project_uuid, membership_uuid=member.uuid) }}"
+                        class="tna-button"
+                        data-testing-id="edit-button"
+                      >
+                        Edit
+                      </a>
+                      {% endif %}
+                      {% if current_user_is_project_owner_or_admin or member.is_current_user %}
+                      <a 
+                        href="{{ url('editor_ui:project__memberships_delete', project_uuid=member.project.uuid, membership_uuid=member.uuid) }}"
+                        class="tna-button"
+                        data-testing-id="delete-button"
+                      >
+                        Delete
+                      </a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}

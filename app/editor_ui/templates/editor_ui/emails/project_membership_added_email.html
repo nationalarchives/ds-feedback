@@ -1,0 +1,6 @@
+{% autoescape off %}
+    You're receiving this email because you have been added as an '{{ role }}' to the '{{ project }}' project by {{ added_by }} at {{ site_name }}.
+    Please log in to review your project memberships.
+    {{ url("editor_ui:project_list") }}
+    The {{ site_name }} team
+{% endautoescape %}
