@@ -13,6 +13,7 @@ from app.editor_ui.forms import (
     ProjectMembershipUpdateForm,
 )
 from app.editor_ui.mixins import (
+    BreadCrumbsMixin,
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
 )
@@ -24,6 +25,7 @@ from app.projects.models import Project, ProjectMembership
 class ProjectMembershipListView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     ListView,
 ):
     model = ProjectMembership
@@ -35,6 +37,8 @@ class ProjectMembershipListView(
     project_roles_required = ["editor", "owner"]
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+
+    breadcrumb = "Project Members"
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -83,6 +87,7 @@ class ProjectMembershipCreateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
+    BreadCrumbsMixin,
     BaseCreateView,
 ):
     form_class = ProjectMembershipCreateForm
@@ -92,6 +97,8 @@ class ProjectMembershipCreateView(
     project_roles_required = ["owner"]
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+
+    breadcrumb = "Add Members to Project"
 
     def form_valid(self, form):
         project_uuid = self.kwargs.get("project_uuid")
@@ -138,6 +145,7 @@ class ProjectMembershipUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
+    BreadCrumbsMixin,
     UpdateView,
 ):
     form_class = ProjectMembershipUpdateForm
@@ -150,6 +158,8 @@ class ProjectMembershipUpdateView(
     project_roles_required = ["owner"]
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+
+    breadcrumb = "Update Project Membership"
 
     def get_queryset(self):
         # Limit the queryset to memberships of the specified project
@@ -174,6 +184,7 @@ class ProjectMembershipUpdateView(
 class ProjectMembershipDeleteView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     DeleteView,
 ):
     model = ProjectMembership
@@ -186,6 +197,8 @@ class ProjectMembershipDeleteView(
     project_roles_required = ["owner"]
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+
+    breadcrumb = "Remove Project Membership"
 
     def get_queryset(self):
         project_uuid = self.kwargs.get("project_uuid")

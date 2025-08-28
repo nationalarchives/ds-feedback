@@ -36,22 +36,22 @@ urlpatterns = [
         name="project_detail",
     ),
     path(
-        "projects/<uuid:project_uuid>/members",
+        "projects/<uuid:project_uuid>/members/",
         ProjectMembershipListView.as_view(),
         name="project__memberships",
     ),
     path(
-        "projects/<uuid:project_uuid>/members/add",
+        "projects/<uuid:project_uuid>/members/add/",
         ProjectMembershipCreateView.as_view(),
         name="project__memberships_add",
     ),
     path(
-        "projects/<uuid:project_uuid>/members/<uuid:membership_uuid>/edit",
+        "projects/<uuid:project_uuid>/members/<uuid:membership_uuid>/edit/",
         ProjectMembershipUpdateView.as_view(),
         name="project__memberships_edit",
     ),
     path(
-        "projects/<uuid:project_uuid>/members/<uuid:membership_uuid>/delete",
+        "projects/<uuid:project_uuid>/members/<uuid:membership_uuid>/delete/",
         ProjectMembershipDeleteView.as_view(),
         name="project__memberships_delete",
     ),
