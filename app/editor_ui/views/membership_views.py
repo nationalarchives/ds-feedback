@@ -187,38 +187,6 @@ class ProjectMembershipDeleteView(
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
 
-    def dispatch(self, request, *args, **kwargs):
-        """
-        Allow users to delete their own membership if they are an editor.
-        Otherwise, require owner role.
-        """
-        self.object = self.get_object()
-        object_user = self.object.user
-        authenticated_user = request.user
-
-        # Bypass role checks for self-deleting users
-        if object_user == authenticated_user:
-            self.project_roles_required = ["editor", "owner"]
-        else:
-            self.project_roles_required = ["owner"]
-
-        # Ensure there is always at least one owner assigned to a project
-        owners_count = ProjectMembership.objects.filter(
-            project=self.object.project, role="owner"
-        ).count()
-        if self.object.role == "owner" and owners_count <= 1:
-            # Prevent deletion of the last owner
-            messages.error(
-                self.request,
-                f"Cannot delete {self.object.user}. Each project must have at least one owner.",
-            )
-            return redirect(
-                "editor_ui:project_memberships",
-                project_uuid=self.object.project.uuid,
-            )
-
-        return super().dispatch(request, *args, **kwargs)
-
     def get_queryset(self):
         project_uuid = self.kwargs.get("project_uuid")
         return ProjectMembership.objects.filter(
@@ -235,3 +203,38 @@ class ProjectMembershipDeleteView(
             "editor_ui:project_memberships",
             kwargs={"project_uuid": project_uuid},
         )
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Allow users to delete their own membership if they are an editor.
+        Otherwise, require owner role.
+        """
+        self.object = self.get_object()
+        object_user = self.object.user
+        authenticated_user = request.user
+
+        # Bypass role checks for self-deleting users
+        if object_user == authenticated_user:
+            self.project_roles_required = ["editor", "owner"]
+        else:
+            self.project_roles_required = ["owner"]
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        # Ensure there is always at least one owner assigned to a project
+        owners_count = ProjectMembership.objects.filter(
+            project=self.object.project, role="owner"
+        ).count()
+
+        if self.object.role == "owner" and owners_count <= 1:
+            messages.error(
+                self.request,
+                f"Cannot delete {self.object.user}. Each project must have at least one owner.",
+            )
+            return redirect(
+                "editor_ui:project_memberships",
+                project_uuid=self.object.project.uuid,
+            )
+
+        return super().form_valid(form)
