@@ -6,7 +6,7 @@ from django.db.models import (
     Prefetch,
 )
 from django.urls import reverse
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, UpdateView
 
 from app.editor_ui.forms import (
     FeedbackFormForm,
@@ -166,6 +166,7 @@ class FeedbackFormDetailView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context.update(
             {
                 "project_uuid": self.kwargs.get("project_uuid"),
@@ -173,6 +174,40 @@ class FeedbackFormDetailView(
                 "prompts": self.object.prompts.select_subclasses().order_by(
                     "order"
                 ),
+                "user_project_permissions": self.get_user_project_permissions(),
             }
         )
+        return context
+
+
+class FeedbackFormUpdateView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    UpdateView,
+):
+    model = FeedbackForm
+    form_class = FeedbackFormForm
+    template_name = "editor_ui/feedback_forms/feedback_form_update.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "feedback_form_uuid"
+
+    # ProjectOwnerMembershipMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+
+    def get_success_url(self):
+        return reverse(
+            "editor_ui:project__feedback_form_detail",
+            kwargs={
+                "project_uuid": self.object.project.uuid,
+                "feedback_form_uuid": self.object.uuid,
+            },
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["user_project_permissions"] = (
+            self.get_user_project_permissions()
+        )
+
         return context

@@ -34,6 +34,9 @@
             {{ feedback_form.uuid }}
           </dd>
         </dl>
+        {% if user_project_permissions.is_owner or user_project_permissions.is_superuser %}
+          <a href="{{ url("editor_ui:project__feedback_form_edit", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}" class="tna-button" data-testing-id="edit-feedback-form-button">Edit feedback form details</a>
+        {% endif %}
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
         <div class="tna-table-wrapper">
