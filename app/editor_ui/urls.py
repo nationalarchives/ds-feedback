@@ -22,7 +22,9 @@ from app.editor_ui.views.project_views import (
 from app.editor_ui.views.prompt_views import (
     PromptCreateView,
     PromptDetailView,
-    RangedPromptOptionsCreateView,
+    PromptUpdateView,
+    RangedPromptOptionCreateView,
+    RangedPromptOptionUpdateView,
 )
 
 app_name = "editor_ui"
@@ -98,8 +100,18 @@ urlpatterns = [
         name="project__feedback_form__prompt_detail",
     ),
     path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/edit/",
+        PromptUpdateView.as_view(),
+        name="project__feedback_form__prompt_edit",
+    ),
+    path(
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/ranged-prompt-options/create/",
-        RangedPromptOptionsCreateView.as_view(),
+        RangedPromptOptionCreateView.as_view(),
         name="project__feedback_form__prompt__ranged_prompt_options_create",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/options/<uuid:option_uuid>/edit/",
+        RangedPromptOptionUpdateView.as_view(),
+        name="project__feedback_form__prompt__ranged_prompt_options_edit",
     ),
 ]

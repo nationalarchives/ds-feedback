@@ -55,6 +55,9 @@
                             {{ prompt.created_by }}
                         </dd>
                     </dl>
+                    <a href="{{ url('editor_ui:project__feedback_form__prompt_edit', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid) }}"
+                       class="tna-button"
+                       data-testing-id="edit-button">Edit</a>
                 </div>
                 {% if promptType == "RangedPrompt" %}
                     {% include "editor_ui/prompts/blocks/ranged_prompt_detail.html" %}

@@ -7,15 +7,19 @@
                     <tr class="tna-table__row">
                         <th class="tna-table__header">Label</th>
                         <th class="tna-table__header">Value</th>
+                        <th class="tna-table__header"></th>
                     </tr>
                 </thead>
                 <tbody class="tna-table__body">
                     {% for option in prompt_options %}
                         <tr class="tna-table__row">
-                            <th class="tna-table__header">
-                                <a href="#">{{ option.label }}</a>
-                            </th>
+                            <td class="tna-table__cell">{{ option.label }}</td>
                             <td class="tna-table__cell">{{ option.value }}</td>
+                            <td class="tna-table__cell">
+                                <a href="{{ url('editor_ui:project__feedback_form__prompt__ranged_prompt_options_edit', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid, option_uuid=option.uuid) }}"
+                           class="tna-button"
+                           data-testing-id="edit-button">Edit</a>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

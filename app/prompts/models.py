@@ -84,5 +84,12 @@ class RangedPromptOption(UUIDModelMixin):
     label = models.CharField(max_length=64)
     value = models.PositiveSmallIntegerField()
 
+    def get_parent_project(self):
+        """Helper to get the parent Project for use in mixins."""
+        return self.ranged_prompt.feedback_form.project
+
+    def type(self):
+        return self.__class__.__name__
+
     def __str__(self):
         return self.label

@@ -10,11 +10,12 @@ from django.db.models import (
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import DetailView
+from django.views.generic import DetailView, UpdateView
 
 from app.editor_ui.forms import (
+    PROMPT_FORM_MAP,
     PromptForm,
-    RangedPromptOptionsForm,
+    RangedPromptOptionForm,
 )
 from app.editor_ui.mixins import (
     BreadCrumbsMixin,
@@ -28,6 +29,8 @@ from app.prompts.models import (
     RangedPrompt,
     RangedPromptOption,
 )
+
+MAX_ACTIVE_PROMPTS = 3
 
 
 class PromptCreateView(
@@ -58,8 +61,6 @@ class PromptCreateView(
 
     breadcrumb = "Create a Prompt"
 
-    MAX_ACTIVE_PROMPTS = 3
-
     def get_feedback_form(self):
         """Helper method to get the feedback form"""
         return FeedbackForm.objects.get(
@@ -83,10 +84,10 @@ class PromptCreateView(
                 disabled_at__isnull=True
             ).count()
             will_be_active = not data.get("is_disabled", False)
-            if will_be_active and active_count >= self.MAX_ACTIVE_PROMPTS:
+            if will_be_active and active_count >= MAX_ACTIVE_PROMPTS:
                 form.add_error(
-                    None,
-                    f"Cannot have more than {self.MAX_ACTIVE_PROMPTS} active prompts.",
+                    "is_disabled",
+                    f"Cannot have more than {MAX_ACTIVE_PROMPTS} active prompts.",
                 )
                 return self.form_invalid(form)
 
@@ -201,18 +202,161 @@ class PromptDetailView(
                 "project_uuid": self.kwargs.get("project_uuid"),
                 "feedback_form_uuid": self.kwargs.get("feedback_form_uuid"),
                 "prompt_options": prompt_options,
+                "user_project_permissions": self.get_user_project_permissions(),
             }
         )
         return context
 
 
-class RangedPromptOptionsCreateView(
+class PromptUpdateView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    UpdateView,
+):
+    template_name = "editor_ui/prompts/prompt_update.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "prompt_uuid"
+
+    # ProjectOwnerMembershipMixin mixin attributes
+    project_roles_required = ["owner"]
+
+    def get_queryset(self):
+        return Prompt.objects.select_subclasses().select_related(
+            "created_by",
+            "disabled_by",
+            "feedback_form",
+            "feedback_form__project",
+        )
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["is_disabled"] = bool(self.object.disabled_at)
+        return initial
+
+    def get_form_class(self):
+        form = PROMPT_FORM_MAP.get(self.object.__class__, None)
+        if not form:
+            raise ValueError("No form found for prompt type")
+        return form
+
+    def form_valid(self, form):
+        data = form.cleaned_data
+        feedback_form_uuid = self.kwargs["feedback_form_uuid"]
+
+        with transaction.atomic():
+            # Lock the feedback form row to prevent race conditions when calculating
+            # order
+            form_locked = FeedbackForm.objects.select_for_update().get(
+                uuid=feedback_form_uuid
+            )
+
+            # Count active prompts (not disabled) **after** acquiring the lock
+            active_count = form_locked.prompts.filter(
+                disabled_at__isnull=True
+            ).count()
+            will_be_active = not data.get("is_disabled", False)
+            if will_be_active and active_count >= MAX_ACTIVE_PROMPTS:
+                form.add_error(
+                    "is_disabled",
+                    f"Cannot have more than {MAX_ACTIVE_PROMPTS} active prompts.",
+                )
+                return self.form_invalid(form)
+
+            # If the prompt should be disabled, set the disabled timestamp
+            if data.get("is_disabled"):
+                self.object.disabled_at = timezone.now()
+                self.object.disabled_by = self.request.user
+            else:
+                self.object.disabled_at = None
+                self.object.disabled_by = None
+
+            self.object.save()
+
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse(
+            "editor_ui:project__feedback_form__prompt_detail",
+            kwargs={
+                "prompt_uuid": self.object.uuid,
+                "feedback_form_uuid": self.object.feedback_form.uuid,
+                "project_uuid": self.object.feedback_form.project.uuid,
+            },
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update(
+            {
+                "prompt_uuid": self.object.uuid,
+                "feedback_form_uuid": self.object.feedback_form.uuid,
+                "project_uuid": self.object.feedback_form.project.uuid,
+                "user_project_permissions": (
+                    self.get_user_project_permissions()
+                ),
+            }
+        )
+
+        return context
+
+
+class RangedPromptOptionUpdateView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    UpdateView,
+):
+    form_class = RangedPromptOptionForm
+    queryset = RangedPromptOption.objects.all()
+    template_name = "editor_ui/prompts/prompt_update.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "option_uuid"
+
+    # ProjectOwnerMembershipMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related(
+                "ranged_prompt",
+                "ranged_prompt__feedback_form",
+                "ranged_prompt__feedback_form__project",
+            )
+        )
+
+    def get_success_url(self):
+        return reverse(
+            "editor_ui:project__feedback_form__prompt_detail",
+            kwargs={
+                "prompt_uuid": self.object.ranged_prompt.uuid,
+                "feedback_form_uuid": self.object.ranged_prompt.feedback_form.uuid,
+                "project_uuid": self.object.ranged_prompt.feedback_form.project.uuid,
+            },
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update(
+            {
+                "prompt_uuid": self.object.ranged_prompt.uuid,
+                "feedback_form_uuid": self.object.ranged_prompt.feedback_form.uuid,
+                "project_uuid": self.object.ranged_prompt.feedback_form.project.uuid,
+            }
+        )
+
+        return context
+
+
+class RangedPromptOptionCreateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     BreadCrumbsMixin,
     BaseCreateView,
 ):
-    form_class = RangedPromptOptionsForm
+    form_class = RangedPromptOptionForm
     object_name = "Range Prompt Option"
 
     # ProjectMembershipRequiredMixin mixin attributes
