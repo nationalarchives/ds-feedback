@@ -90,6 +90,13 @@ class ProjectMembershipRequiredMixin:
             "role": membership.role if membership else None,
         }
 
+    def get_object(self):
+        if hasattr(self, "_cached_object"):
+            return self._cached_object
+        obj = super().get_object()
+        self._cached_object = obj
+        return obj
+
     def get_parent_object(self):
         """
         Fetch the parent object using the URL kwarg and model.
