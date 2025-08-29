@@ -20,10 +20,12 @@
           </div>
         </div>
       {% endif %}
+      {{ user_project_permissions.is_member }}
       <div class="tna-column tna-column--full tna-!--padding-top-m">
-        {% if current_user_is_project_owner_or_admin %}
+        {% if user_project_permissions.is_superuser or user_project_permissions.is_owner %}
           <a href="{{ url("editor_ui:project__memberships_add", project_uuid=project_uuid) }}"
-             class="tna-button">Add users</a>
+             class="tna-button"
+             data-testing-id="add-user-button">Add user</a>
         {% endif %}
         {% if not members %}
           <p>No members found.</p>
@@ -36,7 +38,9 @@
                   <th class="tna-table__header">Role</th>
                   <th class="tna-table__header">Created at</th>
                   <th class="tna-table__header">Created by</th>
-                  {% if current_user_is_project_member_or_admin %}<th class="tna-table__header"></th>{% endif %}
+                  {% if user_project_permissions.is_superuser or user_project_permissions.is_member %}
+                    <th class="tna-table__header"></th>
+                  {% endif %}
                 </tr>
               </thead>
               <tbody class="tna-table__body">
@@ -47,23 +51,15 @@
                     <td class="tna-table__cell">{{ member.created_at }}</td>
                     <td class="tna-table__cell">{{ member.created_by }}</td>
                     <td class="tna-table__cell">
-                      {% if current_user_is_project_owner_or_admin %}
-                      <a 
-                        href="{{ url('editor_ui:project__memberships_edit', project_uuid=project_uuid, membership_uuid=member.uuid) }}"
-                        class="tna-button"
-                        data-testing-id="edit-button"
-                      >
-                        Edit
-                      </a>
+                      {% if user_project_permissions.is_superuser or user_project_permissions.is_owner %}
+                        <a href="{{ url('editor_ui:project__memberships_edit', project_uuid=project_uuid, membership_uuid=member.uuid) }}"
+                           class="tna-button"
+                           data-testing-id="edit-button">Edit</a>
                       {% endif %}
-                      {% if current_user_is_project_owner_or_admin or member.is_current_user %}
-                      <a 
-                        href="{{ url('editor_ui:project__memberships_delete', project_uuid=member.project.uuid, membership_uuid=member.uuid) }}"
-                        class="tna-button"
-                        data-testing-id="delete-button"
-                      >
-                        Delete
-                      </a>
+                      {% if user_project_permissions.is_superuser or user_project_permissions.is_owner or member.is_current_user %}
+                        <a href="{{ url('editor_ui:project__memberships_delete', project_uuid=member.project.uuid, membership_uuid=member.uuid) }}"
+                           class="tna-button"
+                           data-testing-id="delete-button">Delete</a>
                       {% endif %}
                     </td>
                   </tr>

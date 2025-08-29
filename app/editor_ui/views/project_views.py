@@ -144,10 +144,18 @@ class ProjectDetailView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         project = self.object
-        owners = [
-            str(owner) for owner in getattr(self.object, "owner_members", [])
-        ]
+        owners = [str(owner) for owner in getattr(project, "owner_members", [])]
+
+        context.update(
+            {
+                "forms_count": project.forms_count,
+                "responses_count": project.responses_count,
+                "owners": ", ".join(owners),
+                "user_project_permissions": self.get_user_project_permissions(),
+            }
+        )
 
         context["forms_count"] = project.forms_count
         context["responses_count"] = project.responses_count

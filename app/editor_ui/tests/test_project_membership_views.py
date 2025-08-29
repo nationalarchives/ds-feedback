@@ -33,6 +33,7 @@ class ProjectListViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'data-testing-id="add-user-button"')
         self.assertContains(response, 'data-testing-id="edit-button"')
         self.assertContains(response, 'data-testing-id="delete-button"')
 
@@ -43,6 +44,7 @@ class ProjectListViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'data-testing-id="add-user-button"')
         self.assertContains(response, 'data-testing-id="edit-button"')
         self.assertContains(response, 'data-testing-id="delete-button"')
 
@@ -54,7 +56,7 @@ class ProjectListViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'data-testing-id="delete-button"')
-
+        self.assertNotContains(response, 'data-testing-id="add-user-button"')
         self.assertNotContains(response, 'data-testing-id="edit-button"')
 
     def test_editor_with_project_membership_cannot_add_users(self):

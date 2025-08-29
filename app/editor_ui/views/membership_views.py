@@ -62,23 +62,10 @@ class ProjectMembershipListView(
         user = self.request.user
         project_uuid = self.kwargs.get("project_uuid")
 
-        current_user_is_member = ProjectMembership.objects.filter(
-            project__uuid=project_uuid, user=user
-        ).exists()
-
-        current_user_is_project_owner = ProjectMembership.objects.filter(
-            project__uuid=project_uuid, user=user, role="owner"
-        ).exists()
-
-        context.update(
-            {
-                "current_user_is_project_member_or_admin": current_user_is_member
-                or self.request.user.is_superuser,
-                "current_user_is_project_owner_or_admin": current_user_is_project_owner
-                or self.request.user.is_superuser,
-                "project_uuid": project_uuid,
-            }
+        context["user_project_permissions"] = self.get_user_project_permissions(
+            user
         )
+        context["project_uuid"] = project_uuid
 
         return context
 
