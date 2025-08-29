@@ -6,6 +6,7 @@ from django.db.models import (
     Prefetch,
 )
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import DetailView, ListView, UpdateView
 
 from app.editor_ui.forms import (
@@ -61,6 +62,10 @@ class FeedbackFormCreateView(
         instance.project = Project.objects.get(
             uuid=self.kwargs.get("project_uuid")
         )
+        # If the prompt should be disabled, set the disabled timestamp
+        if form.cleaned_data.get("is_disabled"):
+            instance.disabled_at = timezone.now()
+            instance.disabled_by = self.request.user
 
         return super().form_valid(form)
 
@@ -193,6 +198,22 @@ class FeedbackFormUpdateView(
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["editor", "owner"]
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["is_disabled"] = bool(self.object.disabled_at)
+        return initial
+
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        if form.cleaned_data.get("is_disabled"):
+            instance.disabled_at = timezone.now()
+            instance.disabled_by = self.request.user
+        else:
+            instance.disabled_at = None
+            instance.disabled_by = None
+
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse(

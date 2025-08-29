@@ -65,10 +65,19 @@ class ProjectUpdateForm(forms.ModelForm):
 
 
 class FeedbackFormForm(forms.ModelForm):
+    is_disabled = forms.BooleanField(
+        required=False,
+        initial=False,
+        label="Disable this prompt",
+        help_text="Disabled prompts won't be shown to users",
+        widget=forms.CheckboxInput(attrs={"class": "tna-checkbox"}),
+    )
+
     class Meta:
         model = FeedbackForm
         fields = [
             "name",
+            "is_disabled",
         ]
         widgets = {
             "name": forms.TextInput(attrs={**shared_text_input_attrs}),
