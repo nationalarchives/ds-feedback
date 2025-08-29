@@ -1,0 +1,14 @@
+{% extends "editor_ui/base_form_template.html" %}
+{% set pageTitle = "Update Project" %}
+{% block heading %}
+  Update Project
+{% endblock heading %}
+{% block heading_text %}
+  Editing the project details for {{ object.name }}.
+{% endblock heading_text %}
+{% block submit_button_text %}
+  Update Project
+{% endblock submit_button_text %}
+{% block additional_buttons %}
+  <a href="{{ url('editor_ui:project_list') }}" class="tna-button">Cancel</a>
+{% endblock additional_buttons %}

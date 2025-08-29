@@ -16,6 +16,7 @@ from app.editor_ui.views.project_views import (
     ProjectCreateView,
     ProjectDetailView,
     ProjectListView,
+    ProjectUpdateView,
 )
 from app.editor_ui.views.prompt_views import (
     PromptCreateView,
@@ -36,7 +37,12 @@ urlpatterns = [
         name="project_detail",
     ),
     path(
-        "projects/<uuid:project_uuid>/members/",
+        "projects/<uuid:project_uuid>/edit/",
+        ProjectUpdateView.as_view(),
+        name="project_update",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/members",
         ProjectMembershipListView.as_view(),
         name="project__memberships",
     ),

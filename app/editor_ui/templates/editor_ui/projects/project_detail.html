@@ -8,7 +8,6 @@
           <p class="tna-hgroup__supertitle">Project</p>
           <h1 class="tna-hgroup__title">{{ project.name }}</h1>
         </hgroup>
-        <a href="{{ url("editor_ui:project__memberships", project_uuid=project.uuid) }}" class="tna-button">Manage users</a>
         <dl class="tna-dl tna-dl--plain">
           <dt>Domain</dt>
           <dd>
@@ -31,6 +30,11 @@
             {{ owners }}
           </dd>
         </dl>
+        {% if user_project_permissions.is_owner or user_project_permissions.is_superuser %}
+          <a href="{{ url("editor_ui:project_update", project_uuid=project.uuid) }}" class="tna-button" data-testing-id="edit-project-button">Edit project details</a>
+        {% endif %}
+        <a href="{{ url("editor_ui:project__memberships", project_uuid=project.uuid) }}"
+           class="tna-button">Manage access</a>
       </div>
     </div>
     <div class="tna-container tna-container--equal-height-contents">

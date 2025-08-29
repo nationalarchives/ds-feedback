@@ -15,7 +15,7 @@ shared_text_input_attrs = {
 }
 
 
-class ProjectForm(forms.ModelForm):
+class ProjectCreateForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = [
@@ -40,6 +40,20 @@ class ProjectForm(forms.ModelForm):
         domain = self.cleaned_data.get("domain")
         validate_domain_name(domain)
         return domain
+
+
+class ProjectUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = [
+            "name",
+        ]
+        widgets = {
+            "name": forms.TextInput(attrs={**shared_text_input_attrs}),
+        }
+        help_texts = {
+            "name": "A memorable name for your project",
+        }
 
 
 class FeedbackFormForm(forms.ModelForm):
