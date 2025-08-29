@@ -1,5 +1,7 @@
 from django.urls import path
 
+from app.editor_ui.views.user_views import ApiKeyDetailView
+
 from app.editor_ui.views.feedback_form_views import (
     FeedbackFormCreateView,
     FeedbackFormDetailView,
@@ -33,6 +35,7 @@ from app.editor_ui.views.prompt_views import (
 app_name = "editor_ui"
 
 urlpatterns = [
+    path("api-keys/", ApiKeyDetailView.as_view(), name="api_key_list"),
     path("projects/", ProjectListView.as_view(), name="project_list"),
     path(
         "projects/create/", ProjectCreateView.as_view(), name="project_create"

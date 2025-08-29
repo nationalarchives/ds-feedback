@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% set pageTitle = "API Key" %}
+{% block content %}
+  <div class="tna-section">
+    <div class="tna-container">
+      <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+        <hgroup class="tna-hgroup-xl">
+          <p class="tna-hgroup__supertitle">User</p>
+          <h1 class="tna-hgroup__title">API Key</h1>
+        </hgroup>
+        {% for token in tokens %}
+          <dl class="tna-dl tna-dl--plain">
+            <dt>API Key</dt>
+            <dd>
+              <code>{{ token.key }}</code>
+            </dd>
+            <dt>Created on</dt>
+            <dd>
+              {{ token.created|date("d M Y") }}
+            </dd>
+          </dl>
+        {% else %}
+          <p>You don't have an API key yet.</p>
+          <a href="#" class="tna-button">Create Key</a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}
