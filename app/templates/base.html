@@ -77,6 +77,11 @@
         "selected": is_active_url(url("editor_ui:projects:list"), request)
       },
       {
+        "text": "API keys",
+        "href": url("editor_ui:api_keys:list"),
+        "selected": is_active_url(url("editor_ui:api_keys:list"), request)
+      },
+      {
         "text": "Log out",
         "href": url("editor_auth:logout"),
         "selected": is_active_url(url("editor_auth:logout"), request)
