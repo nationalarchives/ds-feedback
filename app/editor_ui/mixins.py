@@ -90,12 +90,12 @@ class ProjectMembershipRequiredMixin:
             "role": membership.role if membership else None,
         }
 
-    def get_object(self):
+    def get_object(self, *args, **kwargs):
         # TODO: move this to its own mixin.
         # ProjectMembershipRequiredMixin is only meant to handle ProjectMemberships
         if hasattr(self, "_cached_object"):
             return self._cached_object
-        obj = super().get_object()
+        obj = super().get_object(*args, **kwargs)
         self._cached_object = obj
         return obj
 
