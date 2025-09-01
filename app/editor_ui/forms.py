@@ -1,6 +1,7 @@
+from email import message
 from django import forms
 from django.contrib.auth import get_user_model
-from django.core.validators import validate_domain_name
+from django.core.validators import URLValidator
 
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.models import Project, ProjectMembership
@@ -20,6 +21,11 @@ shared_text_input_attrs = {
     "autocorrect": "off",
 }
 
+url_validator = URLValidator(
+    schemes=["https"],
+    message="Please enter a valid URL starting with https://",
+)
+
 PROMPT_FORM_MAP = {}
 
 
@@ -34,19 +40,20 @@ class ProjectCreateForm(forms.ModelForm):
         widgets = {
             "name": forms.TextInput(attrs={**shared_text_input_attrs}),
             "domain": forms.URLInput(attrs={**shared_text_input_attrs}),
-            "retention_period_days": forms.Select(
-                attrs={"class": "tna-select"}
-            ),
+            "retention_period_days": forms.Select(attrs={"class": "tna-select"}),
+        }
+        validators = {
+            "domain": [URLValidator()],
         }
         help_texts = {
             "name": "A memorable name for your project",
-            "domain": "Enter the full domain you project will target, e.g. https://example.com",
+            "domain": "Enter the full URL this project will target, e.g. https://example.com",
             "retention_period_days": "Data older than this will be periodically deleted",
         }
 
     def clean_domain(self):
         domain = self.cleaned_data.get("domain")
-        validate_domain_name(domain)
+        url_validator(domain)
         return domain
 
 
@@ -55,13 +62,21 @@ class ProjectUpdateForm(forms.ModelForm):
         model = Project
         fields = [
             "name",
+            "domain",
         ]
         widgets = {
             "name": forms.TextInput(attrs={**shared_text_input_attrs}),
+            "domain": forms.URLInput(attrs={**shared_text_input_attrs}),
         }
         help_texts = {
             "name": "A memorable name for your project",
+            "domain": "The full URL this project will target, e.g. https://example.com",
         }
+
+    def clean_domain(self):
+        domain = self.cleaned_data.get("domain")
+        url_validator(domain)
+        return domain
 
 
 class FeedbackFormForm(forms.ModelForm):
@@ -98,9 +113,7 @@ class PathPatternForm(forms.ModelForm):
 
 
 class PromptForm(forms.ModelForm):
-    PROMPT_TYPES = [
-        (name, cls.field_label) for name, cls in Prompt.PROMPT_MAP.items()
-    ]
+    PROMPT_TYPES = [(name, cls.field_label) for name, cls in Prompt.PROMPT_MAP.items()]
 
     prompt_type = forms.ChoiceField(
         choices=PROMPT_TYPES,
@@ -191,12 +204,8 @@ class BinaryPromptUpdateForm(PromptUpdateForm):
         ]
         widgets = {
             **PromptUpdateForm.Meta.widgets,
-            "positive_answer_label": forms.TextInput(
-                attrs={**shared_text_input_attrs}
-            ),
-            "negative_answer_label": forms.TextInput(
-                attrs={**shared_text_input_attrs}
-            ),
+            "positive_answer_label": forms.TextInput(attrs={**shared_text_input_attrs}),
+            "negative_answer_label": forms.TextInput(attrs={**shared_text_input_attrs}),
         }
         help_texts = {
             **PromptUpdateForm.Meta.widgets,
