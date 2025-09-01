@@ -5,7 +5,7 @@
     <div class="tna-container">
       <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
         <h1 class="tna-heading-xl">API Access</h1>
-        <a href="#" class="tna-button">Create API access</a>
+        <a href="{{ url('editor_ui:project__api_access_create', project_uuid=project_uuid) }}" class="tna-button">Create API access</a>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
         {% if not api_accesses %}
@@ -26,11 +26,11 @@
                 {% for api_access in api_accesses %}
                   <tr class="tna-table__row">
                     <td class="tna-table__cell">
-                      {{ api_access.grantee.get_full_name() or api_access.grantee.username }}
+                      {{ api_access.grantee.get_full_name() or api_access.grantee.email }}
                     </td>
                     <td class="tna-table__cell">{{ api_access.get_role_display() }}</td>
                     <td class="tna-table__cell">
-                      {{ api_access.created_by.get_full_name() or api_access.created_by.username }}
+                      {{ api_access.created_by.get_full_name() or api_access.created_by.email }}
                     </td>
                     <td class="tna-table__cell">
                       {{ api_access.expires_at.strftime("%B %d, %Y at %I:%M %p") }}

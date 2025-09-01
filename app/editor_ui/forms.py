@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from django.core.validators import URLValidator
 
 from app.editor_ui.validators import validate_path_pattern
+from app.api.models import ProjectAPIAccess
+from app.api.types import APIAccessLifespan
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.models import Project, ProjectMembership
 from app.prompts.models import (
@@ -333,3 +335,75 @@ class ProjectMembershipUpdateForm(forms.ModelForm):
             "role": forms.Select(),
         }
         help_texts = {"role": "Select the role you want to assign to the user."}
+
+
+class ProjectAPIAccessCreateForm(forms.ModelForm):
+    grantee_email = forms.EmailField(
+        widget=forms.EmailInput(),
+        label="User Email",
+        help_text="Enter the email address of the user to grant API access to.",
+        required=False,
+    )
+
+    lifespan_days = forms.ChoiceField(
+        choices=APIAccessLifespan.choices,
+        widget=forms.Select(attrs={"class": "tna-select"}),
+        label="Access Duration",
+        help_text="How long the API access should remain active.",
+    )
+
+    def __init__(self, *args, user=None, project=None, **kwargs):
+        self.user = user
+        self.project = project
+        self.has_owner_access = False
+        super().__init__(*args, **kwargs)
+
+        project_owner_ids = [
+            membership.user.id
+            for membership in ProjectMembership.objects.select_related(
+                "user"
+            ).filter(project=project, role="owner")
+        ]
+
+        if user and (user.is_superuser or user.id in project_owner_ids):
+            self.has_owner_access = True
+        else:
+            # Only super-users and project owners can grant access to other users.
+            # Grantee Email is hidden for other users.
+            del self.fields["grantee_email"]
+
+    def clean_grantee_email(self):
+        grantee_email = self.cleaned_data.get("grantee_email")
+
+        if not grantee_email:
+            return grantee_email
+
+        try:
+            user = get_user_model().objects.get(email=grantee_email)
+
+            # Check if user has access to the project
+            if not self.project.members.filter(id=user.id).exists():
+                raise forms.ValidationError(
+                    "User must be a member of this project to receive API access."
+                )
+
+        except get_user_model().DoesNotExist:
+            raise forms.ValidationError("User not found.")
+
+        self.cleaned_data["grantee_user"] = user
+        return grantee_email
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if not self.has_owner_access:
+            cleaned_data["grantee_user"] = self.user
+
+        return cleaned_data
+
+    class Meta:
+        model = ProjectAPIAccess
+        fields = [
+            "grantee_email",
+            "lifespan_days",
+        ]
