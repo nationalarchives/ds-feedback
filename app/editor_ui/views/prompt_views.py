@@ -73,14 +73,13 @@ class PromptCreateView(
         model_cls = Prompt.PROMPT_MAP[data["prompt_type"]]
 
         with transaction.atomic():
-            # Lock the feedback form row to prevent race conditions when calculating
-            # order
-            form_locked = FeedbackForm.objects.select_for_update().get(
-                uuid=feedback_form_uuid
-            )
+            # Lock the prompts rows of the feedback form to
+            # prevent race conditions when calculating order, and active count
+            feedback_form = FeedbackForm.objects.get(uuid=feedback_form_uuid)
+            prompts_locked = feedback_form.prompts.select_for_update().all()
 
             # Count active prompts (not disabled) **after** acquiring the lock
-            active_count = form_locked.prompts.filter(
+            active_count = prompts_locked.filter(
                 disabled_at__isnull=True
             ).count()
             will_be_active = not data.get("is_disabled", False)
@@ -93,7 +92,7 @@ class PromptCreateView(
 
             # Calculate the next order value for the new prompt
             next_order = (
-                form_locked.prompts.aggregate(m=Max("order"))["m"] or 0
+                prompts_locked.aggregate(m=Max("order"))["m"] or 0
             ) + 1
 
             # Create the appropriate Prompt subclass instance with required fields
@@ -244,14 +243,13 @@ class PromptUpdateView(
         feedback_form_uuid = self.kwargs["feedback_form_uuid"]
 
         with transaction.atomic():
-            # Lock the feedback form row to prevent race conditions when calculating
-            # order
-            form_locked = FeedbackForm.objects.select_for_update().get(
-                uuid=feedback_form_uuid
-            )
+            # Lock the prompts rows of the feedback form to
+            # prevent race conditions when calculating order, and active count
+            feedback_form = FeedbackForm.objects.get(uuid=feedback_form_uuid)
+            prompts_locked = feedback_form.prompts.select_for_update().all()
 
             # Count active prompts (not disabled) **after** acquiring the lock
-            active_count = form_locked.prompts.filter(
+            active_count = prompts_locked.filter(
                 disabled_at__isnull=True
             ).count()
             will_be_active = not data.get("is_disabled", False)
