@@ -167,11 +167,6 @@ class PromptDetailView(
         is_ranged = RangedPrompt.objects.filter(uuid=prompt_uuid).exists()
         qs = (
             Prompt.objects.filter(uuid=prompt_uuid)
-            .annotate(
-                is_enabled=ExpressionWrapper(
-                    Q(disabled_at__isnull=True), output_field=BooleanField()
-                )
-            )
             .select_related("created_by")
             .select_related("disabled_by")
             .select_subclasses()

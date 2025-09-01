@@ -7,6 +7,13 @@
         <h1 class="tna-heading-xl">Feedback Forms</h1>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
+        <a href="{{ url("editor_ui:project__feedback_form_create", project_uuid=project_uuid) }}"
+           class="tna-button tna-button--icon-only-mobile"
+           aria-label="Create a feedback form"
+           title="Create a feedback form">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+          Create a feedback form
+        </a>
         {% if not feedback_forms %}
           <p>No feedback forms found for this project.</p>
         {% else %}
@@ -15,33 +22,32 @@
               <thead class="tna-table__head">
                 <tr class="tna-table__row">
                   <th class="tna-table__header">Name</th>
-                  <th class="tna-table__header">Path Patterns</th>
-                  <th class="tna-table__header">Prompts</th>
-                  <th class="tna-table__header">Active</th>
+                  <th class="tna-table__header">State</th>
+                  <th class="tna-table__header tna-table__header--numeric">Date created</th>
+                  <th class="tna-table__header tna-table__header--numeric">Last modified</th>
                 </tr>
               </thead>
               <tbody class="tna-table__body">
                 {% for feedback_form in feedback_forms %}
                   <tr class="tna-table__row">
                     <th class="tna-table__header">
-                       <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid, feedback_form.uuid) }}">{{ feedback_form.name }}</a>
+                      <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid, feedback_form.uuid) }}">{{ feedback_form.name }}</a>
                     </th>
                     <td class="tna-table__cell">
-                      {% if feedback_form.path_patterns_str %}
-                        {{ feedback_form.path_patterns_str }}
+                      {% if feedback_form.is_enabled() %}
+                        Active
+                      {% else %}
+                        Inactive
                       {% endif %}
                     </td>
-                    <td class="tna-table__cell">{{ feedback_form.prompts_count }}</td>
-                    <td class="tna-table__cell">
-                      {{ feedback_form.is_enabled() }}
-                    </td>
+                    <td class="tna-table__cell tna-table__cell--numeric">{{ feedback_form.created_at|date }}</td>
+                    <td class="tna-table__cell tna-table__cell--numeric">{{ feedback_form.modified_at|date }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
         {% endif %}
-        <a href="{{ url("editor_ui:project__feedback_form_create", project_uuid=project_uuid) }}" class="tna-button">Create a feedback form</a>
       </div>
     </div>
   </div>

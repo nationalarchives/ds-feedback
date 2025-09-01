@@ -9,7 +9,7 @@
 {%- from 'components/phase-banner/macro.html' import tnaPhaseBanner -%}
 
 {%- set theme = request.COOKIES['theme'] or 'system' -%}
-{%- set themeAccent = themeAccent if themeAccent else 'yellow' -%}
+{%- set themeAccent = themeAccent if themeAccent else 'blue' -%}
 {%- set htmlAttributes = {
   'data-ga4id': app_config.GA4_ID or '',
   'data-cookiesdomain': app_config.COOKIE_DOMAIN or ''
@@ -130,7 +130,7 @@
 {% block beforeContent %}
 {% if breadcrumbs and breadcrumbs | length > 0 %}
       <div class="tna-container">
-        <div class="tna-column tna-column--full">
+        <div class="tna-column tna-column--full tna-!--padding-vertical-s">
           {{ tnaBreadcrumbs({
             'items': breadcrumbs,
             'structuredData': True
