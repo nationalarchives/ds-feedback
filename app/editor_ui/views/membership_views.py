@@ -59,12 +59,8 @@ class ProjectMembershipListView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
         project_uuid = self.kwargs.get("project_uuid")
 
-        context["user_project_permissions"] = self.get_user_project_permissions(
-            user
-        )
         context["project_uuid"] = project_uuid
 
         return context

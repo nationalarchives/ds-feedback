@@ -154,7 +154,6 @@ class ProjectDetailView(
                 "forms_count": project.forms_count,
                 "responses_count": project.responses_count,
                 "owners": ", ".join(owners),
-                "user_project_permissions": self.get_user_project_permissions(),
             }
         )
 
@@ -180,12 +179,3 @@ class ProjectUpdateView(
             "editor_ui:project_detail",
             kwargs={"project_uuid": self.object.uuid},
         )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context["user_project_permissions"] = (
-            self.get_user_project_permissions()
-        )
-
-        return context

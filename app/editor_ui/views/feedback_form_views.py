@@ -179,7 +179,6 @@ class FeedbackFormDetailView(
                 "prompts": self.object.prompts.select_subclasses().order_by(
                     "order"
                 ),
-                "user_project_permissions": self.get_user_project_permissions(),
             }
         )
         return context
@@ -223,12 +222,3 @@ class FeedbackFormUpdateView(
                 "feedback_form_uuid": self.object.uuid,
             },
         )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context["user_project_permissions"] = (
-            self.get_user_project_permissions()
-        )
-
-        return context

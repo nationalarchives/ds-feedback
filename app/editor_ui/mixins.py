@@ -91,6 +91,8 @@ class ProjectMembershipRequiredMixin:
         }
 
     def get_object(self):
+        # TODO: move this to its own mixin.
+        # ProjectMembershipRequiredMixin is only meant to handle ProjectMemberships
         if hasattr(self, "_cached_object"):
             return self._cached_object
         obj = super().get_object()
@@ -151,6 +153,16 @@ class ProjectMembershipRequiredMixin:
         self._permission_project = project
 
         return project
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        Update template context with `user_project_permissions` to be used for
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context["user_project_permissions"] = (
+            self.get_user_project_permissions()
+        )
+        return context
 
     def dispatch(self, request, *args, **kwargs):
         """

@@ -91,12 +91,3 @@ class PathPatternUpdateView(
                 "feedback_form_uuid": self.object.feedback_form.uuid,
             },
         )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context["user_project_permissions"] = (
-            self.get_user_project_permissions()
-        )
-
-        return context

@@ -201,7 +201,6 @@ class PromptDetailView(
                 "project_uuid": self.kwargs.get("project_uuid"),
                 "feedback_form_uuid": self.kwargs.get("feedback_form_uuid"),
                 "prompt_options": prompt_options,
-                "user_project_permissions": self.get_user_project_permissions(),
             }
         )
         return context
@@ -290,9 +289,6 @@ class PromptUpdateView(
                 "prompt_uuid": self.object.uuid,
                 "feedback_form_uuid": self.object.feedback_form.uuid,
                 "project_uuid": self.object.feedback_form.project.uuid,
-                "user_project_permissions": (
-                    self.get_user_project_permissions()
-                ),
             }
         )
 
