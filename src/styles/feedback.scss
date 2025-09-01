@@ -11,9 +11,15 @@
 
 @use "sass:map";
 
-$spacing-unit: 1rem !default; /* 1 unit = 16px = 1rem */
-$bp-medium: 48rem !default; /* 768px */
-$bp-large: 64rem !default; /* 1024px (optional, shown for extension) */
+$spacing-unit: 1rem !default;
+
+/* 1 unit = 16px = 1rem */
+$bp-medium: 48rem !default;
+
+/* 768px */
+$bp-large: 64rem !default;
+
+/* 1024px (optional, shown for extension) */
 
 $spacing: (
   "xs": 0.5,
@@ -38,30 +44,13 @@ $spacing-mobile: map.merge(
 
 /* Which classes to generate */
 $pad-sides: (
-  "p": null,
-  /* all sides */ "px":
-    (
-      "left",
-      "right",
-    ),
-  /* x-axis */ "py":
-    (
-      "top",
-      "bottom",
-    ),
-  /* y-axis */ "pt":
-    (
-      "top",
-    ),
-  "pr": (
-    "right",
-  ),
-  "pb": (
-    "bottom",
-  ),
-  "pl": (
-    "left",
-  ),
+  /* all sides */ "p": null,
+  /* x-axis */ "px": ("left", "right"),
+  /* y-axis */ "py": ("top", "bottom"),
+  "pt": ("top"),
+  "pr": ("right"),
+  "pb": ("bottom"),
+  "pl": ("left")
 );
 
 /* Helper to emit padding props for any side(s) */
