@@ -14,7 +14,7 @@ class ResponseListingView(
     ProjectMembershipRequiredMixin, BreadCrumbsMixin, ListView
 ):
     model = Response
-    template_name = "todo"  # TODO: add template
+    template_name = "editor_ui/responses/response_list.html"
     context_object_name = "responses"
 
     # ProjectMembershipRequiredMixin mixin attributes
@@ -24,12 +24,25 @@ class ResponseListingView(
 
     breadcrumb = "Responses"
 
+    def get_queryset(self):
+        return (
+            Response.objects.all()
+            .select_related("feedback_form")
+            .filter(feedback_form__project__uuid=self.kwargs.get("project_uuid"))
+            .order_by("-created_at")
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["project_uuid"] = self.kwargs.get("project_uuid")
+        return context
+
 
 class ResponseDetailView(
     ProjectMembershipRequiredMixin, BreadCrumbsMixin, DetailView
 ):
     model = Response
-    template_name = "todo"  # TODO: add template
+    template_name = "editor_ui/responses/response_detail.html"
     context_object_name = "response"
     slug_field = "uuid"
     slug_url_kwarg = "response_uuid"
@@ -38,4 +51,17 @@ class ResponseDetailView(
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
 
-    breadcrumb = "Responses"
+    breadcrumb = "Response Details"
+
+    def get_queryset(self):
+        return (
+            Response.objects.all()
+            .select_related("feedback_form")
+            .prefetch_related("prompt_responses")
+            .filter(feedback_form__project__uuid=self.kwargs.get("project_uuid"))
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["project_uuid"] = self.kwargs.get("project_uuid")
+        return context

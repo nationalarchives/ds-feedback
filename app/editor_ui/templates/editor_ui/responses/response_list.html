@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% set pageTitle = "Responses" %}
+{% block content %}
+  <div class="tna-section">
+    <div class="tna-container">
+      <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+        <h1 class="tna-heading-xl">Responses</h1>
+      </div>
+      <div class="tna-column tna-column--full tna-!--padding-top-m">
+        {% if not responses %}
+          <p>No responses found for this project.</p>
+        {% else %}
+          <div class="tna-table-wrapper">
+            <table class="tna-table">
+              <thead class="tna-table__head">
+                <tr class="tna-table__row">
+                  <th class="tna-table__header">URL</th>
+                  <th class="tna-table__header">Feedback Form</th>
+                  <th class="tna-table__header tna-table__header--numeric">Date created</th>
+                  <th class="tna-table__header tna-table__header--numeric">Last modified</th>
+                </tr>
+              </thead>
+              <tbody class="tna-table__body">
+                {% for response in responses %}
+                  <tr class="tna-table__row">
+                    <th class="tna-table__header">
+                      <a href="{{ url("editor_ui:project__response_detail", project_uuid, response.uuid) }}">{{ response.url }}</a>
+                    </th>
+                    <td class="tna-table__cell">
+                      <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid, response.feedback_form.uuid) }}">{{ response.feedback_form.name }}</a>
+                    </td>
+                    <td class="tna-table__cell tna-table__cell--numeric">{{ response.created_at|date }}</td>
+                    <td class="tna-table__cell tna-table__cell--numeric">{{ response.modified_at|date }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}
