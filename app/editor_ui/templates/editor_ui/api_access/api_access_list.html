@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% set pageTitle = "API Access" %}
+{% block content %}
+  <div class="tna-section">
+    <div class="tna-container">
+      <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+        <h1 class="tna-heading-xl">API Access</h1>
+        <a href="#" class="tna-button">Create API access</a>
+      </div>
+      <div class="tna-column tna-column--full tna-!--padding-top-m">
+        {% if not api_accesses %}
+          <p>No API access entries found for this project.</p>
+        {% else %}
+          <div class="tna-table-wrapper">
+            <table class="tna-table">
+              <thead class="tna-table__head">
+                <tr class="tna-table__row">
+                  <th class="tna-table__header">Grantee</th>
+                  <th class="tna-table__header">Role</th>
+                  <th class="tna-table__header">Created By</th>
+                  <th class="tna-table__header">Expires At</th>
+                  <th class="tna-table__header">Status</th>
+                </tr>
+              </thead>
+              <tbody class="tna-table__body">
+                {% for api_access in api_accesses %}
+                  <tr class="tna-table__row">
+                    <td class="tna-table__cell">
+                      {{ api_access.grantee.get_full_name() or api_access.grantee.username }}
+                    </td>
+                    <td class="tna-table__cell">{{ api_access.get_role_display() }}</td>
+                    <td class="tna-table__cell">
+                      {{ api_access.created_by.get_full_name() or api_access.created_by.username }}
+                    </td>
+                    <td class="tna-table__cell">
+                      {{ api_access.expires_at.strftime("%B %d, %Y at %I:%M %p") }}
+                    </td>
+                    <td class="tna-table__cell">
+                      {% if api_access.is_active %}
+                        <span class="tna-tag tna-tag--green">Active</span>
+                      {% else %}
+                        <span class="tna-tag tna-tag--red">Expired</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}
