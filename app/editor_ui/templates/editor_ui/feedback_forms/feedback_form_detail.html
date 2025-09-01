@@ -47,15 +47,19 @@
                 <tr class="tna-table__row">
                   <th class="tna-table__header">Pattern</th>
                   <th class="tna-table__header">Created by</th>
+                  <th class="tna-table__header"></th>
                 </tr>
               </thead>
               <tbody class="tna-table__body">
                 {% for path in path_patterns %}
                   <tr class="tna-table__row">
                     <th class="tna-table__header">
-                      <a href="">{{ path }}</a>
+                      {{ path }}
                     </th>
                     <td class="tna-table__cell">{{ path.created_by }}</td>
+                    <td class="tna-table__cell tna-table__cell--button">
+                      <a href="{{ url("editor_ui:project__feedback_form__path_pattern_edit", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, path_pattern_uuid=path.uuid) }}" class="tna-button">Edit</a>
+                    </td>
                   </tr>
                 {% endfor %}
               </tbody>

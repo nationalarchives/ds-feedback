@@ -24,6 +24,11 @@
   }
 }
 
+.tna-table__header--button,
+.tna-table__cell--button {
+  text-align: right;
+}
+
 .tna-container {
   &--equal-height-contents {
     > .tna-column {
