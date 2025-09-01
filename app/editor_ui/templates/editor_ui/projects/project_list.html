@@ -5,9 +5,16 @@
     <div class="tna-container">
       <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
         <h1 class="tna-heading-xl">Projects</h1>
+        <p>These are the projects you have access to. Select a project to edit details or manage access.</p>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
-        <a href="{{ url("editor_ui:project_create") }}" class="tna-button">Create a project</a>
+        <a href="{{ url("editor_ui:project_create") }}"
+           class="tna-button tna-button--icon-only-mobile"
+           aria-label="Create a project"
+           title="Create a project">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+          Create a project
+        </a>
         {% if not projects %}
           <p>No projects found.</p>
         {% else %}
@@ -17,7 +24,6 @@
                 <tr class="tna-table__row">
                   <th class="tna-table__header">Name</th>
                   <th class="tna-table__header">Domain</th>
-                  <th class="tna-table__header">Owners</th>
                   <th class="tna-table__header tna-table__header--numeric">Date created</th>
                   <th class="tna-table__header tna-table__header--numeric">Last updated</th>
                   <th class="tna-table__header tna-table__header--numeric">Responses</th>
@@ -30,7 +36,6 @@
                       <a href="{{ url("editor_ui:project_detail", project_uuid=project.uuid) }}">{{ project.name }}</a>
                     </th>
                     <td class="tna-table__cell">{{ project.domain }}</td>
-                    <td class="tna-table__cell">{{ project.owners }}</td>
                     <td class="tna-table__cell tna-table__cell--numeric">{{ project.created_at|date }}</td>
                     <td class="tna-table__cell tna-table__cell--numeric">{{ project.modified_at|date }}</td>
                     <td class="tna-table__cell tna-table__cell--numeric">#</td>

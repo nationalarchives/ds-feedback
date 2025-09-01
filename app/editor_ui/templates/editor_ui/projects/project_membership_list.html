@@ -24,7 +24,7 @@
         {% if user_project_permissions.is_superuser or user_project_permissions.is_owner %}
           <a href="{{ url("editor_ui:project__memberships_add", project_uuid=project_uuid) }}"
              class="tna-button"
-             data-testing-id="add-user-button">Add user</a>
+             data-testing-id="add-user-button">Grant access</a>
         {% endif %}
         {% if not members %}
           <p>No members found.</p>
@@ -58,7 +58,7 @@
                       {% if user_project_permissions.is_superuser or user_project_permissions.is_owner or member.is_current_user %}
                         <a href="{{ url('editor_ui:project__memberships_delete', project_uuid=member.project.uuid, membership_uuid=member.uuid) }}"
                            class="tna-button"
-                           data-testing-id="delete-button">Delete</a>
+                           data-testing-id="delete-button">Remove</a>
                       {% endif %}
                     </td>
                   </tr>
