@@ -2,6 +2,7 @@ from django.urls import path
 
 from app.editor_ui.views.user_views import ApiKeyListView, ApiKeyCreateView
 
+from app.editor_ui.views.api_access_views import APIAccessListView
 from app.editor_ui.views.feedback_form_views import (
     FeedbackFormCreateView,
     FeedbackFormDetailView,
@@ -70,6 +71,11 @@ urlpatterns = [
         "projects/<uuid:project_uuid>/members/<uuid:membership_uuid>/delete/",
         ProjectMembershipDeleteView.as_view(),
         name="project__memberships_delete",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/api-access/",
+        APIAccessListView.as_view(),
+        name="project__api_access_list",
     ),
     path(
         "projects/<uuid:project_uuid>/feedback-forms/",
