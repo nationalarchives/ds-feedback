@@ -47,12 +47,12 @@
                         </div>
                     {% endfor %}
                     <div class="tna-button-group">
+                        {% block cancel_button %}
+                        {% endblock cancel_button %}
                         <button type="submit" class="tna-button">
                             {% block submit_button_text %}
                             {% endblock submit_button_text %}
                         </button>
-                        {% block additional_buttons %}
-                        {% endblock additional_buttons %}
                     </div>
                 </form>
             </div>

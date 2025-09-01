@@ -18,7 +18,7 @@
     Update Prompt
   {% endif %}
 {% endblock submit_button_text %}
-{% block additional_buttons %}
+{% block cancel_button %}
   <a href="{{ url('editor_ui:project__feedback_form__prompt_detail', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt_uuid) }}"
-     class="tna-button">Cancel</a>
-{% endblock additional_buttons %}
+     class="tna-button tna-button--accent">Cancel</a>
+{% endblock cancel_button %}

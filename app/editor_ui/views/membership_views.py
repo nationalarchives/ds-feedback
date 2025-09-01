@@ -226,7 +226,7 @@ class ProjectMembershipDeleteView(
         if self.object.role == "owner" and owners_count <= 1:
             messages.error(
                 self.request,
-                f"Cannot delete {self.object.user}. Each project must have at least one owner.",
+                f"Cannot remove {self.object.user}. Each project must have at least one owner.",
             )
             return redirect(
                 "editor_ui:project__memberships",

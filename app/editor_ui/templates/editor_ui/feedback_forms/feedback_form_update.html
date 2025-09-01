@@ -9,6 +9,6 @@
 {% block submit_button_text %}
   Submit
 {% endblock submit_button_text %}
-{% block additional_buttons %}
-  <a href="{{ url('editor_ui:project__feedback_form_detail', project_uuid=object.project.uuid, feedback_form_uuid=object.uuid) }}" class="tna-button">Cancel</a>
-{% endblock additional_buttons %}
+{% block cancel_button %}
+  <a href="{{ url('editor_ui:project__feedback_form_detail', project_uuid=object.project.uuid, feedback_form_uuid=object.uuid) }}" class="tna-button tna-button--accent">Cancel</a>
+{% endblock cancel_button %}

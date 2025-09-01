@@ -9,6 +9,6 @@
 {% block submit_button_text %}
   Update Project
 {% endblock submit_button_text %}
-{% block additional_buttons %}
-  <a href="{{ url('editor_ui:project_list') }}" class="tna-button">Cancel</a>
-{% endblock additional_buttons %}
+{% block cancel_button %}
+  <a href="{{ url('editor_ui:project_list') }}" class="tna-button tna-button--accent">Cancel</a>
+{% endblock cancel_button %}
