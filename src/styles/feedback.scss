@@ -39,18 +39,18 @@ $spacing-mobile: map.merge(
 /* Which classes to generate */
 $pad-sides: (
   "p": null,
-  /* all sides */
-    "px": (
+  /* all sides */ "px":
+    (
       "left",
       "right",
     ),
-  /* x-axis */
-    "py": (
+  /* x-axis */ "py":
+    (
       "top",
       "bottom",
     ),
-  /* y-axis */
-    "pt": (
+  /* y-axis */ "pt":
+    (
       "top",
     ),
   "pr": (
