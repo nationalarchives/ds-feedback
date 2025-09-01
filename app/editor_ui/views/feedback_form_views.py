@@ -6,7 +6,8 @@ from django.db.models import (
     Prefetch,
 )
 from django.urls import reverse
-from django.views.generic import DetailView, ListView
+from django.utils import timezone
+from django.views.generic import DetailView, ListView, UpdateView
 
 from app.editor_ui.forms import (
     FeedbackFormForm,
@@ -61,6 +62,10 @@ class FeedbackFormCreateView(
         instance.project = Project.objects.get(
             uuid=self.kwargs.get("project_uuid")
         )
+        # If the prompt should be disabled, set the disabled timestamp
+        if form.cleaned_data.get("is_disabled"):
+            instance.disabled_at = timezone.now()
+            instance.disabled_by = self.request.user
 
         return super().form_valid(form)
 
@@ -166,6 +171,7 @@ class FeedbackFormDetailView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context.update(
             {
                 "project_uuid": self.kwargs.get("project_uuid"),
@@ -176,3 +182,43 @@ class FeedbackFormDetailView(
             }
         )
         return context
+
+
+class FeedbackFormUpdateView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    UpdateView,
+):
+    model = FeedbackForm
+    form_class = FeedbackFormForm
+    template_name = "editor_ui/feedback_forms/feedback_form_update.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "feedback_form_uuid"
+
+    # ProjectOwnerMembershipMixin mixin attributes
+    project_roles_required = ["editor", "owner"]
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["is_disabled"] = bool(self.object.disabled_at)
+        return initial
+
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        if form.cleaned_data.get("is_disabled"):
+            instance.disabled_at = timezone.now()
+            instance.disabled_by = self.request.user
+        else:
+            instance.disabled_at = None
+            instance.disabled_by = None
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "editor_ui:project__feedback_form_detail",
+            kwargs={
+                "project_uuid": self.object.project.uuid,
+                "feedback_form_uuid": self.object.uuid,
+            },
+        )

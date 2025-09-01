@@ -4,6 +4,7 @@ from app.editor_ui.views.feedback_form_views import (
     FeedbackFormCreateView,
     FeedbackFormDetailView,
     FeedbackFormListView,
+    FeedbackFormUpdateView,
 )
 from app.editor_ui.views.membership_views import (
     ProjectMembershipCreateView,
@@ -11,16 +12,22 @@ from app.editor_ui.views.membership_views import (
     ProjectMembershipListView,
     ProjectMembershipUpdateView,
 )
-from app.editor_ui.views.path_pattern_views import PathPatternCreateView
+from app.editor_ui.views.path_pattern_views import (
+    PathPatternCreateView,
+    PathPatternUpdateView,
+)
 from app.editor_ui.views.project_views import (
     ProjectCreateView,
     ProjectDetailView,
     ProjectListView,
+    ProjectUpdateView,
 )
 from app.editor_ui.views.prompt_views import (
     PromptCreateView,
     PromptDetailView,
-    RangedPromptOptionsCreateView,
+    PromptUpdateView,
+    RangedPromptOptionCreateView,
+    RangedPromptOptionUpdateView,
 )
 
 app_name = "editor_ui"
@@ -36,7 +43,12 @@ urlpatterns = [
         name="project_detail",
     ),
     path(
-        "projects/<uuid:project_uuid>/members/",
+        "projects/<uuid:project_uuid>/edit/",
+        ProjectUpdateView.as_view(),
+        name="project_update",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/members",
         ProjectMembershipListView.as_view(),
         name="project__memberships",
     ),
@@ -66,6 +78,11 @@ urlpatterns = [
         name="project__feedback_form_create",
     ),
     path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/edit/",
+        FeedbackFormUpdateView.as_view(),
+        name="project__feedback_form_edit",
+    ),
+    path(
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/",
         FeedbackFormDetailView.as_view(),
         name="project__feedback_form_detail",
@@ -74,6 +91,11 @@ urlpatterns = [
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/path-pattern/create/",
         PathPatternCreateView.as_view(),
         name="project__feedback_form__path_pattern_create",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/path-pattern/<uuid:path_pattern_uuid>/edit/",
+        PathPatternUpdateView.as_view(),
+        name="project__feedback_form__path_pattern_edit",
     ),
     path(
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/create/",
@@ -86,8 +108,18 @@ urlpatterns = [
         name="project__feedback_form__prompt_detail",
     ),
     path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/edit/",
+        PromptUpdateView.as_view(),
+        name="project__feedback_form__prompt_edit",
+    ),
+    path(
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/ranged-prompt-options/create/",
-        RangedPromptOptionsCreateView.as_view(),
+        RangedPromptOptionCreateView.as_view(),
         name="project__feedback_form__prompt__ranged_prompt_options_create",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/options/<uuid:option_uuid>/edit/",
+        RangedPromptOptionUpdateView.as_view(),
+        name="project__feedback_form__prompt__ranged_prompt_options_edit",
     ),
 ]

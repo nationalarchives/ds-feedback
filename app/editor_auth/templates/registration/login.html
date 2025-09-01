@@ -3,10 +3,10 @@
 {% block content %}
     <div class="tna-section">
         <div class="tna-container">
-            <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+            <div class="tna-column tna-column--full tna-!--padding-top-m">
                 <h1 class="tna-heading-xl">Log In</h1>
             </div>
-            <div class="tna-column tna-column--full tna-!--padding-top-m">
+            <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
                 <form method="post" class="tna-form">
                     {{ csrf_input }}
                     {% if form.non_field_errors() %}
@@ -26,7 +26,8 @@
                         </div>
                     {% endif %}
                     {% for field in form %}
-                        <div class="tna-form__group" data-module="tna-text-input">
+                        <div class="tna-form__group {% if field.errors %}tna-form__group--error{% endif %}"
+                             data-module="tna-text-input">
                             <div class="tna-form__group-contents">
                                 <h4 class="tna-form__heading tna-form__heading--m">
                                     <label class="tna-form__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -43,7 +44,9 @@
                         </div>
                     {% endfor %}
                     <a href="{{ url("editor_auth:password_reset") }}">Forgot Password?</a>
-                    <button type="submit" class="tna-button">Log In</button>
+                    <div class="tna-button-group">
+                        <button type="submit" class="tna-button">Log In</button>
+                    </div>
                 </form>
             </div>
         </div>

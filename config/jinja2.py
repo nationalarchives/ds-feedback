@@ -31,12 +31,18 @@ def jinja_url(name, *args, **kwargs):
     return Markup(path)
 
 
+def jinja_date(value, format=None):
+    if format is None:
+        format = getattr(settings, "DATE_FORMAT", "N j, Y")
+    return dj_date(value, format)
+
+
 def environment(**options):
     env = Environment(**options)
 
     # Register Django filters for use with Jinja backend
     env.filters["pluralize"] = dj_pluralize
-    env.filters["date"] = dj_date
+    env.filters["date"] = jinja_date
 
     TNA_FRONTEND_VERSION = ""
     try:

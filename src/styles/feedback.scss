@@ -2,6 +2,99 @@
 @use "@nationalarchives/frontend/nationalarchives/tools/spacing";
 @use "@nationalarchives/frontend/nationalarchives/tools/typography";
 
+/* ===========
+   Spacing utilities for padding (mobile vs larger screens)
+   - Base (mobile): uses $spacing-mobile
+   - ≥ medium: uses $spacing
+   Adjust breakpoints to match TNA tokens if you have them.
+   =========== */
+
+@use "sass:map";
+
+$spacing-unit: 1rem !default; /* 1 unit = 16px = 1rem */
+$bp-medium: 48rem !default; /* 768px */
+$bp-large: 64rem !default; /* 1024px (optional, shown for extension) */
+
+$spacing: (
+  "xs": 0.5,
+  "s": 1,
+  "m": 2,
+  "l": 3,
+  "xl": 5,
+  "xxl": 8,
+) !default;
+
+$spacing-mobile: map.merge(
+  $spacing,
+  (
+    "xs": 0.5,
+    "s": 0.75,
+    "m": 1.5,
+    "l": 2,
+    "xl": 3,
+    "xxl": 5,
+  )
+) !default;
+
+/* Which classes to generate */
+$pad-sides: (
+  "p": null,
+  /* all sides */ "px":
+    (
+      "left",
+      "right",
+    ),
+  /* x-axis */ "py":
+    (
+      "top",
+      "bottom",
+    ),
+  /* y-axis */ "pt":
+    (
+      "top",
+    ),
+  "pr": (
+    "right",
+  ),
+  "pb": (
+    "bottom",
+  ),
+  "pl": (
+    "left",
+  ),
+);
+
+/* Helper to emit padding props for any side(s) */
+@mixin pad-props($sides, $value) {
+  @if $sides is null {
+    padding: $value;
+  } @else {
+    @each $side in $sides {
+      padding-#{$side}: $value;
+    }
+  }
+}
+
+/* Generate classes:
+   .u-p-[size], .u-px-[size], .u-pl-[size], etc.
+   Mobile values first, then >= medium overrides
+*/
+@each $abbr, $sides in $pad-sides {
+  @each $name, $mobile-mult in $spacing-mobile {
+    .u-#{$abbr}-#{$name} {
+      @include pad-props($sides, $mobile-mult * $spacing-unit);
+    }
+
+    /* ≥ medium: swap to desktop spacing scale */
+    @media (min-width: $bp-medium) {
+      .u-#{$abbr}-#{$name} {
+        $desktop-mult: map.get($spacing, $name);
+        @include pad-props($sides, $desktop-mult * $spacing-unit);
+      }
+    }
+  }
+}
+
 .tna-table {
   width: 100%;
 
@@ -22,6 +115,11 @@
       }
     }
   }
+}
+
+.tna-table__header--button,
+.tna-table__cell--button {
+  text-align: right;
 }
 
 .tna-container {

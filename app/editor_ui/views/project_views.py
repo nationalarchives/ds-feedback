@@ -9,10 +9,11 @@ from django.db.models import (
     Q,
 )
 from django.urls import reverse
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, UpdateView
 
 from app.editor_ui.forms import (
-    ProjectForm,
+    ProjectCreateForm,
+    ProjectUpdateForm,
 )
 from app.editor_ui.mixins import (
     BreadCrumbsMixin,
@@ -32,7 +33,7 @@ class ProjectCreateView(
     BreadCrumbsMixin,
     BaseCreateView,
 ):
-    form_class = ProjectForm
+    form_class = ProjectCreateForm
     object_name = "Project"
     permission_required = ["projects.add_project"]
     breadcrumb = "Create a Project"
@@ -144,13 +145,37 @@ class ProjectDetailView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        project = self.object
-        owners = [
-            str(owner) for owner in getattr(self.object, "owner_members", [])
-        ]
 
-        context["forms_count"] = project.forms_count
-        context["responses_count"] = project.responses_count
-        context["owners"] = ", ".join(owners)
+        project = self.object
+        owners = [str(owner) for owner in getattr(project, "owner_members", [])]
+
+        context.update(
+            {
+                "forms_count": project.forms_count,
+                "responses_count": project.responses_count,
+                "owners": ", ".join(owners),
+            }
+        )
 
         return context
+
+
+class ProjectUpdateView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    UpdateView,
+):
+    model = Project
+    form_class = ProjectUpdateForm
+    template_name = "editor_ui/projects/project_update.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "project_uuid"
+
+    # ProjectOwnerMembershipMixin mixin attributes
+    project_roles_required = ["owner"]
+
+    def get_success_url(self):
+        return reverse(
+            "editor_ui:project_detail",
+            kwargs={"project_uuid": self.object.uuid},
+        )

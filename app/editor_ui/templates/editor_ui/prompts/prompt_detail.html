@@ -3,63 +3,68 @@
 {% set promptType = prompt.type() %}
 {% block content %}
     <div class="tna-section">
-        <div class="tna-section">
-            <div class="tna-container">
-                <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
-                    <hgroup class="tna-hgroup-xl">
-                        <p class="tna-hgroup__supertitle">Prompt</p>
-                        <h1 class="tna-hgroup__title">{{ prompt.text }}</h1>
-                    </hgroup>
+        <div class="tna-container">
+            <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+                <hgroup class="tna-hgroup-xl">
+                    <p class="tna-hgroup__supertitle">Prompt</p>
+                    <h1 class="tna-hgroup__title">{{ prompt.text }}</h1>
+                </hgroup>
+                <h2 class="tna-heading-l" id="details">Details</h2>
+                <dl class="tna-dl">
+                    <dt>Feedback form</dt>
+                    <dd>
+                        <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid, feedback_form_uuid) }}">{{ prompt.feedback_form.name }}</a>
+                    </dd>
+                    <dt>Status</dt>
+                    <dd>
+                        {% if prompt.is_enabled() %}
+                            Active
+                        {% else %}
+                            Inactive
+                        {% endif %}
+                    </dd>
+                    {% if not prompt.is_enabled() %}
+                        <dt>Deactivated by</dt>
+                        <dd>
+                            {{ prompt.disabled_by }}
+                        </dd>
+                        <dt>Deactivated on</dt>
+                        <dd>
+                            {{ prompt.disabled_at }}
+                        </dd>
+                    {% endif %}
+                    <dt>Type</dt>
+                    <dd>
+                        {{ prompt.field_label }}
+                    </dd>
+                    <dt>Order</dt>
+                    <dd>
+                        {{ prompt.order }}
+                    </dd>
+                    {% if promptType == "TextPrompt" %}
+                        {% include "editor_ui/prompts/blocks/text_prompt_detail.html" %}
+                    {% endif %}
+                    {% if promptType == "BinaryPrompt" %}
+                        {% include "editor_ui/prompts/blocks/binary_prompt_detail.html" %}
+                    {% endif %}
+                    <dt>Created on</dt>
+                    <dd>
+                        {{ prompt.created_at|date("d M Y") }}
+                    </dd>
+                    <dt>Created by</dt>
+                    <dd>
+                        {{ prompt.created_by }}
+                    </dd>
+                </dl>
+                <div class="tna-button-group">
+                    <a href="{{ url('editor_ui:project__feedback_form__prompt_edit', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid) }}"
+                       class="tna-button"
+                       data-testing-id="edit-button">Edit</a>
                 </div>
-                <div class="tna-column tna-column--width-2-3 tna-column--full-small tna-column--full-tiny tna-!--padding-top-l">
-                    <h2 class="tna-heading-l" id="details">Details</h2>
-                    <dl class="tna-dl">
-                        <dt>Feedback form</dt>
-                        <dd>
-                            <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid, feedback_form_uuid) }}">{{ prompt.feedback_form.name }}</a>
-                        </dd>
-                        <dt>Active</dt>
-                        <dd>
-                            {{ prompt.is_enabled }}
-                        </dd>
-                        {% if not prompt.is_enabled %}
-                            <dt>Deactivated by</dt>
-                            <dd>
-                                {{ prompt.disabled_by }}
-                            </dd>
-                            <dt>Deactivated on</dt>
-                            <dd>
-                                {{ prompt.disabled_at }}
-                            </dd>
-                        {% endif %}
-                        <dt>Type</dt>
-                        <dd>
-                            {{ prompt.field_label }}
-                        </dd>
-                        <dt>Order</dt>
-                        <dd>
-                            {{ prompt.order }}
-                        </dd>
-                        {% if promptType == "TextPrompt" %}
-                            {% include "editor_ui/prompts/blocks/text_prompt_detail.html" %}
-                        {% endif %}
-                        {% if promptType == "BinaryPrompt" %}
-                            {% include "editor_ui/prompts/blocks/binary_prompt_detail.html" %}
-                        {% endif %}
-                        <dt>Created on</dt>
-                        <dd>
-                            {{ prompt.created_at|date("d M Y") }}
-                        </dd>
-                        <dt>Created by</dt>
-                        <dd>
-                            {{ prompt.created_by }}
-                        </dd>
-                    </dl>
-                </div>
-                {% if promptType == "RangedPrompt" %}
-                    {% include "editor_ui/prompts/blocks/ranged_prompt_detail.html" %}
-                {% endif %}
             </div>
+            {% if promptType == "RangedPrompt" %}
+                {% include "editor_ui/prompts/blocks/ranged_prompt_detail.html" %}
+            {% endif %}
         </div>
     </div>
 {% endblock content %}

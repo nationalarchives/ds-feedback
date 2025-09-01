@@ -320,3 +320,5 @@ EMAIL_USE_TLS = True
 # https://docs.djangoproject.com/en/5.2/ref/settings/#email-subject-prefix
 if "EMAIL_SUBJECT_PREFIX" in env:
     EMAIL_SUBJECT_PREFIX = env["EMAIL_SUBJECT_PREFIX"]
+
+DATE_FORMAT = "d F Y"

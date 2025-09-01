@@ -64,6 +64,41 @@ class ProjectMembershipRequiredMixin:
     parent_lookup_kwarg = None
     parent_model = None
 
+    def get_user_project_permissions(self, user=None):
+        """
+        Return a dictionary of the user's permissions/role for the current project (
+        retrieved get_project_for_permission_check method). If user is not provided,
+        uses self.request.user.
+        """
+        if user is None:
+            user = self.request.user
+        project = self.get_project_for_permission_check()
+        if user.is_superuser:
+            return {
+                "is_superuser": True,
+                "is_owner": True,
+                "is_member": True,
+                "role": "superuser",
+            }
+        membership = ProjectMembership.objects.filter(
+            user=user, project=project
+        ).first()
+        return {
+            "is_superuser": False,
+            "is_owner": bool(membership and membership.role == "owner"),
+            "is_member": bool(membership),
+            "role": membership.role if membership else None,
+        }
+
+    def get_object(self):
+        # TODO: move this to its own mixin.
+        # ProjectMembershipRequiredMixin is only meant to handle ProjectMemberships
+        if hasattr(self, "_cached_object"):
+            return self._cached_object
+        obj = super().get_object()
+        self._cached_object = obj
+        return obj
+
     def get_parent_object(self):
         """
         Fetch the parent object using the URL kwarg and model.
@@ -93,8 +128,10 @@ class ProjectMembershipRequiredMixin:
     def get_project_for_permission_check(self):
         """
         Returns the related Project for permission checks by calling
-        `get_parent_project()` on the relevant object.
+        `get_parent_project()` on the relevant object. Caches the result per-instance.
         """
+        if hasattr(self, "_permission_project"):
+            return self._permission_project
 
         if isinstance(self, (DetailView, UpdateView, DeleteView)):
             obj = self.get_object()
@@ -105,13 +142,27 @@ class ProjectMembershipRequiredMixin:
         if hasattr(obj, "get_parent_project") and callable(
             obj.get_parent_project
         ):
-            return obj.get_parent_project()
+            project = obj.get_parent_project()
         elif isinstance(obj, Project):
-            return obj
+            project = obj
         else:
             raise ImproperlyConfigured(
                 f"{obj.__class__.__name__} must implement get_parent_project()."
             )
+
+        self._permission_project = project
+
+        return project
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        Update template context with `user_project_permissions` to be used for
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context["user_project_permissions"] = (
+            self.get_user_project_permissions()
+        )
+        return context
 
     def dispatch(self, request, *args, **kwargs):
         """
@@ -132,9 +183,14 @@ class ProjectMembershipRequiredMixin:
 
         project = self.get_project_for_permission_check()
 
-        if not ProjectMembership.objects.filter(
-            user=user, project=project, role__in=self.project_roles_required
-        ).exists():
+        self._current_membership = ProjectMembership.objects.filter(
+            user=user, project=project
+        ).first()
+
+        if (
+            not self._current_membership
+            or self._current_membership.role not in self.project_roles_required
+        ):
             raise PermissionDenied(
                 "You do not have permission for this project."
             )

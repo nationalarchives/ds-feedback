@@ -1,0 +1,24 @@
+{% extends "editor_ui/base_form_template.html" %}
+{% set pageTitle = "Update Prompt" %}
+{% set promptType = object.type() %}
+{% block heading %}
+  Update Prompt
+{% endblock heading %}
+{% block heading_text %}
+  {% if promptType == "RangedPromptOption" %}
+    <p>Editing the ranged prompt options for '{{ object.ranged_prompt.text }}' in the '{{ object.ranged_prompt.feedback_form.name }}' feedback form.</p>
+  {% else %}
+    <p>Editing the prompt details for '{{ object.text }}' in '{{ object.feedback_form.name }}'.</p>
+  {% endif %}
+{% endblock heading_text %}
+{% block submit_button_text %}
+  {% if promptType == "RangedPromptOption" %}
+    Update Prompt Option
+  {% else %}
+    Update Prompt
+  {% endif %}
+{% endblock submit_button_text %}
+{% block cancel_button %}
+  <a href="{{ url('editor_ui:project__feedback_form__prompt_detail', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt_uuid) }}"
+     class="tna-button tna-button--accent">Cancel</a>
+{% endblock cancel_button %}

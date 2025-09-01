@@ -59,26 +59,9 @@ class ProjectMembershipListView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
         project_uuid = self.kwargs.get("project_uuid")
 
-        current_user_is_member = ProjectMembership.objects.filter(
-            project__uuid=project_uuid, user=user
-        ).exists()
-
-        current_user_is_project_owner = ProjectMembership.objects.filter(
-            project__uuid=project_uuid, user=user, role="owner"
-        ).exists()
-
-        context.update(
-            {
-                "current_user_is_project_member_or_admin": current_user_is_member
-                or self.request.user.is_superuser,
-                "current_user_is_project_owner_or_admin": current_user_is_project_owner
-                or self.request.user.is_superuser,
-                "project_uuid": project_uuid,
-            }
-        )
+        context["project_uuid"] = project_uuid
 
         return context
 
@@ -243,7 +226,7 @@ class ProjectMembershipDeleteView(
         if self.object.role == "owner" and owners_count <= 1:
             messages.error(
                 self.request,
-                f"Cannot delete {self.object.user}. Each project must have at least one owner.",
+                f"Cannot remove {self.object.user}. Each project must have at least one owner.",
             )
             return redirect(
                 "editor_ui:project__memberships",
