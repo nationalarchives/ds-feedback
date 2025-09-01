@@ -15,7 +15,7 @@
           </dd>
           <dt>Project ID</dt>
           <dd>
-            <code>{{ project.id }}</code>
+            {{ project.uuid }}
           </dd>
           <dt>Data retention</dt>
           <dd>
@@ -23,41 +23,44 @@
           </dd>
           <dt>Created on</dt>
           <dd>
-            {{ project.created_at|date("d M Y") }}
+            {{ project.created_at|date }}
+          </dd>
+          <dt>last modified</dt>
+          <dd>
+            {{ project.modified_at|date }}
           </dd>
           <dt>Owners</dt>
           <dd>
             {{ owners }}
           </dd>
         </dl>
+        <div class="tna-button-group">
         {% if user_project_permissions.is_owner or user_project_permissions.is_superuser %}
           <a href="{{ url("editor_ui:project_update", project_uuid=project.uuid) }}" class="tna-button" data-testing-id="edit-project-button">Edit project details</a>
         {% endif %}
         <a href="{{ url("editor_ui:project__memberships", project_uuid=project.uuid) }}"
            class="tna-button">Manage access</a>
+        </div>
       </div>
     </div>
     <div class="tna-container tna-container--equal-height-contents">
       <div class="tna-column tna-column--width-1-3 tna-column--full-small tna-column--full-tiny tna-!--margin-top-l">
         <div class="tna-aside tna-aside--tight tna-background-accent">
           <h2 class="tna-heading-m">
-            <a href="{{ url("editor_ui:project__feedback_form_list", project_uuid=project.uuid) }}">Feedback Forms</a>
           </h2>
-          <p>
-            <span class="tna-heading-xl">{{ forms_count }}</span>
-            form{{ forms_count|pluralize }}
-          </p>
+          
+            <span class="tna-heading-xl u-pl-s">{{ forms_count }} </span><a href="{{ url("editor_ui:project__feedback_form_list", project_uuid=project.uuid) }}">feedback form{{ forms_count|pluralize }}</a>
+          
         </div>
       </div>
       <div class="tna-column tna-column--width-1-3 tna-column--full-small tna-column--full-tiny tna-!--margin-top-l">
-        <div class="tna-aside tna-aside--tight tna-background-contrast">
+        <div class="tna-aside tna-aside--tight tna-background-accent">
           <h2 class="tna-heading-m">
-            <a href="#">Responses</a>
+            
           </h2>
-          <p>
-            <span class="tna-heading-xl">{{ responses_count }}</span>
-            response{{ responses_count|pluralize }}
-          </p>
+          
+            <span class="tna-heading-xl u-pl-s">{{ responses_count }} </span><a href="#">response{{ responses_count|pluralize }}</a>
+          
         </div>
       </div>
     </div>

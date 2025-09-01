@@ -4,10 +4,9 @@
         <div class="tna-container">
             <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
                 <h1 class="tna-heading-xl">
-                    {% block heading %}{% endblock heading %}
+                    {% block heading %}
+                    {% endblock heading %}
                 </h1>
-            </div>
-            <div class="tna-column tna-column--full tna-!--padding-top-m">
                 {% block heading_text %}
                 {% endblock heading_text %}
                 <form method="post" class="tna-form">
@@ -29,7 +28,7 @@
                         </div>
                     {% endif %}
                     {% for field in form %}
-                        <div class="tna-form__group"
+                        <div class="tna-form__group {% if field.errors %}tna-form__group--error{% endif %}"
                              {% if field.field.widget.input_type == "text" %}data-module="tna-text-input"{% endif %}>
                             <div class="tna-form__group-contents">
                                 <h4 class="tna-form__heading tna-form__heading--m">
@@ -45,15 +44,17 @@
                                 {% endif %}
                             </div>
                             {{ field }}
-                        {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <div class="tna-button-group">
                         <button type="submit" class="tna-button">
                             {% block submit_button_text %}
                             {% endblock submit_button_text %}
                         </button>
                         {% block additional_buttons %}
                         {% endblock additional_buttons %}
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

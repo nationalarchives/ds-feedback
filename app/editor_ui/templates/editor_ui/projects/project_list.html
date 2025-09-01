@@ -7,6 +7,7 @@
         <h1 class="tna-heading-xl">Projects</h1>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
+        <a href="{{ url("editor_ui:project_create") }}" class="tna-button">Create a project</a>
         {% if not projects %}
           <p>No projects found.</p>
         {% else %}
@@ -17,6 +18,9 @@
                   <th class="tna-table__header">Name</th>
                   <th class="tna-table__header">Domain</th>
                   <th class="tna-table__header">Owners</th>
+                  <th class="tna-table__header">Date created</th>
+                  <th class="tna-table__header">Last updated</th>
+                  <th class="tna-table__header">Responses</th>
                 </tr>
               </thead>
               <tbody class="tna-table__body">
@@ -27,13 +31,15 @@
                     </th>
                     <td class="tna-table__cell">{{ project.domain }}</td>
                     <td class="tna-table__cell">{{ project.owners }}</td>
+                    <td class="tna-table__cell">{{ project.created_at|date }}</td>
+                    <td class="tna-table__cell">{{ project.modified_at|date }}</td>
+                    <td class="tna-table__cell">#</td>
                   </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
         {% endif %}
-        <a href="{{ url("editor_ui:project_create") }}" class="tna-button">Create a project</a>
       </div>
     </div>
   </div>

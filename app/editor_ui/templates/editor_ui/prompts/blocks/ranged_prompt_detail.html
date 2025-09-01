@@ -1,6 +1,8 @@
 <div class="tna-column tna-column--full tna-!--padding-top-m">
     <div class="tna-table-wrapper">
-        <p class="tna-hgroup__supertitle">Ranged prompt options</p>
+        <hgroup class="tna-hgroup-m">
+            <h2 class="tna-hgroup__title">Ranged prompt options</h2>
+        </hgroup>
         {% if prompt_options %}
             <table class="tna-table">
                 <thead class="tna-table__head">
@@ -17,8 +19,8 @@
                             <td class="tna-table__cell">{{ option.value }}</td>
                             <td class="tna-table__cell">
                                 <a href="{{ url('editor_ui:project__feedback_form__prompt__ranged_prompt_options_edit', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid, option_uuid=option.uuid) }}"
-                           class="tna-button"
-                           data-testing-id="edit-button">Edit</a>
+                                   class="tna-button"
+                                   data-testing-id="edit-button">Edit</a>
                             </td>
                         </tr>
                     {% endfor %}
@@ -27,7 +29,9 @@
         {% else %}
             <p>No ranged options</p>
         {% endif %}
+        <div class="tna-button-group">
+            <a href="{{ url("editor_ui:project__feedback_form__prompt__ranged_prompt_options_create", project_uuid, feedback_form_uuid, prompt.uuid) }}"
+               class="tna-button">Create ranged prompt option</a>
+        </div>
     </div>
-    <a href="{{ url("editor_ui:project__feedback_form__prompt__ranged_prompt_options_create", project_uuid, feedback_form_uuid, prompt.uuid) }}"
-       class="tna-button">Create ranged prompt option</a>
 </div>

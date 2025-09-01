@@ -4,16 +4,16 @@
         <div class="tna-container">
             <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
                 <h1 class="tna-heading-xl">Confirm Deletion</h1>
-            </div>
-            <div class="tna-column tna-column--full tna-!--padding-top-m">
                 <p>
                     Are you sure you want to remove <strong>{{ object.user.email }}</strong> from the project <strong>{{ object.project.name }}</strong>?
                 </p>
                 <form method="post">
                     {{ csrf_input }}
-                    <button type="submit" class="tna-button tna-button--danger">Confirm Remove</button>
-                    <a href="{{ url("editor_ui:project__memberships", project_uuid=object.project.uuid) }}"
-                       class="tna-button">Cancel</a>
+                    <div class="tna-button-group">
+                        <button type="submit" class="tna-button tna-button--danger">Confirm Remove</button>
+                        <a href="{{ url("editor_ui:project__memberships", project_uuid=object.project.uuid) }}"
+                           class="tna-button">Cancel</a>
+                    </div>
                 </form>
             </div>
         </div>

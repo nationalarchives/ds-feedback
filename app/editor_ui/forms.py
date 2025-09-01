@@ -68,8 +68,8 @@ class FeedbackFormForm(forms.ModelForm):
     is_disabled = forms.BooleanField(
         required=False,
         initial=False,
-        label="Disable this prompt",
-        help_text="Disabled prompts won't be shown to users",
+        label="Disable this feedback form",
+        help_text="Disabled feedback forms won't be shown to users",
         widget=forms.CheckboxInput(attrs={"class": "tna-checkbox"}),
     )
 
@@ -262,7 +262,10 @@ class ProjectMembershipCreateForm(forms.ModelForm):
             "email",
             "role",
         ]
-
+        widgets = {
+            "email": forms.TextInput(attrs={**shared_text_input_attrs}),
+            "role": forms.Select(attrs={"class": "tna-select"}),
+        }
         help_texts = {"role": "Select the role you want to assign to the user."}
 
 
@@ -272,5 +275,7 @@ class ProjectMembershipUpdateForm(forms.ModelForm):
         fields = [
             "role",
         ]
-
+        widgets = {
+            "role": forms.Select(attrs={"class": "tna-select"}),
+        }
         help_texts = {"role": "Select the role you want to assign to the user."}

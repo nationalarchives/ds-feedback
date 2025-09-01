@@ -6,9 +6,9 @@
 {% endblock heading %}
 {% block heading_text %}
   {% if promptType == "RangedPromptOption" %}
-    Editing the ranged prompt options for '{{ object.ranged_prompt.text }}' in the '{{ object.ranged_prompt.feedback_form.name }}' feedback form.
+    <p>Editing the ranged prompt options for '{{ object.ranged_prompt.text }}' in the '{{ object.ranged_prompt.feedback_form.name }}' feedback form.</p>
   {% else %}
-    Editing the prompt details for {{ object.text }} in {{ object.feedback_form.name }}.
+    <p>Editing the prompt details for '{{ object.text }}' in '{{ object.feedback_form.name }}'.</p>
   {% endif %}
 {% endblock heading_text %}
 {% block submit_button_text %}

@@ -20,7 +20,6 @@
           </div>
         </div>
       {% endif %}
-      {{ user_project_permissions.is_member }}
       <div class="tna-column tna-column--full tna-!--padding-top-m">
         {% if user_project_permissions.is_superuser or user_project_permissions.is_owner %}
           <a href="{{ url("editor_ui:project__memberships_add", project_uuid=project_uuid) }}"
