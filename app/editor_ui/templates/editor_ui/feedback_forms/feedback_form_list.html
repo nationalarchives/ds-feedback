@@ -18,8 +18,8 @@
                 <tr class="tna-table__row">
                   <th class="tna-table__header">Name</th>
                   <th class="tna-table__header">Path Patterns</th>
-                  <th class="tna-table__header">Prompts</th>
                   <th class="tna-table__header">State</th>
+                  <th class="tna-table__header tna-table__header--numeric">Prompts</th>
                 </tr>
               </thead>
               <tbody class="tna-table__body">
@@ -31,7 +31,6 @@
                     <td class="tna-table__cell">
                       {% if feedback_form.path_patterns_str %}{{ feedback_form.path_patterns_str }}{% endif %}
                     </td>
-                    <td class="tna-table__cell">{{ feedback_form.prompts_count }}</td>
                     <td class="tna-table__cell">
                       {% if feedback_form.is_enabled() %}
                         Active
@@ -39,6 +38,7 @@
                         Inactive
                       {% endif %}
                     </td>
+                    <td class="tna-table__cell tna-table__cell--numeric">{{ feedback_form.prompts_count }}</td>
                   </tr>
                 {% endfor %}
               </tbody>

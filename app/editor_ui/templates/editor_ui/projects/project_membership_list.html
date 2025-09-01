@@ -35,7 +35,7 @@
                 <tr class="tna-table__row">
                   <th class="tna-table__header">User</th>
                   <th class="tna-table__header">Role</th>
-                  <th class="tna-table__header">Created at</th>
+                  <th class="tna-table__header tna-table__header--numeric">Created at</th>
                   <th class="tna-table__header">Created by</th>
                   {% if user_project_permissions.is_superuser or user_project_permissions.is_member %}
                     <th class="tna-table__header"></th>
@@ -47,9 +47,9 @@
                   <tr class="tna-table__row">
                     <td class="tna-table__cell">{{ member.user }}</td>
                     <td class="tna-table__cell">{{ member.role }}</td>
-                    <td class="tna-table__cell">{{ member.created_at }}</td>
+                    <td class="tna-table__cell tna-table__cell--numeric">{{ member.created_at|date }}</td>
                     <td class="tna-table__cell">{{ member.created_by }}</td>
-                    <td class="tna-table__cell">
+                    <td class="tna-table__cell tna-table__cell--button">
                       {% if user_project_permissions.is_superuser or user_project_permissions.is_owner %}
                         <a href="{{ url('editor_ui:project__memberships_edit', project_uuid=project_uuid, membership_uuid=member.uuid) }}"
                            class="tna-button"

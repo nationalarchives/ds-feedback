@@ -18,9 +18,9 @@
                   <th class="tna-table__header">Name</th>
                   <th class="tna-table__header">Domain</th>
                   <th class="tna-table__header">Owners</th>
-                  <th class="tna-table__header">Date created</th>
-                  <th class="tna-table__header">Last updated</th>
-                  <th class="tna-table__header">Responses</th>
+                  <th class="tna-table__header tna-table__header--numeric">Date created</th>
+                  <th class="tna-table__header tna-table__header--numeric">Last updated</th>
+                  <th class="tna-table__header tna-table__header--numeric">Responses</th>
                 </tr>
               </thead>
               <tbody class="tna-table__body">
@@ -31,9 +31,9 @@
                     </th>
                     <td class="tna-table__cell">{{ project.domain }}</td>
                     <td class="tna-table__cell">{{ project.owners }}</td>
-                    <td class="tna-table__cell">{{ project.created_at|date }}</td>
-                    <td class="tna-table__cell">{{ project.modified_at|date }}</td>
-                    <td class="tna-table__cell">#</td>
+                    <td class="tna-table__cell tna-table__cell--numeric">{{ project.created_at|date }}</td>
+                    <td class="tna-table__cell tna-table__cell--numeric">{{ project.modified_at|date }}</td>
+                    <td class="tna-table__cell tna-table__cell--numeric">#</td>
                   </tr>
                 {% endfor %}
               </tbody>
