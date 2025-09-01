@@ -41,7 +41,7 @@ class ProjectCreationTests(TestCase):
             self.project_create_url,
             {
                 "name": "Owner Project",
-                "domain": "owner.domain.com",
+                "domain": "https://owner.domain.com",
                 "retention_period_days": RETENTION_PERIOD_CHOICES[0],
                 "created_by": self.creator_user,
             },
@@ -81,7 +81,7 @@ class ProjectCreationTests(TestCase):
             self.project_create_url,
             {
                 "name": "Other Project",
-                "domain": "other.domain.com",
+                "domain": "https://other.domain.com",
                 "retention_period_days": RETENTION_PERIOD_CHOICES[0],
             },
         )
@@ -117,7 +117,7 @@ class ProjectMembershipAssignmentTests(TestCase):
             self.project_create_url,
             {
                 "name": "Owner Project",
-                "domain": "owner.domain.com",
+                "domain": "https://owner.domain.com",
                 "retention_period_days": 30,
             },
         )
