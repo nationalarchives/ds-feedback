@@ -1,6 +1,8 @@
+from email import message
+
 from django import forms
 from django.contrib.auth import get_user_model
-from django.core.validators import validate_domain_name
+from django.core.validators import URLValidator
 
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.models import Project, ProjectMembership
@@ -20,6 +22,11 @@ shared_text_input_attrs = {
     "autocorrect": "off",
 }
 
+url_validator = URLValidator(
+    schemes=["https"],
+    message="Please enter a valid URL starting with https://",
+)
+
 PROMPT_FORM_MAP = {}
 
 
@@ -38,15 +45,18 @@ class ProjectCreateForm(forms.ModelForm):
                 attrs={"class": "tna-select"}
             ),
         }
+        validators = {
+            "domain": [URLValidator()],
+        }
         help_texts = {
             "name": "A memorable name for your project",
-            "domain": "Enter the full domain you project will target, e.g. https://example.com",
+            "domain": "Enter the full URL this project will target, e.g. https://example.com",
             "retention_period_days": "Data older than this will be periodically deleted",
         }
 
     def clean_domain(self):
         domain = self.cleaned_data.get("domain")
-        validate_domain_name(domain)
+        url_validator(domain)
         return domain
 
 
@@ -55,13 +65,21 @@ class ProjectUpdateForm(forms.ModelForm):
         model = Project
         fields = [
             "name",
+            "domain",
         ]
         widgets = {
             "name": forms.TextInput(attrs={**shared_text_input_attrs}),
+            "domain": forms.URLInput(attrs={**shared_text_input_attrs}),
         }
         help_texts = {
             "name": "A memorable name for your project",
+            "domain": "The full URL this project will target, e.g. https://example.com",
         }
+
+    def clean_domain(self):
+        domain = self.cleaned_data.get("domain")
+        url_validator(domain)
+        return domain
 
 
 class FeedbackFormForm(forms.ModelForm):
