@@ -15,26 +15,6 @@ def validate_path_pattern(value):
     if not value.endswith("/"):
         raise ValidationError("Pattern must end with a forward slash (/)")
 
-    path_parts = [part for part in value.split("/") if part]
-
-    sanitized_parts = []
-    for part in path_parts:
-        print(f"Processing part: {part}")
-
-        # Remove directory segments
-        if part in [".", ".."]:
-            continue
-
-        if part:
-            # Only add non-empty parts
-            sanitized_parts.append(part)
-
-    sanitized = "/" + "/".join(sanitized_parts) + "/"
-
-    # normalize multiple slashes
-    while "//" in sanitized:
-        sanitized = sanitized.replace("//", "/")
-
     # Use Django's RegexValidator for the valid characters check
     path_validator = RegexValidator(
         regex=r"^[a-zA-Z0-9\-_\./%]+$",
@@ -42,6 +22,4 @@ def validate_path_pattern(value):
         "underscores, periods, forward slashes, and percent encodings are allowed.",
     )
 
-    path_validator(sanitized)
-
-    return sanitized
+    path_validator(value)

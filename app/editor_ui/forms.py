@@ -99,7 +99,7 @@ class PathPatternForm(forms.ModelForm):
 
     def clean_pattern(self):
         pattern = self.cleaned_data.get("pattern")
-        pattern = validate_path_pattern(pattern)
+        validate_path_pattern(pattern)
 
         return pattern
 
