@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.core.validators import validate_domain_name
 
+from app.editor_ui.validators import validate_path_pattern
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.models import Project, ProjectMembership
 from app.prompts.models import (
@@ -95,6 +96,12 @@ class PathPatternForm(forms.ModelForm):
             "pattern": forms.TextInput(attrs={**shared_text_input_attrs}),
             "is_wildcard": forms.CheckboxInput(attrs={"class": "tna-checkbox"}),
         }
+
+    def clean_pattern(self):
+        pattern = self.cleaned_data.get("pattern")
+        pattern = validate_path_pattern(pattern)
+
+        return pattern
 
 
 class PromptForm(forms.ModelForm):
