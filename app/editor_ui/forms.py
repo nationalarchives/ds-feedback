@@ -1,4 +1,5 @@
 from email import message
+
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.validators import URLValidator
@@ -40,7 +41,9 @@ class ProjectCreateForm(forms.ModelForm):
         widgets = {
             "name": forms.TextInput(attrs={**shared_text_input_attrs}),
             "domain": forms.URLInput(attrs={**shared_text_input_attrs}),
-            "retention_period_days": forms.Select(attrs={"class": "tna-select"}),
+            "retention_period_days": forms.Select(
+                attrs={"class": "tna-select"}
+            ),
         }
         validators = {
             "domain": [URLValidator()],
@@ -113,7 +116,9 @@ class PathPatternForm(forms.ModelForm):
 
 
 class PromptForm(forms.ModelForm):
-    PROMPT_TYPES = [(name, cls.field_label) for name, cls in Prompt.PROMPT_MAP.items()]
+    PROMPT_TYPES = [
+        (name, cls.field_label) for name, cls in Prompt.PROMPT_MAP.items()
+    ]
 
     prompt_type = forms.ChoiceField(
         choices=PROMPT_TYPES,
@@ -204,8 +209,12 @@ class BinaryPromptUpdateForm(PromptUpdateForm):
         ]
         widgets = {
             **PromptUpdateForm.Meta.widgets,
-            "positive_answer_label": forms.TextInput(attrs={**shared_text_input_attrs}),
-            "negative_answer_label": forms.TextInput(attrs={**shared_text_input_attrs}),
+            "positive_answer_label": forms.TextInput(
+                attrs={**shared_text_input_attrs}
+            ),
+            "negative_answer_label": forms.TextInput(
+                attrs={**shared_text_input_attrs}
+            ),
         }
         help_texts = {
             **PromptUpdateForm.Meta.widgets,
