@@ -113,7 +113,7 @@ class ProjectDetailView(
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
 
-    breadcrumb = "Project Details"
+    breadcrumb_field = "name"
 
     def get_queryset(self):
         UserModel = get_user_model()
@@ -163,6 +163,7 @@ class ProjectDetailView(
 class ProjectUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     UpdateView,
 ):
     model = Project
@@ -173,6 +174,8 @@ class ProjectUpdateView(
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["owner"]
+
+    breadcrumb = None
 
     def get_success_url(self):
         return reverse(

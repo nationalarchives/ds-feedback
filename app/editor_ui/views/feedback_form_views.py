@@ -52,7 +52,7 @@ class FeedbackFormCreateView(
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
 
-    breadcrumb = "Create a Feedback Form"
+    breadcrumb = None
 
     def form_valid(self, form):
         """
@@ -153,7 +153,7 @@ class FeedbackFormDetailView(
     context_object_name = "feedback_form"
     project_roles_required = ["editor", "owner"]
 
-    breadcrumb = "Feedback Form Details"
+    breadcrumb_field = "name"
 
     def get_queryset(self):
         return (
@@ -187,6 +187,7 @@ class FeedbackFormDetailView(
 class FeedbackFormUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     UpdateView,
 ):
     model = FeedbackForm
@@ -197,6 +198,8 @@ class FeedbackFormUpdateView(
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["editor", "owner"]
+
+    breadcrumb = None
 
     def get_initial(self):
         initial = super().get_initial()
