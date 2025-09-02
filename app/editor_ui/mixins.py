@@ -235,12 +235,12 @@ class BreadCrumbsMixin:
         path.
         """
         # remove leading/trailing slashes and split, ignore empty segments
-        parts = [p for p in self.request.path.strip("/").split("/") if p]
+        parts = self.request.path.split("/")
         breadcrumbs = []
-        parsed_url = "/"
+        parsed_url = ""
 
         # only go up to the parent (exclude the current page)
-        for url_part in parts[:-1]:
+        for url_part in parts[:-2]:
             parsed_url += f"{url_part}/"
             resolved = self._breadcrumb_inner(parsed_url)
             if resolved:
