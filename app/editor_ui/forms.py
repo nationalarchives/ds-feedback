@@ -86,19 +86,32 @@ class FeedbackFormForm(forms.ModelForm):
 
 
 class PathPatternForm(forms.ModelForm):
+    pattern_with_wildcard = forms.CharField(
+        widget=forms.TextInput(attrs={**shared_text_input_attrs}),
+        label="URL Pattern",
+        help_text="Enter a URL pattern. Add * at the end for wildcard matching.",
+    )
+
     class Meta:
         model = PathPattern
         fields = [
-            "pattern",
+            "pattern_with_wildcard",
             "is_wildcard",
         ]
         widgets = {
-            "pattern": forms.TextInput(attrs={**shared_text_input_attrs}),
             "is_wildcard": forms.CheckboxInput(attrs={"class": "tna-checkbox"}),
         }
 
-    def clean_pattern(self):
-        pattern = self.cleaned_data.get("pattern")
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get("instance")
+        if instance:
+            initial = kwargs.get("initial", {})
+            initial["pattern_with_wildcard"] = instance.pattern_with_wildcard
+            kwargs["initial"] = initial
+        super().__init__(*args, **kwargs)
+
+    def clean_pattern_with_wildcard(self):
+        pattern = self.cleaned_data.get("pattern_with_wildcard")
         validate_path_pattern(pattern)
 
         return pattern
