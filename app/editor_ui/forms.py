@@ -96,11 +96,7 @@ class PathPatternForm(forms.ModelForm):
         model = PathPattern
         fields = [
             "pattern_with_wildcard",
-            "is_wildcard",
         ]
-        widgets = {
-            "is_wildcard": forms.CheckboxInput(attrs={"class": "tna-checkbox"}),
-        }
 
     def __init__(self, *args, **kwargs):
         instance = kwargs.get("instance")
