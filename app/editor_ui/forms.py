@@ -4,6 +4,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.core.validators import URLValidator
 
+from app.editor_ui.validators import validate_path_pattern
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.models import Project, ProjectMembership
 from app.prompts.models import (
@@ -103,16 +104,31 @@ class FeedbackFormForm(forms.ModelForm):
 
 
 class PathPatternForm(forms.ModelForm):
+    pattern_with_wildcard = forms.CharField(
+        widget=forms.TextInput(attrs={**shared_text_input_attrs}),
+        label="URL Pattern",
+        help_text="Enter a URL pattern. Add * at the end for wildcard matching.",
+    )
+
     class Meta:
         model = PathPattern
         fields = [
-            "pattern",
-            "is_wildcard",
+            "pattern_with_wildcard",
         ]
-        widgets = {
-            "pattern": forms.TextInput(attrs={**shared_text_input_attrs}),
-            "is_wildcard": forms.CheckboxInput(attrs={"class": "tna-checkbox"}),
-        }
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get("instance")
+        if instance:
+            initial = kwargs.get("initial", {})
+            initial["pattern_with_wildcard"] = instance.pattern_with_wildcard
+            kwargs["initial"] = initial
+        super().__init__(*args, **kwargs)
+
+    def clean_pattern_with_wildcard(self):
+        pattern = self.cleaned_data.get("pattern_with_wildcard")
+        validate_path_pattern(pattern)
+
+        return pattern
 
 
 class PromptForm(forms.ModelForm):
