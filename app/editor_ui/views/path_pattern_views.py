@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import IntegrityError
 from django.urls import reverse
 from django.views.generic import UpdateView
 
@@ -44,7 +45,16 @@ class PathPatternCreateView(
             "pattern_with_wildcard"
         ]
 
-        return super().form_valid(form)
+        try:
+            response = super().form_valid(form)
+        except IntegrityError:
+            form.add_error(
+                "pattern_with_wildcard",
+                "This pattern already exists for this project. Please use a different pattern.",
+            )
+            return self.form_invalid(form)
+
+        return response
 
     def get_success_url(self):
         feedback_form_uuid = self.object.feedback_form.uuid
@@ -90,7 +100,16 @@ class PathPatternUpdateView(
             "pattern_with_wildcard"
         ]
 
-        return super().form_valid(form)
+        try:
+            response = super().form_valid(form)
+        except IntegrityError:
+            form.add_error(
+                "pattern_with_wildcard",
+                "This pattern already exists for this project. Please use a different pattern.",
+            )
+            return self.form_invalid(form)
+
+        return response
 
     def get_success_url(self):
         return reverse(
