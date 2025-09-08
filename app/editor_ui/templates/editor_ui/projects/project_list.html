@@ -38,7 +38,7 @@
                     <td class="tna-table__cell">{{ project.domain }}</td>
                     <td class="tna-table__cell tna-table__cell--numeric">{{ project.created_at|date }}</td>
                     <td class="tna-table__cell tna-table__cell--numeric">{{ project.modified_at|date }}</td>
-                    <td class="tna-table__cell tna-table__cell--numeric">#</td>
+                    <td class="tna-table__cell tna-table__cell--numeric">{{ project.responses_count }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
