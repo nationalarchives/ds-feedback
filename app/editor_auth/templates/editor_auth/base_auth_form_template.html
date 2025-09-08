@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "components/error-summary/macro.html" import tnaErrorSummary %}
+{% import "macros/form_fields.njk" as forms %}
+{% block content %}
+    <div class="tna-section">
+        <div class="tna-container">
+            <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+                {% block content_inner %}
+                    <h1 class="tna-heading-xl">
+                        {% block heading %}
+                        {% endblock heading %}
+                    </h1>
+                    {% block sub_headline %}
+                    {% endblock sub_headline %}
+                    {% block form %}
+                        <form method="post" class="tna-form">
+                            {% block form_inner %}
+                                {{ csrf_input }}
+                                {% set ns = namespace(items=[]) %}
+                                {% if form.non_field_errors() %}
+                                    {% for error in form.non_field_errors() | list %}
+                                        {% set ns.items = ns.items + [{"text": error|string}] %}
+                                    {% endfor %}
+                                    {{ tnaErrorSummary({
+                                        "title": "There is a problem",
+                                        "headingLevel": 2,
+                                        "items": ns.items,
+                                        "disableAutoFocus": true
+                                        }) }}
+                                {% endif %}
+                                {% for field in form %}{{ forms.renderField(field) }}{% endfor %}
+                            {% endblock form_inner %}
+                            <div class="tna-button-group">
+                                {% block cancel_button %}
+                                {% endblock cancel_button %}
+                                <button type="submit" class="tna-button">
+                                    {% block submit_button_text %}
+                                        Submit
+                                    {% endblock submit_button_text %}
+                                </button>
+                            </div>
+                        </form>
+                    {% endblock form %}
+                {% endblock content_inner %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
