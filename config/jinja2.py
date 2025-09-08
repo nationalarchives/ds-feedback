@@ -37,12 +37,19 @@ def jinja_date(value, format=None):
     return dj_date(value, format)
 
 
+def dict_merge(a, b):
+    merged = a.copy()
+    merged.update(b)
+    return merged
+
+
 def environment(**options):
     env = Environment(**options)
 
     # Register Django filters for use with Jinja backend
     env.filters["pluralize"] = dj_pluralize
     env.filters["date"] = jinja_date
+    env.filters["dict_merge"] = dict_merge
 
     TNA_FRONTEND_VERSION = ""
     try:
