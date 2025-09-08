@@ -29,10 +29,9 @@ from app.editor_ui.views.prompt_views import (
     RangedPromptOptionCreateView,
     RangedPromptOptionUpdateView,
 )
-
 from app.editor_ui.views.response_views import (
-    ResponseListingView,
     ResponseDetailView,
+    ResponseListingView,
 )
 
 app_name = "editor_ui"
@@ -135,6 +134,6 @@ urlpatterns = [
     path(
         "projects/<uuid:project_uuid>/responses/<uuid:response_uuid>/",
         ResponseDetailView.as_view(),
-        name="project__response_list",
+        name="project__response_detail",
     ),
 ]
