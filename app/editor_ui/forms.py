@@ -1,5 +1,3 @@
-from email import message
-
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.validators import URLValidator
@@ -14,14 +12,6 @@ from app.prompts.models import (
     RangedPromptOption,
     TextPrompt,
 )
-
-shared_text_input_attrs = {
-    "class": "tna-text-input",
-    "type": "text",
-    "spellcheck": "false",
-    "autocapitalize": "off",
-    "autocorrect": "off",
-}
 
 url_validator = URLValidator(
     schemes=["https"],
@@ -40,11 +30,9 @@ class ProjectCreateForm(forms.ModelForm):
             "retention_period_days",
         ]
         widgets = {
-            "name": forms.TextInput(attrs={**shared_text_input_attrs}),
-            "domain": forms.URLInput(attrs={**shared_text_input_attrs}),
-            "retention_period_days": forms.Select(
-                attrs={"class": "tna-select"}
-            ),
+            "name": forms.TextInput(),
+            "domain": forms.URLInput(),
+            "retention_period_days": forms.Select(),
         }
         validators = {
             "domain": [URLValidator()],
@@ -69,8 +57,8 @@ class ProjectUpdateForm(forms.ModelForm):
             "domain",
         ]
         widgets = {
-            "name": forms.TextInput(attrs={**shared_text_input_attrs}),
-            "domain": forms.URLInput(attrs={**shared_text_input_attrs}),
+            "name": forms.TextInput(),
+            "domain": forms.URLInput(),
         }
         help_texts = {
             "name": "A memorable name for your project",
@@ -89,7 +77,7 @@ class FeedbackFormForm(forms.ModelForm):
         initial=False,
         label="Disable this feedback form",
         help_text="Disabled feedback forms won't be shown to users",
-        widget=forms.CheckboxInput(attrs={"class": "tna-checkbox"}),
+        widget=forms.CheckboxInput(attrs={"text": "Disable"}),
     )
 
     class Meta:
@@ -99,13 +87,13 @@ class FeedbackFormForm(forms.ModelForm):
             "is_disabled",
         ]
         widgets = {
-            "name": forms.TextInput(attrs={**shared_text_input_attrs}),
+            "name": forms.TextInput(),
         }
 
 
 class PathPatternForm(forms.ModelForm):
     pattern_with_wildcard = forms.CharField(
-        widget=forms.TextInput(attrs={**shared_text_input_attrs}),
+        widget=forms.TextInput(),
         label="URL Pattern",
         help_text="Enter a URL pattern. Add * at the end for wildcard matching.",
     )
@@ -138,7 +126,7 @@ class PromptForm(forms.ModelForm):
 
     prompt_type = forms.ChoiceField(
         choices=PROMPT_TYPES,
-        widget=forms.Select(attrs={"class": "tna-select"}),
+        widget=forms.Select(),
         required=True,
         label="Question Type",
     )
@@ -148,7 +136,7 @@ class PromptForm(forms.ModelForm):
         initial=False,
         label="Disable this prompt",
         help_text="Disabled prompts won't be shown to users",
-        widget=forms.CheckboxInput(attrs={"class": "tna-checkbox"}),
+        widget=forms.CheckboxInput(attrs={"text": "Disable"}),
     )
 
     class Meta:
@@ -157,7 +145,7 @@ class PromptForm(forms.ModelForm):
             "text",
         ]
         widgets = {
-            "text": forms.TextInput(attrs={**shared_text_input_attrs}),
+            "text": forms.TextInput(),
         }
         help_texts = {"text": "The prompt to display to users"}
 
@@ -174,7 +162,7 @@ class PromptUpdateForm(forms.ModelForm):
         initial=False,
         label="Disable this prompt",
         help_text="Disabled prompts won't be shown to users",
-        widget=forms.CheckboxInput(attrs={"class": "tna-checkbox"}),
+        widget=forms.CheckboxInput(attrs={"text": "Disable"}),
     )
 
     class Meta:
@@ -185,7 +173,7 @@ class PromptUpdateForm(forms.ModelForm):
             "is_disabled",
         ]
         widgets = {
-            "text": forms.TextInput(attrs={**shared_text_input_attrs}),
+            "text": forms.TextInput(),
             "order": forms.NumberInput(attrs={"class": "tna-text-input"}),
         }
         help_texts = {
@@ -225,12 +213,8 @@ class BinaryPromptUpdateForm(PromptUpdateForm):
         ]
         widgets = {
             **PromptUpdateForm.Meta.widgets,
-            "positive_answer_label": forms.TextInput(
-                attrs={**shared_text_input_attrs}
-            ),
-            "negative_answer_label": forms.TextInput(
-                attrs={**shared_text_input_attrs}
-            ),
+            "positive_answer_label": forms.TextInput(),
+            "negative_answer_label": forms.TextInput(),
         }
         help_texts = {
             **PromptUpdateForm.Meta.help_texts,
@@ -247,7 +231,7 @@ class RangedPromptOptionForm(forms.ModelForm):
             "value",
         ]
         widgets = {
-            "label": forms.TextInput(attrs={**shared_text_input_attrs}),
+            "label": forms.TextInput(),
             "value": forms.NumberInput(attrs={"class": "tna-text-input"}),
         }
 
@@ -270,7 +254,7 @@ class RangedPromptUpdateForm(PromptUpdateForm):
 
 class ProjectMembershipCreateForm(forms.ModelForm):
     email = forms.EmailField(
-        widget=forms.EmailInput(attrs={**shared_text_input_attrs}),
+        widget=forms.EmailInput(),
         label="User Email",
         help_text="Enter the email address of the user you want to assign the permission.",
     )
@@ -297,8 +281,8 @@ class ProjectMembershipCreateForm(forms.ModelForm):
             "role",
         ]
         widgets = {
-            "email": forms.TextInput(attrs={**shared_text_input_attrs}),
-            "role": forms.Select(attrs={"class": "tna-select"}),
+            "email": forms.TextInput(),
+            "role": forms.Select(),
         }
         help_texts = {"role": "Select the role you want to assign to the user."}
 
@@ -310,6 +294,6 @@ class ProjectMembershipUpdateForm(forms.ModelForm):
             "role",
         ]
         widgets = {
-            "role": forms.Select(attrs={"class": "tna-select"}),
+            "role": forms.Select(),
         }
         help_texts = {"role": "Select the role you want to assign to the user."}
