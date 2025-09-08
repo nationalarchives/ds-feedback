@@ -72,7 +72,12 @@
         {% endif %}
         <div class="tna-button-group">
           <a href="{{ url("editor_ui:project__feedback_form__path_pattern_create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
-             class="tna-button">Create a path pattern</a>
+             class="tna-button tna-button--icon-only-mobile"
+             aria-label="Create a path pattern"
+             title="Create a path pattern">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Create a path pattern
+          </a>
         </div>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-xl">
@@ -124,7 +129,13 @@
         {% endif %}
         <div class="tna-button-group">
           <a href="{{ url("editor_ui:project__feedback_form__prompt_create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
-             class="tna-button">Create a prompt</a>
+             class="tna-button"
+             class="tna-button tna-button--icon-only-mobile"
+             aria-label="Create a prompt"
+             title="Create a prompt">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Create a prompt
+          </a>
         </div>
       </div>
     </div>
