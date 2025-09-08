@@ -34,7 +34,7 @@ class ProjectCreateView(
     BaseCreateView,
 ):
     form_class = ProjectCreateForm
-    object_name = "Project"
+    model_display_name = "Project"
     permission_required = ["projects.add_project"]
     breadcrumb = "Create a Project"
 

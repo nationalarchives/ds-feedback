@@ -24,7 +24,7 @@ class PathPatternCreateView(
     BaseCreateView,
 ):
     form_class = PathPatternForm
-    object_name = "Path Pattern"
+    model_display_name = "Path Pattern"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
@@ -67,17 +67,6 @@ class PathPatternCreateView(
                 "feedback_form_uuid": feedback_form_uuid,
             },
         )
-
-    def get_context_data(self, **kwargs):
-        """
-        Adds the object name to the template context for generic form rendering.
-
-        The object name is used by the generic create template to display
-        appropriate headings and labels.
-        """
-        context = super().get_context_data(**kwargs)
-        context["object_name"] = "Path Pattern"
-        return context
 
 
 class PathPatternUpdateView(

@@ -45,7 +45,7 @@ class FeedbackFormCreateView(
     """
 
     form_class = FeedbackFormForm
-    object_name = "Feedback Form"
+    model_display_name = "Feedback Form"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]

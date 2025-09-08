@@ -52,7 +52,7 @@ class PromptCreateView(
     """
 
     form_class = PromptForm
-    object_name = "Prompt"
+    model_display_name = "Prompt"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
@@ -125,17 +125,6 @@ class PromptCreateView(
                 "prompt_uuid": prompt_uuid,
             },
         )
-
-    def get_context_data(self, **kwargs):
-        """
-        Adds the object name to the template context for generic form rendering.
-
-        The object name is used by the generic create template to display
-        appropriate headings and labels.
-        """
-        context = super().get_context_data(**kwargs)
-        context["object_name"] = "Prompt"
-        return context
 
 
 class PromptDetailView(
@@ -356,7 +345,7 @@ class RangedPromptOptionCreateView(
     BaseCreateView,
 ):
     form_class = RangedPromptOptionForm
-    object_name = "Range Prompt Option"
+    model_display_name = "Range Prompt Option"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
@@ -389,14 +378,3 @@ class RangedPromptOptionCreateView(
         )
 
         return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        """
-        Adds the object name to the template context for generic form rendering.
-
-        The object name is used by the generic create template to display
-        appropriate headings and labels.
-        """
-        context = super().get_context_data(**kwargs)
-        context["object_name"] = "Ranged Prompt Options"
-        return context

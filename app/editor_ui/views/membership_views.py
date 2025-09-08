@@ -75,7 +75,7 @@ class ProjectMembershipCreateView(
     BaseCreateView,
 ):
     form_class = ProjectMembershipCreateForm
-    object_name = "Project Membership"
+    model_display_name = "Project Membership"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["owner"]
@@ -152,11 +152,6 @@ class ProjectMembershipUpdateView(
             project__uuid=project_uuid
         ).select_related("user", "project")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["object_name"] = self.object_name
-        return context
-
     def get_success_url(self):
         project_uuid = self.kwargs.get("project_uuid")
         return reverse(
@@ -175,7 +170,6 @@ class ProjectMembershipDeleteView(
     template_name = "editor_ui/projects/project_membership_confirm_delete.html"
     slug_field = "uuid"
     slug_url_kwarg = "membership_uuid"
-    object_name = "Project Membership Removal"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["owner"]
