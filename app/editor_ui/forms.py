@@ -233,7 +233,7 @@ class BinaryPromptUpdateForm(PromptUpdateForm):
             ),
         }
         help_texts = {
-            **PromptUpdateForm.Meta.widgets,
+            **PromptUpdateForm.Meta.help_texts,
             "positive_answer_label": "The label for the positive answer option",
             "negative_answer_label": "The label for the negative answer option",
         }
