@@ -11,7 +11,7 @@ from app.editor_ui.mixins import (
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
 )
-from app.editor_ui.views.base_views import BaseCreateView
+from app.editor_ui.views.base_views import BaseCreateView, CustomUpdateView
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.models import Project
 
@@ -83,13 +83,15 @@ class PathPatternCreateView(
 class PathPatternUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
-    UpdateView,
+    CustomUpdateView,
 ):
     model = PathPattern
     form_class = PathPatternForm
     template_name = "editor_ui/path_patterns/path_pattern_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "path_pattern_uuid"
+
+    model_display_name = "Path Pattern"
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["editor", "owner"]

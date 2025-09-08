@@ -21,7 +21,7 @@ from app.editor_ui.mixins import (
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
 )
-from app.editor_ui.views.base_views import BaseCreateView
+from app.editor_ui.views.base_views import BaseCreateView, CustomUpdateView
 from app.projects.models import Project
 
 
@@ -148,10 +148,11 @@ class ProjectUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     BreadCrumbsMixin,
-    UpdateView,
+    CustomUpdateView,
 ):
     model = Project
     form_class = ProjectUpdateForm
+    model_display_name = "Project"
     template_name = "editor_ui/projects/project_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "project_uuid"

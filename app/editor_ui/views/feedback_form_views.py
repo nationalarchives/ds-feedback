@@ -17,7 +17,7 @@ from app.editor_ui.mixins import (
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
 )
-from app.editor_ui.views.base_views import BaseCreateView
+from app.editor_ui.views.base_views import BaseCreateView, CustomUpdateView
 from app.feedback_forms.models import FeedbackForm
 from app.projects.models import Project
 from app.prompts.models import (
@@ -188,13 +188,15 @@ class FeedbackFormUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     BreadCrumbsMixin,
-    UpdateView,
+    CustomUpdateView,
 ):
     model = FeedbackForm
     form_class = FeedbackFormForm
     template_name = "editor_ui/feedback_forms/feedback_form_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "feedback_form_uuid"
+
+    model_display_name = "Feedback Form"
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["editor", "owner"]

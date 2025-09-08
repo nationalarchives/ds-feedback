@@ -7,6 +7,7 @@ from django.db.models import BooleanField, Case, Value, When
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DeleteView, ListView, UpdateView
+from django.views.generic.edit import BaseUpdateView
 
 from app.editor_ui.forms import (
     ProjectMembershipCreateForm,
@@ -129,7 +130,7 @@ class ProjectMembershipUpdateView(
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
     BreadCrumbsMixin,
-    UpdateView,
+    BaseUpdateView,
 ):
     form_class = ProjectMembershipUpdateForm
     template_name = "editor_ui/projects/project_membership_update.html"

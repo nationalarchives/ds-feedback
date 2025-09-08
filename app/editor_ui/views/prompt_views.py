@@ -22,7 +22,7 @@ from app.editor_ui.mixins import (
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
 )
-from app.editor_ui.views.base_views import BaseCreateView
+from app.editor_ui.views.base_views import BaseCreateView, CustomUpdateView
 from app.feedback_forms.models import FeedbackForm
 from app.prompts.models import (
     Prompt,
@@ -205,11 +205,13 @@ class PromptUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     BreadCrumbsMixin,
-    UpdateView,
+    CustomUpdateView,
 ):
     template_name = "editor_ui/prompts/prompt_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "prompt_uuid"
+
+    model_display_name = "Prompt"
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["owner"]
@@ -297,13 +299,15 @@ class RangedPromptOptionUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     BreadCrumbsMixin,
-    UpdateView,
+    CustomUpdateView,
 ):
     form_class = RangedPromptOptionForm
     queryset = RangedPromptOption.objects.all()
     template_name = "editor_ui/prompts/prompt_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "option_uuid"
+
+    model_display_name = "Prompt Option"
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["editor", "owner"]
