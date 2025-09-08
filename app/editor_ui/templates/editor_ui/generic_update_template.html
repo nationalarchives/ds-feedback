@@ -1,0 +1,16 @@
+{% extends "editor_ui/base_form_template.html" %}
+{% set pageTitle = "Edit " + model_display_name %}
+
+{% block heading %}
+  Edit {{ object.name or model_display_name }}
+{% endblock heading %}
+
+{% block heading_text %}
+{% endblock heading_text %}
+
+{% block submit_button_text %}
+  Update {{ model_display_name }}
+{% endblock submit_button_text %}
+
+{% block cancel_button %}
+{% endblock cancel_button %}
