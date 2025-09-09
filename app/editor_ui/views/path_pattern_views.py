@@ -1,8 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import IntegrityError
 from django.urls import reverse
 from django.views.generic import UpdateView
-
-from click import Path
 
 from app.editor_ui.forms import (
     PathPatternForm,
@@ -42,8 +41,20 @@ class PathPatternCreateView(
         instance.project = Project.objects.get(
             uuid=self.kwargs.get("project_uuid")
         )
+        instance.pattern_with_wildcard = form.cleaned_data[
+            "pattern_with_wildcard"
+        ]
 
-        return super().form_valid(form)
+        try:
+            response = super().form_valid(form)
+        except IntegrityError:
+            form.add_error(
+                "pattern_with_wildcard",
+                "This pattern already exists for this project. Please use a different pattern.",
+            )
+            return self.form_invalid(form)
+
+        return response
 
     def get_success_url(self):
         feedback_form_uuid = self.object.feedback_form.uuid
@@ -82,6 +93,23 @@ class PathPatternUpdateView(
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["editor", "owner"]
+
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        instance.pattern_with_wildcard = form.cleaned_data[
+            "pattern_with_wildcard"
+        ]
+
+        try:
+            response = super().form_valid(form)
+        except IntegrityError:
+            form.add_error(
+                "pattern_with_wildcard",
+                "This pattern already exists for this project. Please use a different pattern.",
+            )
+            return self.form_invalid(form)
+
+        return response
 
     def get_success_url(self):
         return reverse(
