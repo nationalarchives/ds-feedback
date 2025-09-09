@@ -61,19 +61,15 @@ class ProjectListView(
         """
         Filter objects to only those where the user has one of the `project_roles_required`
         """
-        UserModel = get_user_model()
-
         user = self.request.user
-        qs = super().get_queryset()
+        qs = Project.objects.all()
 
-        qs = qs.prefetch_related(
-            Prefetch(
-                "members",
-                queryset=UserModel.objects.filter(
-                    projectmembership__role="owner"
-                ),
-                to_attr="owner_members",
-            )
+        qs = qs.annotate(
+            responses_count=Count(
+                "feedback_forms__responses",
+                filter=Q(feedback_forms__disabled_at=None),
+                distinct=True,
+            ),
         )
 
         if user.is_superuser:
@@ -85,18 +81,6 @@ class ProjectListView(
         }
 
         return qs.filter(**filter_kwargs).distinct()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        projects = context.get("projects", [])
-
-        for project in projects:
-            owners = [
-                str(owner) for owner in getattr(project, "owner_members", [])
-            ]
-            project.owners = ", ".join(owners)
-
-        return context
 
 
 class ProjectDetailView(
@@ -113,7 +97,7 @@ class ProjectDetailView(
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
 
-    breadcrumb = "Project Details"
+    breadcrumb_field = "name"
 
     def get_queryset(self):
         UserModel = get_user_model()
@@ -163,6 +147,7 @@ class ProjectDetailView(
 class ProjectUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     UpdateView,
 ):
     model = Project
@@ -173,6 +158,8 @@ class ProjectUpdateView(
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["owner"]
+
+    breadcrumb = None
 
     def get_success_url(self):
         return reverse(

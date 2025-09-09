@@ -90,12 +90,12 @@ class ProjectMembershipRequiredMixin:
             "role": membership.role if membership else None,
         }
 
-    def get_object(self):
+    def get_object(self, *args, **kwargs):
         # TODO: move this to its own mixin.
         # ProjectMembershipRequiredMixin is only meant to handle ProjectMemberships
         if hasattr(self, "_cached_object"):
             return self._cached_object
-        obj = super().get_object()
+        obj = super().get_object(*args, **kwargs)
         self._cached_object = obj
         return obj
 
@@ -200,21 +200,26 @@ class ProjectMembershipRequiredMixin:
 
 class BreadCrumbsMixin:
     """
-    A mixin to help with the display of breadcrumbs via the TNA Breadcrumbs component
+    A mixin to help with the display of breadcrumbs via the TNA Breadcrumbs component.
 
     Usage:
     - Add BreadCrumbsMixin to your view class
-    - Set the `breadcrumb` property in the view class
+    - Set ONE of the following attributes:
+      - `breadcrumb`: A string for static breadcrumb text
+      - `breadcrumb_field`: A string with the name of the object field to display
 
-    Note:
-    - The implicit assumption is that all view urls are suffixed with '/'. All urls for views must have the '/' suffix,
-    if the BreadCrumbsMixin is to work.
+    Examples:
+    1. Static: breadcrumb = "Projects"
+    2. Dynamic: breadcrumb_field = "name"  # Will display the object's name attribute
     """
 
     def __init__(self) -> None:
-        if not hasattr(self, "breadcrumb"):
+        if not hasattr(self, "breadcrumb") and not hasattr(
+            self, "breadcrumb_field"
+        ):
             raise ImproperlyConfigured(
-                f"{self.__class__.__name__} requires 'breadcrumbs' to be set, as it's using the BreadCrumbsMixin."
+                f"{self.__class__.__name__} requires either 'breadcrumb' or "
+                "'breadcrumb_field' to be set, as it's using the BreadCrumbsMixin."
             )
 
         super().__init__()
@@ -226,18 +231,16 @@ class BreadCrumbsMixin:
 
     def _breadcrumb_calculator(self):
         """
-        Calculate the breadcrumbs from the url, from root to the current path.
-
-        Only views that have the BreadCrumbsMixin and self.breadcrumbs
-        will be added to the list of breadcrumbs.
+        Calculate the breadcrumbs from the url, from root to the parent of the current
+        path.
         """
+        # remove leading/trailing slashes and split, ignore empty segments
         parts = self.request.path.split("/")
-
         breadcrumbs = []
-
         parsed_url = ""
 
-        for url_part in parts[:-1]:
+        # only go up to the parent (exclude the current page)
+        for url_part in parts[:-2]:
             parsed_url += f"{url_part}/"
             resolved = self._breadcrumb_inner(parsed_url)
             if resolved:
@@ -248,22 +251,78 @@ class BreadCrumbsMixin:
     def _breadcrumb_inner(self, url):
         """
         Extract breadcrumb from a url
-
-        If the required criteria aren't met, or the url isn't using a BreadCrumbsMixin,
-        then no breadcrumbs are extracted.
         """
         try:
             # extract relevant view class or function, from the url
             resolved = resolve(url)
 
-            # Check if it's a class-based view
+            # check if it's a class-based view
             if hasattr(resolved.func, "view_class"):
-                target = resolved.func.view_class
-                # if view class has BreadCrumbsMixin, extract breadcrumb and url
-                if issubclass(target, BreadCrumbsMixin) and target.breadcrumb:
-                    # match format required by TNA Breadcrumbs component
-                    return {"href": url, "text": target.breadcrumb}
+                view_class = resolved.func.view_class
+                # check if view class uses BreadCrumbsMixin
+                if issubclass(view_class, BreadCrumbsMixin):
+                    # handle dynamic object field lookup
+                    if hasattr(view_class, "breadcrumb_field"):
+                        field_name = view_class.breadcrumb_field
+                        try:
+                            # attempt to get the object based on URL kwargs
+                            obj = self._get_object_for_breadcrumb(
+                                view_class, resolved.kwargs, field_name
+                            )
+                            if obj and hasattr(obj, field_name):
+                                text = getattr(obj, field_name)
+                            else:
+                                text = "Unknown"
+                        except Exception:
+                            text = "Unknown"
+                    # handle static text
+                    elif hasattr(view_class, "breadcrumb"):
+                        text = view_class.breadcrumb
+                    else:
+                        return None
+
+                    return {"href": url, "text": text}
 
             return None
         except Resolver404:
+            return None
+
+    def _get_object_for_breadcrumb(self, view_class, kwargs, field_name):
+        """
+        Get the object for a view class based on its kwargs.
+        Uses a simple caching mechanism to prevent redundant queries.
+        """
+        # create a cache key based on view class and kwargs
+        cache_key = f"{view_class.__name__}:{sorted(kwargs.items())}"
+
+        # check if we've already cached this object
+        if not hasattr(self, "_breadcrumb_object_cache"):
+            self._breadcrumb_object_cache = {}
+
+        if cache_key in self._breadcrumb_object_cache:
+            return self._breadcrumb_object_cache[cache_key]
+
+        # get the model and lookup fields from the view class
+        model = getattr(view_class, "model", None)
+        if not model:
+            return None
+
+        # find the lookup field (slug_field/slug_url_kwarg or pk)
+        slug_field = getattr(view_class, "slug_field", "pk")
+        slug_url_kwarg = getattr(view_class, "slug_url_kwarg", "pk")
+
+        # get the lookup value from kwargs
+        lookup_value = kwargs.get(slug_url_kwarg)
+        if not lookup_value:
+            return None
+
+        # fetch the object
+        try:
+            lookup_kwargs = {slug_field: lookup_value}
+            # Only fetch the field we need plus id
+            obj = model.objects.only(field_name).get(**lookup_kwargs)
+            # cache the result
+            self._breadcrumb_object_cache[cache_key] = obj
+            return obj
+        except Exception:
             return None

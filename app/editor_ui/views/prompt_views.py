@@ -59,7 +59,7 @@ class PromptCreateView(
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
 
-    breadcrumb = "Create a Prompt"
+    breadcrumb = None
 
     def get_feedback_form(self):
         """Helper method to get the feedback form"""
@@ -159,7 +159,7 @@ class PromptDetailView(
     context_object_name = "prompt"
     project_roles_required = ["editor", "owner"]
 
-    breadcrumb = "Prompt Details"
+    breadcrumb_field = "text"
 
     def get_queryset(self):
         prompt_uuid = self.kwargs.get("prompt_uuid")
@@ -204,6 +204,7 @@ class PromptDetailView(
 class PromptUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     UpdateView,
 ):
     template_name = "editor_ui/prompts/prompt_update.html"
@@ -212,6 +213,8 @@ class PromptUpdateView(
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["owner"]
+
+    breadcrumb = None
 
     def get_queryset(self):
         return Prompt.objects.select_subclasses().select_related(
@@ -293,6 +296,7 @@ class PromptUpdateView(
 class RangedPromptOptionUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     UpdateView,
 ):
     form_class = RangedPromptOptionForm
@@ -303,6 +307,8 @@ class RangedPromptOptionUpdateView(
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["editor", "owner"]
+
+    breadcrumb = None
 
     def get_queryset(self):
         return (
@@ -353,7 +359,7 @@ class RangedPromptOptionCreateView(
     parent_model = RangedPrompt
     parent_lookup_kwarg = "prompt_uuid"
 
-    breadcrumb = "Create a Ranged Prompt Option"
+    breadcrumb = None
 
     def get_success_url(self):
         prompt_uuid = self.kwargs.get("prompt_uuid")
