@@ -6,7 +6,7 @@ from django.db import IntegrityError
 from django.db.models import BooleanField, Case, Value, When
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import DeleteView, ListView, UpdateView
+from django.views.generic import DeleteView, ListView
 from django.views.generic.edit import BaseUpdateView
 
 from app.editor_ui.forms import (

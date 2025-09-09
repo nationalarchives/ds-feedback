@@ -9,7 +9,7 @@ from django.db.models import (
     Q,
 )
 from django.urls import reverse
-from django.views.generic import DetailView, ListView, UpdateView
+from django.views.generic import DetailView, ListView
 
 from app.editor_ui.forms import (
     ProjectCreateForm,

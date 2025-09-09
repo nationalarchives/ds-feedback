@@ -7,7 +7,7 @@ from django.db.models import (
 )
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import DetailView, ListView, UpdateView
+from django.views.generic import DetailView, ListView
 
 from app.editor_ui.forms import (
     FeedbackFormForm,

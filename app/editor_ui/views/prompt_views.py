@@ -1,16 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import (
-    BooleanField,
-    ExpressionWrapper,
     Max,
     Prefetch,
-    Q,
 )
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import DetailView, UpdateView
+from django.views.generic import DetailView
 
 from app.editor_ui.forms import (
     PROMPT_FORM_MAP,

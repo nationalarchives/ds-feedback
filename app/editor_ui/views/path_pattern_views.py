@@ -1,7 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
 from django.urls import reverse
-from django.views.generic import UpdateView
 
 from app.editor_ui.forms import (
     PathPatternForm,
