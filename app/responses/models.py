@@ -25,6 +25,9 @@ class Response(TimestampedModelMixin, UUIDModelMixin):
     url = models.TextField()
     metadata = models.JSONField()
 
+    def get_parent_project(self):
+        return self.feedback_form.project
+
     def __str__(self):
         return self.url
 
