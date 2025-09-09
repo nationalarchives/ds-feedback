@@ -50,17 +50,7 @@ def environment(**options):
         if not request:
             return False
 
-        current_path = request.path
-
-        if exact:
-            return url == current_path
-        else:
-            if url == "/":
-                return current_path == "/"
-            elif url.endswith("/"):
-                return current_path.startswith(url)
-            else:
-                return current_path.startswith(f"{url}/") or current_path == url
+        return request.path == url
 
     # Register Django filters/functions for use with Jinja backend
     env.filters["pluralize"] = dj_pluralize
