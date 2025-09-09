@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% set pageTitle = response.url %}
+{% block content %}
+  <div class="tna-section">
+    <div class="tna-container">
+      <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+        <hgroup class="tna-hgroup-xl">
+          <h1 class="tna-hgroup__title">Response Details</h1>
+        </hgroup>
+        <dl class="tna-dl tna-dl--plain">
+          <dt>URL</dt>
+          <dd>
+            {{ response.url }}
+          </dd>
+          <dt>ID</dt>
+          <dd>
+            {{ response.uuid }}
+          </dd>
+          <dt>Created</dt>
+          <dd>
+            {{ response.created_at|date("d M Y") }}
+          </dd>
+          <dt>Feedback Form</dt>
+          <dd>
+            <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid, response.feedback_form.uuid) }}">{{ response.feedback_form.name }}</a>
+          </dd>
+          {% if response.metadata %}
+          <dt>Metadata</dt>
+          <dd>
+            <pre class="tna-!--font-size-14">{{ response.metadata|pprint }}</pre>
+          </dd>
+          {% endif %}
+        </dl>
+      </div>
+      <div class="tna-column tna-column--full tna-!--padding-top-xl">
+        <hgroup class="tna-hgroup-m">
+          <h2 class="tna-hgroup__title">Prompt Responses</h2>
+        </hgroup>
+        <p class="tna-body">User responses to feedback form prompts.</p>
+        {% if prompt_responses %}
+          <div class="tna-table-wrapper tna-!--margin-top-s tna-!--margin-bottom-m">
+            <table class="tna-table">
+              <thead class="tna-table__head">
+                <tr class="tna-table__row">
+                  <th class="tna-table__header">Prompt</th>
+                  <th class="tna-table__header">Type</th>
+                  <th class="tna-table__header">Answer</th>
+                  <th class="tna-table__header tna-table__header--numeric">Submitted</th>
+                </tr>
+              </thead>
+              <tbody class="tna-table__body">
+                {% for prompt_response in prompt_responses %}
+                  
+                    <tr class="tna-table__row">
+                      <th class="tna-table__header">{{ prompt_response.prompt.text }}</th>
+                      
+                      <td class="tna-table__cell">{{ prompt_response }}</td>
+                      <td class="tna-table__cell">{{ prompt_response.answer() }}</td>
+                      <td class="tna-table__cell tna-table__cell--numeric">{{ prompt_response.created_at|date("Y/m/d H:i:s") }}</td>
+                    </tr>
+
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p>No prompt responses available.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}
