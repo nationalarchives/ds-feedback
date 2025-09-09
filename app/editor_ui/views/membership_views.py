@@ -81,7 +81,7 @@ class ProjectMembershipCreateView(
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
 
-    breadcrumb = "Add Members to Project"
+    breadcrumb = None
 
     def form_valid(self, form):
         project_uuid = self.kwargs.get("project_uuid")
@@ -142,7 +142,7 @@ class ProjectMembershipUpdateView(
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
 
-    breadcrumb = "Update Project Membership"
+    breadcrumb = None
 
     def get_queryset(self):
         # Limit the queryset to memberships of the specified project
@@ -181,7 +181,7 @@ class ProjectMembershipDeleteView(
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
 
-    breadcrumb = "Remove Project Membership"
+    breadcrumb = None
 
     def get_queryset(self):
         project_uuid = self.kwargs.get("project_uuid")
