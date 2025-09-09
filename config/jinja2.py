@@ -46,10 +46,27 @@ def dict_merge(a, b):
 def environment(**options):
     env = Environment(**options)
 
-    # Register Django filters for use with Jinja backend
+    def is_active_url(url, request=None, exact=False):
+        if not request:
+            return False
+
+        current_path = request.path
+
+        if exact:
+            return url == current_path
+        else:
+            if url == "/":
+                return current_path == "/"
+            elif url.endswith("/"):
+                return current_path.startswith(url)
+            else:
+                return current_path.startswith(f"{url}/") or current_path == url
+
+    # Register Django filters/functions for use with Jinja backend
     env.filters["pluralize"] = dj_pluralize
     env.filters["date"] = jinja_date
     env.filters["dict_merge"] = dict_merge
+    env.globals["is_active_url"] = is_active_url
 
     TNA_FRONTEND_VERSION = ""
     try:
