@@ -9,7 +9,7 @@ from django.db.models import (
     Q,
 )
 from django.urls import reverse
-from django.views.generic import DetailView, ListView, UpdateView
+from django.views.generic import DetailView, ListView
 
 from app.editor_ui.forms import (
     ProjectCreateForm,
@@ -21,7 +21,7 @@ from app.editor_ui.mixins import (
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
 )
-from app.editor_ui.views.base_views import BaseCreateView
+from app.editor_ui.views.base_views import CustomCreateView, CustomUpdateView
 from app.projects.models import Project
 
 
@@ -31,10 +31,10 @@ class ProjectCreateView(
     CreatedByUserMixin,
     ProjectOwnerMembershipMixin,
     BreadCrumbsMixin,
-    BaseCreateView,
+    CustomCreateView,
 ):
     form_class = ProjectCreateForm
-    object_name = "Project"
+    model_display_name = "Project"
     permission_required = ["projects.add_project"]
     breadcrumb = "Create a Project"
 
@@ -148,10 +148,11 @@ class ProjectUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     BreadCrumbsMixin,
-    UpdateView,
+    CustomUpdateView,
 ):
     model = Project
     form_class = ProjectUpdateForm
+    model_display_name = "Project"
     template_name = "editor_ui/projects/project_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "project_uuid"

@@ -1,18 +1,19 @@
-{% extends "base.html" %}
-{% set pageTitle = "Log In" %}
-{% block content %}
-    <div class="tna-section">
-        <div class="tna-container">
-            <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
-                <h1 class="tna-heading-xl">Log out</h1>
-                <p>Are you sure you would like to log out?</p>
-                <form method="post" action="{{ url("editor_auth:logout_action") }}">
-                    {{ csrf_input }}
-                    <div class="tna-button-group">
-                        <button type="submit" class="tna-button">Log out</button>
-                    </form>
-                </div>
-            </div>
+{% extends "editor_auth/base_auth_form_template.html" %}
+{% set pageTitle = "Log out" %}
+
+{% block heading %}
+    Log out
+{% endblock heading %}
+
+{% block sub_headline %}
+    <p>Are you sure you would like to log out?</p>
+{% endblock sub_headline %}
+
+{% block form %}
+    <form method="post" action="{{ url("editor_auth:logout_action") }}">
+        {{ csrf_input }}
+        <div class="tna-button-group">
+            <button type="submit" class="tna-button">Log out</button>
         </div>
-    </div>
-{% endblock content %}
+    </form>
+{% endblock form %}

@@ -1,14 +1,8 @@
-{% extends "editor_ui/base_form_template.html" %}
-{% set pageTitle = "Edit Feedback Form" %}
-{% block heading %}
-  Edit Feedback Form
-{% endblock heading %}
+{% extends "editor_ui/generic_update_template.html" %}
 {% block heading_text %}
   <p>Editing the feedback form '{{ object.name }}' in the '{{ object.project }}' project.</p>
 {% endblock heading_text %}
-{% block submit_button_text %}
-  Submit
-{% endblock submit_button_text %}
 {% block cancel_button %}
-  <a href="{{ url('editor_ui:project__feedback_form_detail', project_uuid=object.project.uuid, feedback_form_uuid=object.uuid) }}" class="tna-button tna-button--accent">Cancel</a>
+  <a href="{{ url('editor_ui:project__feedback_form_detail', project_uuid=object.project.uuid, feedback_form_uuid=object.uuid) }}"
+     class="tna-button tna-button--accent">Cancel</a>
 {% endblock cancel_button %}

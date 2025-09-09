@@ -1,0 +1,107 @@
+{#
+  Purpose:
+    Wrapper for rendering Django BoundField objects using The National Archives (TNA) design system macros.
+
+  What it does:
+    - Inspects a field's widget class (TextInput, Select, etc.)
+    - Chooses the corresponding TNA macro (tnaTextInput, tnaSelect, etc.)
+    - Builds the base attributes (base_attrs) dict expected by the TNA component:
+        • label, id, name, value
+        • hint (from help_text)
+        • error (first error message, if any)
+        • items + selected/checked for choice widgets
+    - Normalises empty values to empty string.
+    - Applies shared attributes for text inputs (class, spellcheck, etc.).
+    - Renders the field unaltered if a matching component is not found.
+
+  Inputs:
+    - field (Django BoundField): e.g. item from `{% for field in form %}`
+
+  Output:
+    - Renders the correct TNA component for the field. Falls back to `{{ field }}` if the widget type is unknown.
+
+  Requirements:
+    - Jinja2 with a custom filter to combine dictionaries (dict_merge).
+
+  Supported mappings:
+    - TextInput, URLInput, NumberInput, EmailInput, PasswordInput → tnaTextInput
+    - Select → tnaSelect (single select; sets top-level `selected`)
+    - CheckboxInput → tnaCheckboxes (single checkbox)
+
+  Notes:
+    - Extend the `elif` chain to support more components or custom widgets.
+
+  Usage:
+    {% import "macros/form_fields.njk" as tna %}
+    {% for field in form %}
+      {{ tna.renderField(field) }}
+    {% endfor %}
+#}
+
+{% from "components/text-input/macro.html" import tnaTextInput %}
+{% from "components/select/macro.html" import tnaSelect %}
+{% from "components/checkboxes/macro.html" import tnaCheckboxes %}
+
+{% macro renderField(field) %}
+{% set value = field.value() %}
+  {# normalise empty values to empty string #}
+  {% if value is none %}
+    {% set value = "" %}
+  {% endif %}
+
+  {# base attributes shared by all components #}
+  {% set base_attrs = {
+    "label": field.label,
+    "id": field.auto_id,
+    "name": field.name,
+    "value": value,
+    "novalidate": true
+  } %}
+
+  {% if field.help_text %}
+    {% set base_attrs = base_attrs | dict_merge({"hint": field.help_text}) %}
+  {% endif %}
+
+  {% if field.errors %}
+    {% set base_attrs = base_attrs | dict_merge({"error": {"text": field.errors[0]}}) %}
+  {% endif %}
+
+  {# determine which widget we're dealing with #}
+  {% set widget = field.field.widget.__class__.__name__ %}
+
+  {% if widget in ["TextInput", "URLInput", "NumberInput", "EmailInput"] %}
+    {{ tnaTextInput(base_attrs) }}
+
+  {% elif widget == "PasswordInput" %}
+    {% set base_attrs = base_attrs | dict_merge({
+      "password": true
+    }) %}
+    {{ tnaTextInput(base_attrs) }}
+
+  {% elif widget == "Select" %}
+    {% set current = (field.value() or "") | string %}
+    {% set ns = namespace(items=[]) %}
+    {% for val, text in field.field.choices | list %}
+      {% set ns.items = ns.items + [{"text": text|string, "value": val|string}] %}
+    {% endfor %}
+    {{ tnaSelect(
+      base_attrs | dict_merge({
+          "items": ns.items,
+          "selected": current
+        })
+    ) }}
+
+  {% elif widget == "CheckboxInput" %}
+    {% set is_checked = field.value() or False %}
+    {% set item_text = field.field.widget.attrs.get('text') or field.label %}
+    {% set item = {
+      "text": item_text,
+      "value": "true",
+      "checked": is_checked
+    } %}
+    {{ tnaCheckboxes(base_attrs | dict_merge({"items": [item]})) }}
+
+  {% else %}
+    {{ field }} {# fallback #}
+  {% endif %}
+{% endmacro %}

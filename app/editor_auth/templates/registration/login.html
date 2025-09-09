@@ -1,54 +1,16 @@
-{% extends "base.html" %}
-{% set pageTitle = "Log In" %}
-{% block content %}
-    <div class="tna-section">
-        <div class="tna-container">
-            <div class="tna-column tna-column--full tna-!--padding-top-m">
-                <h1 class="tna-heading-xl">Log In</h1>
-            </div>
-            <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
-                <form method="post" class="tna-form">
-                    {{ csrf_input }}
-                    {% if form.non_field_errors() %}
-                        <div class="tna-error-summary"
-                             data-module="tna-error-summary"
-                             data-disable-autofocus="true">
-                            <div role="alert">
-                                <h2 class="tna-error-summary__heading tna-heading-m">There is a problem</h2>
-                                <ul class="tna-error-summary__list">
-                                    {% for error in form.non_field_errors() %}
-                                        <li class="tna-error-summary__item">
-                                            <a href="#" class="tna-error-summary__link">{{ error }}</a>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% for field in form %}
-                        <div class="tna-form__group {% if field.errors %}tna-form__group--error{% endif %}"
-                             data-module="tna-text-input">
-                            <div class="tna-form__group-contents">
-                                <h4 class="tna-form__heading tna-form__heading--m">
-                                    <label class="tna-form__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                </h4>
-                                {% if field.errors %}
-                                    {% for error in field.errors %}
-                                        <p class="tna-form__error-message">
-                                            <span class="tna-!--visually-hidden">Error:</span> {{ error }}
-                                        </p>
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                            {{ field }}
-                        </div>
-                    {% endfor %}
-                    <a href="{{ url("editor_auth:password_reset") }}">Forgot Password?</a>
-                    <div class="tna-button-group">
-                        <button type="submit" class="tna-button">Log In</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-{% endblock content %}
+{% extends "editor_auth/base_auth_form_template.html" %}
+{% set pageTitle = "Log in" %}
+
+{% block heading %}
+    Log In
+{% endblock heading %}
+
+{% block form_inner %}
+    {{ super() }}
+    <a href="{{ url("editor_auth:password_reset") }}">Forgot Password?</a>
+{% endblock form_inner %}
+
+{% block submit_button_text %}
+    Log In
+{% endblock submit_button_text %}
+
