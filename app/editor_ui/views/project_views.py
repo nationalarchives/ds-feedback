@@ -21,7 +21,7 @@ from app.editor_ui.mixins import (
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
 )
-from app.editor_ui.views.base_views import BaseCreateView, CustomUpdateView
+from app.editor_ui.views.base_views import CustomCreateView, CustomUpdateView
 from app.projects.models import Project
 
 
@@ -31,7 +31,7 @@ class ProjectCreateView(
     CreatedByUserMixin,
     ProjectOwnerMembershipMixin,
     BreadCrumbsMixin,
-    BaseCreateView,
+    CustomCreateView,
 ):
     form_class = ProjectCreateForm
     model_display_name = "Project"

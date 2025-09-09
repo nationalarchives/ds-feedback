@@ -19,7 +19,7 @@ from app.editor_ui.mixins import (
     ProjectOwnerMembershipMixin,
 )
 from app.editor_ui.utils import send_email_util
-from app.editor_ui.views.base_views import BaseCreateView
+from app.editor_ui.views.base_views import CustomCreateView
 from app.projects.models import Project, ProjectMembership
 
 
@@ -72,7 +72,7 @@ class ProjectMembershipCreateView(
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
     BreadCrumbsMixin,
-    BaseCreateView,
+    CustomCreateView,
 ):
     form_class = ProjectMembershipCreateForm
     model_display_name = "Project Membership"

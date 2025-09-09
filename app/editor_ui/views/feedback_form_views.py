@@ -17,7 +17,7 @@ from app.editor_ui.mixins import (
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
 )
-from app.editor_ui.views.base_views import BaseCreateView, CustomUpdateView
+from app.editor_ui.views.base_views import CustomCreateView, CustomUpdateView
 from app.feedback_forms.models import FeedbackForm
 from app.projects.models import Project
 from app.prompts.models import (
@@ -30,7 +30,7 @@ class FeedbackFormCreateView(
     ProjectMembershipRequiredMixin,
     CreatedByUserMixin,
     BreadCrumbsMixin,
-    BaseCreateView,
+    CustomCreateView,
 ):
     """
     View for creating a new FeedbackForm within a project.

@@ -10,7 +10,7 @@ from app.editor_ui.mixins import (
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
 )
-from app.editor_ui.views.base_views import BaseCreateView, CustomUpdateView
+from app.editor_ui.views.base_views import CustomCreateView, CustomUpdateView
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.models import Project
 
@@ -20,7 +20,7 @@ class PathPatternCreateView(
     ProjectMembershipRequiredMixin,
     CreatedByUserMixin,
     BreadCrumbsMixin,
-    BaseCreateView,
+    CustomCreateView,
 ):
     form_class = PathPatternForm
     model_display_name = "Path Pattern"

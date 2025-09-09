@@ -19,7 +19,7 @@ from app.editor_ui.mixins import (
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
 )
-from app.editor_ui.views.base_views import BaseCreateView, CustomUpdateView
+from app.editor_ui.views.base_views import CustomCreateView, CustomUpdateView
 from app.feedback_forms.models import FeedbackForm
 from app.prompts.models import (
     Prompt,
@@ -35,7 +35,7 @@ class PromptCreateView(
     ProjectMembershipRequiredMixin,
     CreatedByUserMixin,
     BreadCrumbsMixin,
-    BaseCreateView,
+    CustomCreateView,
 ):
     """
     View for creating a new Prompt (TextPrompt, BinaryPrompt, or RangedPrompt) within a
@@ -339,7 +339,7 @@ class RangedPromptOptionCreateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     BreadCrumbsMixin,
-    BaseCreateView,
+    CustomCreateView,
 ):
     form_class = RangedPromptOptionForm
     model_display_name = "Range Prompt Option"

@@ -2,7 +2,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import CreateView, UpdateView
 
 
-class BaseCreateView(CreateView):
+class CustomCreateView(CreateView):
     """
     Base class for creation views in the editor UI.
 
