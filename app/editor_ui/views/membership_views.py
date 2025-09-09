@@ -7,7 +7,6 @@ from django.db.models import BooleanField, Case, Value, When
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DeleteView, ListView
-from django.views.generic.edit import BaseUpdateView
 
 from app.editor_ui.forms import (
     ProjectMembershipCreateForm,
@@ -19,7 +18,7 @@ from app.editor_ui.mixins import (
     ProjectOwnerMembershipMixin,
 )
 from app.editor_ui.utils import send_email_util
-from app.editor_ui.views.base_views import CustomCreateView
+from app.editor_ui.views.base_views import CustomCreateView, CustomUpdateView
 from app.projects.models import Project, ProjectMembership
 
 
@@ -130,13 +129,13 @@ class ProjectMembershipUpdateView(
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
     BreadCrumbsMixin,
-    BaseUpdateView,
+    CustomUpdateView,
 ):
     form_class = ProjectMembershipUpdateForm
     template_name = "editor_ui/projects/project_membership_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "membership_uuid"
-    object_name = "Project Membership"
+    model_display_name = "Project Membership"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["owner"]
