@@ -23,6 +23,7 @@ class PathPatternCreateView(
     CustomCreateView,
 ):
     form_class = PathPatternForm
+    template_name = "editor_ui/path_patterns/path_pattern_create.html"
     model_display_name = "Path Pattern"
 
     # ProjectMembershipRequiredMixin mixin attributes
@@ -66,6 +67,17 @@ class PathPatternCreateView(
                 "feedback_form_uuid": feedback_form_uuid,
             },
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # required for form cancel button
+        project_uuid = self.kwargs.get("project_uuid")
+        feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
+        context["project_uuid"] = project_uuid
+        context["feedback_form_uuid"] = feedback_form_uuid
+
+        return context
 
 
 class PathPatternUpdateView(

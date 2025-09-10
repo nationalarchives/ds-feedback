@@ -45,6 +45,7 @@ class FeedbackFormCreateView(
     """
 
     form_class = FeedbackFormForm
+    template_name = "editor_ui/feedback_forms/feedback_form_create.html"
     model_display_name = "Feedback Form"
 
     # ProjectMembershipRequiredMixin mixin attributes
@@ -80,6 +81,15 @@ class FeedbackFormCreateView(
                 "feedback_form_uuid": feedback_form_uuid,
             },
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # required for form cancel button
+        project_uuid = self.kwargs.get("project_uuid")
+        context["project_uuid"] = project_uuid
+
+        return context
 
 
 class FeedbackFormListView(

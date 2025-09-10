@@ -49,6 +49,7 @@ class PromptCreateView(
     """
 
     form_class = PromptForm
+    template_name = "editor_ui/path_patterns/path_pattern_create.html"
     model_display_name = "Prompt"
 
     # ProjectMembershipRequiredMixin mixin attributes
@@ -122,6 +123,20 @@ class PromptCreateView(
                 "prompt_uuid": prompt_uuid,
             },
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # required for form cancel button
+        context.update(
+            {
+                "prompt_uuid": self.kwargs.get("prompt_uuid"),
+                "feedback_form_uuid": self.kwargs.get("feedback_form_uuid"),
+                "project_uuid": self.kwargs.get("project_uuid"),
+            }
+        )
+
+        return context
 
 
 class PromptDetailView(
@@ -342,6 +357,7 @@ class RangedPromptOptionCreateView(
     CustomCreateView,
 ):
     form_class = RangedPromptOptionForm
+    template_name = "editor_ui/prompts/ranged_prompt_create.html"
     model_display_name = "Range Prompt Option"
 
     # ProjectMembershipRequiredMixin mixin attributes
@@ -375,3 +391,17 @@ class RangedPromptOptionCreateView(
         )
 
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # required for form cancel button
+        context.update(
+            {
+                "prompt_uuid": self.kwargs.get("prompt_uuid"),
+                "feedback_form_uuid": self.kwargs.get("feedback_form_uuid"),
+                "project_uuid": self.kwargs.get("project_uuid"),
+            }
+        )
+
+        return context
