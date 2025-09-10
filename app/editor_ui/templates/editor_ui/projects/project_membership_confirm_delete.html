@@ -10,9 +10,9 @@
                 <form method="post">
                     {{ csrf_input }}
                     <div class="tna-button-group">
+                        <button type="submit" class="tna-button tna-button--accent">Confirm Removal</button>
                         <a href="{{ url("editor_ui:project__memberships", project_uuid=object.project.uuid) }}"
-                           class="tna-button tna-button--accent">Cancel</a>
-                        <button type="submit" class="tna-button tna-button--danger">Confirm Removal</button>
+                           class="tna-button">Cancel</a>
                     </div>
                 </form>
             </div>

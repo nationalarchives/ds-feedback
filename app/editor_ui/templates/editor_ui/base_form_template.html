@@ -27,12 +27,12 @@
                     {% endif %}
                     {% for field in form %}{{ forms.renderField(field) }}{% endfor %}
                     <div class="tna-button-group">
-                        {% block cancel_button %}
-                        {% endblock cancel_button %}
-                        <button type="submit" class="tna-button">
+                        <button type="submit" class="tna-button tna-button--accent">
                             {% block submit_button_text %}
                             {% endblock submit_button_text %}
                         </button>
+                        {% block cancel_button %}
+                        {% endblock cancel_button %}
                     </div>
                 </form>
             </div>
