@@ -36,10 +36,6 @@ class CustomResetPasswordView(SuccessMessageMixin, PasswordResetView):
     form_class = CustomPasswordResetForm
     email_template_name = "registration/password_reset_email.html"
     subject_template_name = "registration/password_reset_subject.txt"
-    success_message = (
-        "A link to reset your password has been emailed to you "
-        "if an account exists for this address."
-    )
     success_url = reverse_lazy("editor_auth:password_reset_done")
 
 
