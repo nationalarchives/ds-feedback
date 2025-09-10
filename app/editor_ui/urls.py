@@ -2,6 +2,7 @@ from django.urls import path
 
 from app.editor_ui.views.feedback_form_views import (
     FeedbackFormCreateView,
+    FeedbackFormDeleteView,
     FeedbackFormDetailView,
     FeedbackFormListView,
     FeedbackFormUpdateView,
@@ -14,6 +15,7 @@ from app.editor_ui.views.membership_views import (
 )
 from app.editor_ui.views.path_pattern_views import (
     PathPatternCreateView,
+    PathPatternDeleteView,
     PathPatternUpdateView,
 )
 from app.editor_ui.views.project_views import (
@@ -24,9 +26,11 @@ from app.editor_ui.views.project_views import (
 )
 from app.editor_ui.views.prompt_views import (
     PromptCreateView,
+    PromptDeleteView,
     PromptDetailView,
     PromptUpdateView,
     RangedPromptOptionCreateView,
+    RangedPromptOptionDeleteView,
     RangedPromptOptionUpdateView,
 )
 from app.editor_ui.views.response_views import (
@@ -92,6 +96,11 @@ urlpatterns = [
         name="project__feedback_form_detail",
     ),
     path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/delete/",
+        FeedbackFormDeleteView.as_view(),
+        name="project__feedback_form_delete",
+    ),
+    path(
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/path-pattern/create/",
         PathPatternCreateView.as_view(),
         name="project__feedback_form__path_pattern_create",
@@ -100,6 +109,11 @@ urlpatterns = [
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/path-pattern/<uuid:path_pattern_uuid>/edit/",
         PathPatternUpdateView.as_view(),
         name="project__feedback_form__path_pattern_edit",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/path-pattern/<uuid:path_pattern_uuid>/delete/",
+        PathPatternDeleteView.as_view(),
+        name="project__feedback_form__path_pattern_delete",
     ),
     path(
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/create/",
@@ -117,6 +131,11 @@ urlpatterns = [
         name="project__feedback_form__prompt_edit",
     ),
     path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/delete/",
+        PromptDeleteView.as_view(),
+        name="project__feedback_form__prompt_delete",
+    ),
+    path(
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/ranged-prompt-options/create/",
         RangedPromptOptionCreateView.as_view(),
         name="project__feedback_form__prompt__ranged_prompt_options_create",
@@ -125,6 +144,11 @@ urlpatterns = [
         "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/options/<uuid:option_uuid>/edit/",
         RangedPromptOptionUpdateView.as_view(),
         name="project__feedback_form__prompt__ranged_prompt_options_edit",
+    ),
+    path(
+        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/options/<uuid:option_uuid>/delete/",
+        RangedPromptOptionDeleteView.as_view(),
+        name="project__feedback_form__prompt__ranged_prompt_options_delete",
     ),
     path(
         "projects/<uuid:project_uuid>/responses/",

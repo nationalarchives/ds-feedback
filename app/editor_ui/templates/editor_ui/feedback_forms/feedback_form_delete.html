@@ -1,0 +1,15 @@
+{% extends "editor_ui/base_deletion_template.html" %}
+{% set pageTitle = "Delete " + object.name %}
+
+{% block heading_text %}
+    Are you sure you want to remove the feedback form <strong>{{ object.name }}</strong> from project <strong>{{ object.project.name }}</strong>?
+{% endblock heading_text %}
+
+{% block submit_button_text %}
+    Delete feedback form
+{% endblock submit_button_text %}
+
+{% block cancel_button %}
+    <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid=object.project.uuid, feedback_form_uuid=object.uuid) }}"
+       class="tna-button">Cancel</a>
+{% endblock cancel_button %}

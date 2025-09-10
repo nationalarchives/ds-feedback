@@ -1,0 +1,15 @@
+{% extends "editor_ui/base_deletion_template.html" %}
+{% set pageTitle = "Delete " + object.label %}
+
+{% block heading_text %}
+    Are you sure you want to remove the ranged prompt option <strong>{{ object }}</strong> from prompt <strong>{{ object.ranged_prompt }}</strong>?
+{% endblock heading_text %}
+
+{% block submit_button_text %}
+    Delete
+{% endblock submit_button_text %}
+
+{% block cancel_button %}
+    <a href="{{ url("editor_ui:project__feedback_form__prompt_detail", project_uuid=object.ranged_prompt.feedback_form.project.uuid, feedback_form_uuid=object.ranged_prompt.feedback_form.uuid, prompt_uuid=object.ranged_prompt.uuid) }}"
+       class="tna-button">Cancel</a>
+{% endblock cancel_button %}

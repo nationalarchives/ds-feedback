@@ -7,7 +7,7 @@ from django.db.models import (
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import DetailView
+from django.views.generic import DeleteView, DetailView
 
 from app.editor_ui.forms import (
     PROMPT_FORM_MAP,
@@ -296,6 +296,42 @@ class PromptUpdateView(
         return context
 
 
+class PromptDeleteView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
+    DeleteView,
+):
+    model = Prompt
+    template_name = "editor_ui/prompts/prompt_delete.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "prompt_uuid"
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["owner"]
+    parent_model = FeedbackForm
+    parent_lookup_kwarg = "feedback_form_uuid"
+
+    breadcrumb = None
+
+    def get_queryset(self):
+        feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
+        return Prompt.objects.filter(
+            feedback_form__uuid=feedback_form_uuid
+        ).select_related("feedback_form")
+
+    def get_success_url(self):
+        project_uuid = self.kwargs.get("project_uuid")
+        feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
+        return reverse(
+            "editor_ui:project__feedback_form_detail",
+            kwargs={
+                "project_uuid": project_uuid,
+                "feedback_form_uuid": feedback_form_uuid,
+            },
+        )
+
+
 class RangedPromptOptionUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
@@ -405,3 +441,41 @@ class RangedPromptOptionCreateView(
         )
 
         return context
+
+
+class RangedPromptOptionDeleteView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
+    DeleteView,
+):
+    model = RangedPromptOption
+    template_name = "editor_ui/prompts/ranged_prompt_option_delete.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "option_uuid"
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["owner"]
+    parent_model = Prompt
+    parent_lookup_kwarg = "prompt_uuid"
+
+    breadcrumb = None
+
+    def get_queryset(self):
+        prompt_uuid = self.kwargs.get("prompt_uuid")
+        return RangedPromptOption.objects.filter(
+            ranged_prompt__uuid=prompt_uuid
+        ).select_related("ranged_prompt")
+
+    def get_success_url(self):
+        project_uuid = self.kwargs.get("project_uuid")
+        feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
+        prompt_uuid = self.kwargs.get("prompt_uuid")
+        return reverse(
+            "editor_ui:project__feedback_form__prompt_detail",
+            kwargs={
+                "project_uuid": project_uuid,
+                "feedback_form_uuid": feedback_form_uuid,
+                "prompt_uuid": prompt_uuid,
+            },
+        )
