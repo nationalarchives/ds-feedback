@@ -1,5 +1,5 @@
 {% extends "editor_ui/generic_creation_template.html" %}
 
 {% block cancel_button %}
-  <a href="{{ url('editor_ui:project__feedback_form_detail', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid) }}" class="tna-button">Cancel</a>
+  <a href="{{ url('editor_ui:project__feedback_form_detail', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid) }}" class="tna-button tna-button--plain">Cancel</a>
 {% endblock cancel_button %}

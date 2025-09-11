@@ -11,5 +11,5 @@
 
 {% block cancel_button %}
     <a href="{{ url("editor_ui:project__feedback_form__prompt_detail", project_uuid=object.ranged_prompt.feedback_form.project.uuid, feedback_form_uuid=object.ranged_prompt.feedback_form.uuid, prompt_uuid=object.ranged_prompt.uuid) }}"
-       class="tna-button">Cancel</a>
+       class="tna-button tna-button--plain">Cancel</a>
 {% endblock cancel_button %}
