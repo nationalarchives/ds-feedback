@@ -158,6 +158,29 @@ class ProjectMembershipUpdateView(
             kwargs={"project_uuid": project_uuid},
         )
 
+    def form_valid(self, form):
+        # Ensure there is always at least one owner assigned to a project
+        owners_count = ProjectMembership.objects.filter(
+            project=self.object.project, role="owner"
+        ).count()
+
+        if (
+            form.initial.get("role") == "owner"
+            and owners_count <= 1
+            and not form.cleaned_data.get("role") == "owner"
+        ):
+            messages.error(
+                self.request,
+                f"Cannot update {self.object.user}. "
+                "Each project must have at least one owner.",
+            )
+            return redirect(
+                "editor_ui:project__memberships",
+                project_uuid=self.object.project.uuid,
+            )
+
+        return super().form_valid(form)
+
 
 class ProjectMembershipDeleteView(
     LoginRequiredMixin,
