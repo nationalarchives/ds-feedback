@@ -251,7 +251,7 @@ class FeedbackFormDeleteView(
     slug_url_kwarg = "feedback_form_uuid"
 
     # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["owner"]
+    project_roles_required = ["owner", "editor"]
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
 

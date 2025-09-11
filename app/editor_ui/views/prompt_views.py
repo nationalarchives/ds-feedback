@@ -457,7 +457,7 @@ class RangedPromptOptionDeleteView(
     slug_url_kwarg = "option_uuid"
 
     # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["owner"]
+    project_roles_required = ["owner", "editor"]
     parent_model = Prompt
     parent_lookup_kwarg = "prompt_uuid"
 

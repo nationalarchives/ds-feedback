@@ -136,7 +136,7 @@ class PathPatternDeleteView(
     slug_url_kwarg = "path_pattern_uuid"
 
     # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["owner"]
+    project_roles_required = ["owner", "editor"]
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
 
