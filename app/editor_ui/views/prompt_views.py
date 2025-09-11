@@ -158,7 +158,7 @@ class PromptDetailView(
     slug_field = "uuid"
     slug_url_kwarg = "prompt_uuid"
     context_object_name = "prompt"
-    project_roles_required = ["editor", "owner"]
+    project_roles_required = ["owner", "editor"]
 
     breadcrumb_field = "text"
 
@@ -215,7 +215,7 @@ class PromptUpdateView(
     model_display_name = "Prompt"
 
     # ProjectOwnerMembershipMixin mixin attributes
-    project_roles_required = ["owner"]
+    project_roles_required = ["owner", "editor"]
 
     breadcrumb = None
 

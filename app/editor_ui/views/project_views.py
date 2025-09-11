@@ -159,7 +159,7 @@ class ProjectUpdateView(
     slug_url_kwarg = "project_uuid"
 
     # ProjectOwnerMembershipMixin mixin attributes
-    project_roles_required = ["owner", "editor"]
+    project_roles_required = ["owner"]
 
     breadcrumb = None
 
