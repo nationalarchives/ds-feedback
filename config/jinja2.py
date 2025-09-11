@@ -37,12 +37,26 @@ def jinja_date(value, format=None):
     return dj_date(value, format)
 
 
+def dict_merge(a, b):
+    merged = a.copy()
+    merged.update(b)
+    return merged
+
+
 def environment(**options):
     env = Environment(**options)
 
-    # Register Django filters for use with Jinja backend
+    def is_active_url(url, request=None, exact=False):
+        if not request:
+            return False
+
+        return request.path == url
+
+    # Register Django filters/functions for use with Jinja backend
     env.filters["pluralize"] = dj_pluralize
     env.filters["date"] = jinja_date
+    env.filters["dict_merge"] = dict_merge
+    env.globals["is_active_url"] = is_active_url
 
     TNA_FRONTEND_VERSION = ""
     try:

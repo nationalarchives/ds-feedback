@@ -6,7 +6,8 @@ from django.db import IntegrityError
 from django.db.models import BooleanField, Case, Value, When
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import DeleteView, ListView, UpdateView
+from django.views.generic import DeleteView, ListView
+from django.views.generic.edit import BaseUpdateView
 
 from app.editor_ui.forms import (
     ProjectMembershipCreateForm,
@@ -18,7 +19,7 @@ from app.editor_ui.mixins import (
     ProjectOwnerMembershipMixin,
 )
 from app.editor_ui.utils import send_email_util
-from app.editor_ui.views.base_views import BaseCreateView
+from app.editor_ui.views.base_views import CustomCreateView
 from app.projects.models import Project, ProjectMembership
 
 
@@ -71,10 +72,10 @@ class ProjectMembershipCreateView(
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
     BreadCrumbsMixin,
-    BaseCreateView,
+    CustomCreateView,
 ):
     form_class = ProjectMembershipCreateForm
-    object_name = "Project Membership"
+    model_display_name = "Project Membership"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["owner"]
@@ -129,7 +130,7 @@ class ProjectMembershipUpdateView(
     ProjectMembershipRequiredMixin,
     ProjectOwnerMembershipMixin,
     BreadCrumbsMixin,
-    UpdateView,
+    BaseUpdateView,
 ):
     form_class = ProjectMembershipUpdateForm
     template_name = "editor_ui/projects/project_membership_update.html"
@@ -151,11 +152,6 @@ class ProjectMembershipUpdateView(
             project__uuid=project_uuid
         ).select_related("user", "project")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["object_name"] = self.object_name
-        return context
-
     def get_success_url(self):
         project_uuid = self.kwargs.get("project_uuid")
         return reverse(
@@ -174,7 +170,6 @@ class ProjectMembershipDeleteView(
     template_name = "editor_ui/projects/project_membership_confirm_delete.html"
     slug_field = "uuid"
     slug_url_kwarg = "membership_uuid"
-    object_name = "Project Membership Removal"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["owner"]

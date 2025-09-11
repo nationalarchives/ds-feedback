@@ -1,16 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import (
-    BooleanField,
-    ExpressionWrapper,
     Max,
     Prefetch,
-    Q,
 )
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import DetailView, UpdateView
+from django.views.generic import DetailView
 
 from app.editor_ui.forms import (
     PROMPT_FORM_MAP,
@@ -22,7 +19,7 @@ from app.editor_ui.mixins import (
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
 )
-from app.editor_ui.views.base_views import BaseCreateView
+from app.editor_ui.views.base_views import CustomCreateView, CustomUpdateView
 from app.feedback_forms.models import FeedbackForm
 from app.prompts.models import (
     Prompt,
@@ -38,7 +35,7 @@ class PromptCreateView(
     ProjectMembershipRequiredMixin,
     CreatedByUserMixin,
     BreadCrumbsMixin,
-    BaseCreateView,
+    CustomCreateView,
 ):
     """
     View for creating a new Prompt (TextPrompt, BinaryPrompt, or RangedPrompt) within a
@@ -52,7 +49,7 @@ class PromptCreateView(
     """
 
     form_class = PromptForm
-    object_name = "Prompt"
+    model_display_name = "Prompt"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
@@ -126,17 +123,6 @@ class PromptCreateView(
             },
         )
 
-    def get_context_data(self, **kwargs):
-        """
-        Adds the object name to the template context for generic form rendering.
-
-        The object name is used by the generic create template to display
-        appropriate headings and labels.
-        """
-        context = super().get_context_data(**kwargs)
-        context["object_name"] = "Prompt"
-        return context
-
 
 class PromptDetailView(
     LoginRequiredMixin,
@@ -205,11 +191,13 @@ class PromptUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     BreadCrumbsMixin,
-    UpdateView,
+    CustomUpdateView,
 ):
     template_name = "editor_ui/prompts/prompt_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "prompt_uuid"
+
+    model_display_name = "Prompt"
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["owner"]
@@ -299,13 +287,15 @@ class RangedPromptOptionUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     BreadCrumbsMixin,
-    UpdateView,
+    CustomUpdateView,
 ):
     form_class = RangedPromptOptionForm
     queryset = RangedPromptOption.objects.all()
     template_name = "editor_ui/prompts/prompt_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "option_uuid"
+
+    model_display_name = "Prompt Option"
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["editor", "owner"]
@@ -351,10 +341,10 @@ class RangedPromptOptionCreateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     BreadCrumbsMixin,
-    BaseCreateView,
+    CustomCreateView,
 ):
     form_class = RangedPromptOptionForm
-    object_name = "Range Prompt Option"
+    model_display_name = "Range Prompt Option"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
@@ -387,14 +377,3 @@ class RangedPromptOptionCreateView(
         )
 
         return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        """
-        Adds the object name to the template context for generic form rendering.
-
-        The object name is used by the generic create template to display
-        appropriate headings and labels.
-        """
-        context = super().get_context_data(**kwargs)
-        context["object_name"] = "Ranged Prompt Options"
-        return context

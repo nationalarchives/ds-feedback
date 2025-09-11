@@ -1,7 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
 from django.urls import reverse
-from django.views.generic import UpdateView
 
 from app.editor_ui.forms import (
     PathPatternForm,
@@ -11,7 +10,7 @@ from app.editor_ui.mixins import (
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
 )
-from app.editor_ui.views.base_views import BaseCreateView
+from app.editor_ui.views.base_views import CustomCreateView, CustomUpdateView
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.models import Project
 
@@ -21,10 +20,10 @@ class PathPatternCreateView(
     ProjectMembershipRequiredMixin,
     CreatedByUserMixin,
     BreadCrumbsMixin,
-    BaseCreateView,
+    CustomCreateView,
 ):
     form_class = PathPatternForm
-    object_name = "Path Pattern"
+    model_display_name = "Path Pattern"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
@@ -68,28 +67,19 @@ class PathPatternCreateView(
             },
         )
 
-    def get_context_data(self, **kwargs):
-        """
-        Adds the object name to the template context for generic form rendering.
-
-        The object name is used by the generic create template to display
-        appropriate headings and labels.
-        """
-        context = super().get_context_data(**kwargs)
-        context["object_name"] = "Path Pattern"
-        return context
-
 
 class PathPatternUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
-    UpdateView,
+    CustomUpdateView,
 ):
     model = PathPattern
     form_class = PathPatternForm
     template_name = "editor_ui/path_patterns/path_pattern_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "path_pattern_uuid"
+
+    model_display_name = "Path Pattern"
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["editor", "owner"]

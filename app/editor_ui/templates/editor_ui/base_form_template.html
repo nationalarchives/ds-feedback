@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% from "components/error-summary/macro.html" import tnaErrorSummary %}
+{% import "macros/form_fields.njk" as forms %}
 {% block content %}
     <div class="tna-section">
         <div class="tna-container">
@@ -11,41 +13,19 @@
                 {% endblock heading_text %}
                 <form method="post" class="tna-form">
                     {{ csrf_input }}
+                    {% set ns = namespace(items=[]) %}
                     {% if form.non_field_errors() %}
-                        <div class="tna-error-summary"
-                             data-module="tna-error-summary"
-                             data-disable-autofocus="true">
-                            <div role="alert">
-                                <h2 class="tna-error-summary__heading tna-heading-m">There is a problem</h2>
-                                <ul class="tna-error-summary__list">
-                                    {% for error in form.non_field_errors() %}
-                                        <li class="tna-error-summary__item">
-                                            <a href="#" class="tna-error-summary__link">{{ error }}</a>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
+                        {% for error in form.non_field_errors() | list %}
+                            {% set ns.items = ns.items + [{"text": error|string}] %}
+                        {% endfor %}
+                        {{ tnaErrorSummary({
+                            title: "There is a problem",
+                            headingLevel: 2,
+                            items: ns.items,
+                            disableAutoFocus: true
+                            }) }}
                     {% endif %}
-                    {% for field in form %}
-                        <div class="tna-form__group {% if field.errors %}tna-form__group--error{% endif %}"
-                             {% if field.field.widget.input_type == "text" %}data-module="tna-text-input"{% endif %}>
-                            <div class="tna-form__group-contents">
-                                <h4 class="tna-form__heading tna-form__heading--m">
-                                    <label class="tna-form__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                </h4>
-                                <p id="name-hint" class="tna-form__hint">{{ field.help_text }}</p>
-                                {% if field.errors %}
-                                    {% for error in field.errors %}
-                                        <p class="tna-form__error-message">
-                                            <span class="tna-!--visually-hidden">Error:</span> {{ error }}
-                                        </p>
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                            {{ field }}
-                        </div>
-                    {% endfor %}
+                    {% for field in form %}{{ forms.renderField(field) }}{% endfor %}
                     <div class="tna-button-group">
                         {% block cancel_button %}
                         {% endblock cancel_button %}
