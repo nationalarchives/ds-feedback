@@ -7,7 +7,7 @@ from django.db.models import (
 )
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import DetailView, ListView, UpdateView
+from django.views.generic import DetailView, ListView
 
 from app.editor_ui.forms import (
     FeedbackFormForm,
@@ -17,7 +17,7 @@ from app.editor_ui.mixins import (
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
 )
-from app.editor_ui.views.base_views import BaseCreateView
+from app.editor_ui.views.base_views import CustomCreateView, CustomUpdateView
 from app.feedback_forms.models import FeedbackForm
 from app.projects.models import Project
 from app.prompts.models import (
@@ -30,7 +30,7 @@ class FeedbackFormCreateView(
     ProjectMembershipRequiredMixin,
     CreatedByUserMixin,
     BreadCrumbsMixin,
-    BaseCreateView,
+    CustomCreateView,
 ):
     """
     View for creating a new FeedbackForm within a project.
@@ -45,7 +45,7 @@ class FeedbackFormCreateView(
     """
 
     form_class = FeedbackFormForm
-    object_name = "Feedback Form"
+    model_display_name = "Feedback Form"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
@@ -188,13 +188,15 @@ class FeedbackFormUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
     BreadCrumbsMixin,
-    UpdateView,
+    CustomUpdateView,
 ):
     model = FeedbackForm
     form_class = FeedbackFormForm
     template_name = "editor_ui/feedback_forms/feedback_form_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "feedback_form_uuid"
+
+    model_display_name = "Feedback Form"
 
     # ProjectOwnerMembershipMixin mixin attributes
     project_roles_required = ["editor", "owner"]

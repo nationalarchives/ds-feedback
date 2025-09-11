@@ -2,9 +2,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 
 import factory
-import factory.fuzzy
-
-from app.projects.models import RETENTION_PERIOD_CHOICES, Project
 
 
 class UserFactory(factory.django.DjangoModelFactory):
