@@ -115,7 +115,7 @@ class PromptCreateView(
         project_uuid = self.kwargs.get("project_uuid")
 
         return reverse(
-            "editor_ui:project__feedback_form__prompt_detail",
+            "editor_ui:project__feedback_form__prompt_edit",
             kwargs={
                 "project_uuid": project_uuid,
                 "feedback_form_uuid": feedback_form_uuid,
