@@ -116,7 +116,7 @@ class PromptCreateView(
         project_uuid = self.kwargs.get("project_uuid")
 
         return reverse(
-            "editor_ui:project__feedback_form__prompt_detail",
+            "editor_ui:project__feedback_form__prompt_edit",
             kwargs={
                 "project_uuid": project_uuid,
                 "feedback_form_uuid": feedback_form_uuid,
@@ -249,9 +249,11 @@ class PromptUpdateView(
             prompts_locked = feedback_form.prompts.select_for_update().all()
 
             # Count active prompts (not disabled) **after** acquiring the lock
-            active_count = prompts_locked.filter(
-                disabled_at__isnull=True
-            ).count()
+            active_count = (
+                prompts_locked.filter(disabled_at__isnull=True)
+                .exclude(uuid=self.object.uuid)
+                .count()
+            )
             will_be_active = not data.get("is_disabled", False)
             if will_be_active and active_count >= MAX_ACTIVE_PROMPTS:
                 form.add_error(
