@@ -51,12 +51,12 @@
                     <td class="tna-table__cell tna-table__cell--button">
                       {% if user_project_permissions.is_superuser or user_project_permissions.is_owner %}
                         <a href="{{ url('editor_ui:projects:memberships:update', project_uuid=project_uuid, membership_uuid=member.uuid) }}"
-                           class="tna-button"
+                           class="tna-button tna-button--plain"
                            data-testing-id="edit-button">Edit</a>
                       {% endif %}
                       {% if user_project_permissions.is_superuser or user_project_permissions.is_owner or member.is_current_user %}
                         <a href="{{ url('editor_ui:projects:memberships:delete', project_uuid=member.project.uuid, membership_uuid=member.uuid) }}"
-                           class="tna-button"
+                           class="tna-button tna-button--plain"
                            data-testing-id="delete-button">Remove</a>
                       {% endif %}
                     </td>

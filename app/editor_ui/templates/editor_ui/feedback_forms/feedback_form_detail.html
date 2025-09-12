@@ -77,8 +77,8 @@
                     </th>
                     <td class="tna-table__cell">{{ path.created_by }}</td>
                     <td class="tna-table__cell tna-table__cell--button">
-                      <a href="{{ url("editor_ui:projects:feedback_forms:path_patterns:update", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, path_pattern_uuid=path.uuid) }}" class="tna-button">Edit</a>
-                      <a href="{{ url("editor_ui:projects:feedback_forms:path_patterns:delete", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, path_pattern_uuid=path.uuid) }}" class="tna-button">Delete</a>
+                      <a href="{{ url("editor_ui:projects:feedback_forms:path_patterns:update", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, path_pattern_uuid=path.uuid) }}" class="tna-button tna-button--plain">Edit</a>
+                      <a href="{{ url("editor_ui:projects:feedback_forms:path_patterns:delete", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, path_pattern_uuid=path.uuid) }}" class="tna-button tna-button--plain">Delete</a>
                     </td>
                   </tr>
                 {% endfor %}
@@ -134,10 +134,10 @@
                     <td class="tna-table__cell">{{ prompt.created_by }}</td>
                     <td class="tna-table__cell tna-table__cell--button">
                       <a href="{{ url('editor_ui:projects:feedback_forms:prompts:update', project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, prompt_uuid=prompt.uuid) }}"
-                       class="tna-button"
+                       class="tna-button tna-button--plain"
                        data-testing-id="edit-button">Edit</a>
                       <a href="{{ url('editor_ui:projects:feedback_forms:prompts:delete', project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, prompt_uuid=prompt.uuid) }}"
-                       class="tna-button"
+                       class="tna-button tna-button--plain"
                        data-testing-id="edit-button">Delete</a>
                     </td>
                   </tr>

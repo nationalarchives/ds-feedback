@@ -19,10 +19,10 @@
                             <td class="tna-table__cell">{{ option.value }}</td>
                             <td class="tna-table__cell tna-table__cell--button">
                                 <a href="{{ url('editor_ui:projects:feedback_forms:prompts:options:update', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid, option_uuid=option.uuid) }}"
-                                   class="tna-button"
+                                   class="tna-button tna-button--plain"
                                    data-testing-id="edit-button">Edit</a>
                                 <a href="{{ url('editor_ui:projects:feedback_forms:prompts:options:delete', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid, option_uuid=option.uuid) }}"
-                                   class="tna-button"
+                                   class="tna-button tna-button--plain"
                                    data-testing-id="edit-button">Delete</a>
                             </td>
                         </tr>
