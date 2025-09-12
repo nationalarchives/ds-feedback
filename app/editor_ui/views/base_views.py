@@ -12,8 +12,10 @@ class CustomCreateView(CreateView):
     - Uses a default template 'editor_ui/generic_creation_template.html'.
     """
 
-    model_display_name = None
     template_name = "editor_ui/generic_creation_template.html"
+
+    # used to provide readable model name in templates.
+    model_display_name = None
 
     def get_context_data(self, **kwargs):
         if (
@@ -24,7 +26,11 @@ class CustomCreateView(CreateView):
                 f"{self.__class__.__name__} requires 'model_display_name' to be set as a string."
             )
         context = super().get_context_data(**kwargs)
-        context["model_display_name"] = self.model_display_name
+
+        context.update(
+            {"model_display_name": self.model_display_name},
+        )
+
         return context
 
 
@@ -38,8 +44,10 @@ class CustomUpdateView(UpdateView):
     - Uses a default template 'editor_ui/generic_update_template.html'.
     """
 
-    model_display_name = None
     template_name = "editor_ui/generic_update_template.html"
+
+    # Used to provide human readable model name in templates.
+    model_display_name = None
 
     def get_context_data(self, **kwargs):
         if (
@@ -50,5 +58,9 @@ class CustomUpdateView(UpdateView):
                 f"{self.__class__.__name__} requires 'model_display_name' to be set as a string."
             )
         context = super().get_context_data(**kwargs)
-        context["model_display_name"] = self.model_display_name
+
+        context.update(
+            {"model_display_name": self.model_display_name},
+        )
+
         return context

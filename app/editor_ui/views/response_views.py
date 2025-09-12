@@ -16,11 +16,12 @@ class ResponseListingView(
     template_name = "editor_ui/responses/response_list.html"
     context_object_name = "responses"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = "Responses"
 
     def get_queryset(self):
@@ -35,7 +36,11 @@ class ResponseListingView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["project_uuid"] = self.kwargs.get("project_uuid")
+
+        context.update(
+            {"project_uuid": self.kwargs.get("project_uuid")},
+        )
+
         return context
 
 
@@ -48,11 +53,13 @@ class ResponseDetailView(
     slug_field = "uuid"
     slug_url_kwarg = "response_uuid"
 
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["editor", "owner"]
 
-    breadcrumb = "Response Details"
+    # required by BreadCrumbsMixin
+    breadcrumb = "Response details"
 
     def get_queryset(self):
         return (
@@ -73,6 +80,12 @@ class ResponseDetailView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["project_uuid"] = self.kwargs.get("project_uuid")
-        context["prompt_responses"] = self.object.prompt_responses.all()
+
+        context.update(
+            {
+                "project_uuid": self.kwargs.get("project_uuid"),
+                "prompt_responses": self.object.prompt_responses.all(),
+            }
+        )
+
         return context

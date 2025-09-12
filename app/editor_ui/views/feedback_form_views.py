@@ -46,13 +46,16 @@ class FeedbackFormCreateView(
 
     form_class = FeedbackFormForm
     template_name = "editor_ui/feedback_forms/feedback_form_create.html"
-    model_display_name = "Feedback Form"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by CustomCreateView
+    model_display_name = "Feedback form"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def form_valid(self, form):
@@ -87,7 +90,9 @@ class FeedbackFormCreateView(
 
         # required for form cancel button
         project_uuid = self.kwargs.get("project_uuid")
-        context["project_uuid"] = project_uuid
+        context.update(
+            {"project_uuid": project_uuid},
+        )
 
         return context
 
@@ -111,12 +116,13 @@ class FeedbackFormListView(
     template_name = "editor_ui/feedback_forms/feedback_form_list.html"
     context_object_name = "feedback_forms"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["editor", "owner"]
 
-    breadcrumb = "Feedback Forms"
+    # required by BreadCrumbsMixin for breadcrumb name
+    breadcrumb = "Feedback forms"
 
     def get_queryset(self):
         qs = (
@@ -136,7 +142,10 @@ class FeedbackFormListView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["project_uuid"] = self.kwargs.get("project_uuid")
+
+        context.update(
+            {"project_uuid": self.kwargs.get("project_uuid")},
+        )
 
         return context
 
@@ -158,11 +167,14 @@ class FeedbackFormDetailView(
 
     model = FeedbackForm
     template_name = "editor_ui/feedback_forms/feedback_form_detail.html"
+    context_object_name = "feedback_form"
     slug_field = "uuid"
     slug_url_kwarg = "feedback_form_uuid"
-    context_object_name = "feedback_form"
+
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb_field = "name"
 
     def get_queryset(self):
@@ -191,6 +203,7 @@ class FeedbackFormDetailView(
                 ),
             }
         )
+
         return context
 
 
@@ -206,11 +219,13 @@ class FeedbackFormUpdateView(
     slug_field = "uuid"
     slug_url_kwarg = "feedback_form_uuid"
 
-    model_display_name = "Feedback Form"
+    # required by CustomUpdateView
+    model_display_name = "Feedback form"
 
-    # ProjectOwnerMembershipMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_initial(self):
@@ -250,11 +265,12 @@ class FeedbackFormDeleteView(
     slug_field = "uuid"
     slug_url_kwarg = "feedback_form_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["owner", "editor"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_queryset(self):

@@ -1,5 +1,13 @@
 {% extends "editor_ui/generic_creation_template.html" %}
 
+{% block heading %}
+  Add a project member
+{% endblock heading %}
+
+{% block submit_button_text %}
+  Add member
+{% endblock submit_button_text %}
+
 {% block cancel_button %}
   <a href="{{ url('editor_ui:project__memberships', project_uuid=project_uuid) }}" class="tna-button tna-button--plain">Cancel</a>
 {% endblock cancel_button %}
