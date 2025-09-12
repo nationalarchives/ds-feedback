@@ -25,6 +25,7 @@ from app.prompts.models import (
     Prompt,
     RangedPrompt,
     RangedPromptOption,
+    TextPrompt,
 )
 
 MAX_ACTIVE_PROMPTS = 3
@@ -115,8 +116,21 @@ class PromptCreateView(
         feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
         project_uuid = self.kwargs.get("project_uuid")
 
+        # Redirect to different pages based on the prompt type
+        #
+        # TextPrompts go to detail view as there are no options to manage
+        if isinstance(self.object, TextPrompt):
+            return reverse(
+                "editor_ui:projects:feedback_forms:prompts:list",
+                kwargs={
+                    "project_uuid": project_uuid,
+                    "feedback_form_uuid": feedback_form_uuid,
+                    "prompt_uuid": prompt_uuid,
+                },
+            )
+
         return reverse(
-            "editor_ui:project__feedback_form__prompt_edit",
+            "editor_ui:projects:feedback_forms:prompts:update",
             kwargs={
                 "project_uuid": project_uuid,
                 "feedback_form_uuid": feedback_form_uuid,
@@ -276,7 +290,7 @@ class PromptUpdateView(
 
     def get_success_url(self):
         return reverse(
-            "editor_ui:project__feedback_form__prompt_detail",
+            "editor_ui:projects:feedback_forms:prompts:detail",
             kwargs={
                 "prompt_uuid": self.object.uuid,
                 "feedback_form_uuid": self.object.feedback_form.uuid,
@@ -326,7 +340,7 @@ class PromptDeleteView(
         project_uuid = self.kwargs.get("project_uuid")
         feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
         return reverse(
-            "editor_ui:project__feedback_form_detail",
+            "editor_ui:projects:feedback_forms:detail",
             kwargs={
                 "project_uuid": project_uuid,
                 "feedback_form_uuid": feedback_form_uuid,
@@ -366,7 +380,7 @@ class RangedPromptOptionUpdateView(
 
     def get_success_url(self):
         return reverse(
-            "editor_ui:project__feedback_form__prompt_detail",
+            "editor_ui:projects:feedback_forms:prompts:detail",
             kwargs={
                 "prompt_uuid": self.object.ranged_prompt.uuid,
                 "feedback_form_uuid": self.object.ranged_prompt.feedback_form.uuid,
@@ -411,7 +425,7 @@ class RangedPromptOptionCreateView(
         project_uuid = self.kwargs.get("project_uuid")
 
         return reverse(
-            "editor_ui:project__feedback_form__prompt_detail",
+            "editor_ui:projects:feedback_forms:prompts:detail",
             kwargs={
                 "project_uuid": project_uuid,
                 "feedback_form_uuid": feedback_form_uuid,
@@ -474,7 +488,7 @@ class RangedPromptOptionDeleteView(
         feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
         prompt_uuid = self.kwargs.get("prompt_uuid")
         return reverse(
-            "editor_ui:project__feedback_form__prompt_detail",
+            "editor_ui:projects:feedback_forms:prompts:detail",
             kwargs={
                 "project_uuid": project_uuid,
                 "feedback_form_uuid": feedback_form_uuid,

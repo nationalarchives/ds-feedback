@@ -120,7 +120,7 @@ class ProjectMembershipCreateView(
     def get_success_url(self):
         project_uuid = self.kwargs.get("project_uuid")
         return reverse(
-            "editor_ui:project__memberships",
+            "editor_ui:projects:memberships:list",
             kwargs={"project_uuid": project_uuid},
         )
 
@@ -164,7 +164,7 @@ class ProjectMembershipUpdateView(
     def get_success_url(self):
         project_uuid = self.kwargs.get("project_uuid")
         return reverse(
-            "editor_ui:project__memberships",
+            "editor_ui:projects:memberships:list",
             kwargs={"project_uuid": project_uuid},
         )
 
@@ -194,7 +194,7 @@ class ProjectMembershipUpdateView(
                         "Each project must have at least one owner.",
                     )
                     return redirect(
-                        "editor_ui:project__memberships",
+                        "editor_ui:projects:memberships:list",
                         project_uuid=self.object.project.uuid,
                     )
 
@@ -228,11 +228,11 @@ class ProjectMembershipDeleteView(
     def get_success_url(self):
         # If a user left the project, redirect to the project list
         if self.object.user == self.request.user:
-            return reverse("editor_ui:project_list")
+            return reverse("editor_ui:projects:list")
         # Otherwise, redirect to the project members list
         project_uuid = self.kwargs.get("project_uuid")
         return reverse(
-            "editor_ui:project__memberships",
+            "editor_ui:projects:memberships:list",
             kwargs={"project_uuid": project_uuid},
         )
 
@@ -279,7 +279,7 @@ class ProjectMembershipDeleteView(
                         f"Cannot remove {self.object.user}. Each project must have at least one owner.",
                     )
                     return redirect(
-                        "editor_ui:project__memberships",
+                        "editor_ui:projects:memberships:list",
                         project_uuid=self.object.project.uuid,
                     )
 

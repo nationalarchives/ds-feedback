@@ -41,7 +41,7 @@ class ProjectCreateView(
 
     def get_success_url(self):
         return reverse(
-            "editor_ui:project_detail",
+            "editor_ui:projects:detail",
             kwargs={"project_uuid": self.object.uuid},
         )
 
@@ -165,6 +165,6 @@ class ProjectUpdateView(
 
     def get_success_url(self):
         return reverse(
-            "editor_ui:project_detail",
+            "editor_ui:projects:detail",
             kwargs={"project_uuid": self.object.uuid},
         )

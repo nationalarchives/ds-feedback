@@ -62,7 +62,7 @@ class PathPatternCreateView(
         project_uuid = self.object.project.uuid
 
         return reverse(
-            "editor_ui:project__feedback_form_detail",
+            "editor_ui:projects:feedback_forms:detail",
             kwargs={
                 "project_uuid": project_uuid,
                 "feedback_form_uuid": feedback_form_uuid,
@@ -116,7 +116,7 @@ class PathPatternUpdateView(
 
     def get_success_url(self):
         return reverse(
-            "editor_ui:project__feedback_form_detail",
+            "editor_ui:projects:feedback_forms:detail",
             kwargs={
                 "project_uuid": self.object.feedback_form.project.uuid,
                 "feedback_form_uuid": self.object.feedback_form.uuid,
@@ -152,7 +152,7 @@ class PathPatternDeleteView(
         project_uuid = self.kwargs.get("project_uuid")
         feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
         return reverse(
-            "editor_ui:project__feedback_form_detail",
+            "editor_ui:projects:feedback_forms:detail",
             kwargs={
                 "project_uuid": project_uuid,
                 "feedback_form_uuid": feedback_form_uuid,

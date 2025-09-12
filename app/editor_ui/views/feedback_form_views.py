@@ -75,7 +75,7 @@ class FeedbackFormCreateView(
         project_uuid = self.object.project.uuid
 
         return reverse(
-            "editor_ui:project__feedback_form_detail",
+            "editor_ui:projects:feedback_forms:detail",
             kwargs={
                 "project_uuid": project_uuid,
                 "feedback_form_uuid": feedback_form_uuid,
@@ -231,7 +231,7 @@ class FeedbackFormUpdateView(
 
     def get_success_url(self):
         return reverse(
-            "editor_ui:project__feedback_form_detail",
+            "editor_ui:projects:feedback_forms:detail",
             kwargs={
                 "project_uuid": self.object.project.uuid,
                 "feedback_form_uuid": self.object.uuid,
@@ -266,6 +266,6 @@ class FeedbackFormDeleteView(
     def get_success_url(self):
         project_uuid = self.kwargs.get("project_uuid")
         return reverse(
-            "editor_ui:project__feedback_form_list",
+            "editor_ui:projects:feedback_forms:list",
             kwargs={"project_uuid": project_uuid},
         )
