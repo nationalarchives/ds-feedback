@@ -34,6 +34,7 @@ class ProjectCreateView(
     CustomCreateView,
 ):
     form_class = ProjectCreateForm
+    template_name = "editor_ui/projects/project_create.html"
     model_display_name = "Project"
     permission_required = ["projects.add_project"]
     breadcrumb = "Create a Project"

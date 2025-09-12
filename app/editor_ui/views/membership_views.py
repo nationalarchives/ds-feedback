@@ -74,6 +74,7 @@ class ProjectMembershipCreateView(
     CustomCreateView,
 ):
     form_class = ProjectMembershipCreateForm
+    template_name = "editor_ui/projects/project_membership_create.html"
     model_display_name = "Project Membership"
 
     # ProjectMembershipRequiredMixin mixin attributes
@@ -122,6 +123,15 @@ class ProjectMembershipCreateView(
             "editor_ui:project__memberships",
             kwargs={"project_uuid": project_uuid},
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # required for form cancel button
+        project_uuid = self.kwargs.get("project_uuid")
+        context["project_uuid"] = project_uuid
+
+        return context
 
 
 class ProjectMembershipUpdateView(

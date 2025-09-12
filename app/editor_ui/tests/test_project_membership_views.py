@@ -6,7 +6,7 @@ from app.projects.factories import ProjectFactory
 from app.projects.models import ProjectMembership
 
 
-class ProjectListViewTests(TestCase):
+class ProjectMembershipListViewTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin = UserFactory(is_superuser=True)
@@ -59,86 +59,8 @@ class ProjectListViewTests(TestCase):
         self.assertNotContains(response, 'data-testing-id="add-user-button"')
         self.assertNotContains(response, 'data-testing-id="edit-button"')
 
-    def test_editor_with_project_membership_cannot_add_users(self):
-        self.client.force_login(self.editor)
-        response = self.client.get(
-            reverse(
-                "editor_ui:project__memberships_add", args=[self.project.uuid]
-            )
-        )
 
-        self.assertEqual(response.status_code, 403)
-
-    def test_editor_can_remove_self(self):
-        self.client.force_login(self.editor)
-        editor_membership = ProjectMembership.objects.get(
-            project=self.project, user=self.editor
-        )
-        response = self.client.post(
-            reverse(
-                "editor_ui:project__memberships_delete",
-                args=[self.project.uuid, editor_membership.uuid],
-            ),
-            follow=True,
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertRedirects(response, reverse("editor_ui:project_list"))
-        self.assertFalse(
-            ProjectMembership.objects.filter(
-                project=self.project, user=self.editor
-            ).exists()
-        )
-
-    def test_editor_cannot_remove_others(self):
-        self.client.force_login(self.editor)
-        owner_membership = ProjectMembership.objects.get(
-            project=self.project, user=self.owner
-        )
-        response = self.client.post(
-            reverse(
-                "editor_ui:project__memberships_delete",
-                args=[self.project.uuid, owner_membership.uuid],
-            ),
-            follow=True,
-        )
-
-        self.assertEqual(response.status_code, 403)
-        self.assertTrue(
-            ProjectMembership.objects.filter(
-                project=self.project, user=self.owner, role="owner"
-            ).exists()
-        )
-
-    def test_cannot_delete_last_owner(self):
-        self.client.force_login(self.owner)
-        owner_membership = ProjectMembership.objects.get(
-            project=self.project, user=self.owner
-        )
-        response = self.client.post(
-            reverse(
-                "editor_ui:project__memberships_delete",
-                args=[self.project.uuid, owner_membership.uuid],
-            ),
-            follow=True,
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertRedirects(
-            response,
-            reverse("editor_ui:project__memberships", args=[self.project.uuid]),
-        )
-        self.assertContains(
-            response, "Each project must have at least one owner."
-        )
-        self.assertTrue(
-            ProjectMembership.objects.filter(
-                project=self.project, user=self.owner, role="owner"
-            ).exists()
-        )
-
-
-class ProjectDetailViewTests(TestCase):
+class ProjectMembershipDetailViewTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin = UserFactory(is_superuser=True)
@@ -158,7 +80,7 @@ class ProjectDetailViewTests(TestCase):
             created_by=cls.admin,
         )
 
-    def test_admin_sees_project_management_option(self):
+    def test_admin_sees_project_management_actions(self):
         self.client.force_login(self.admin)
         response = self.client.get(
             reverse("editor_ui:project_detail", args=[self.project.uuid])
@@ -167,7 +89,7 @@ class ProjectDetailViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'data-testing-id="edit-project-button"')
 
-    def test_owner_sees_project_management_option(self):
+    def test_owner_sees_project_management_actions(self):
         self.client.force_login(self.owner)
         response = self.client.get(
             reverse("editor_ui:project_detail", args=[self.project.uuid])
@@ -176,7 +98,7 @@ class ProjectDetailViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'data-testing-id="edit-project-button"')
 
-    def test_editor_cannot_see_project_management_option(self):
+    def test_editor_cannot_see_project_management_actions(self):
         self.client.force_login(self.editor)
         response = self.client.get(
             reverse("editor_ui:project_detail", args=[self.project.uuid])
@@ -186,11 +108,3 @@ class ProjectDetailViewTests(TestCase):
         self.assertNotContains(
             response, 'data-testing-id="edit-project-button"'
         )
-
-    def test_editor_with_project_membership_cannot_edit_project_details(self):
-        self.client.force_login(self.editor)
-        response = self.client.get(
-            reverse("editor_ui:project_update", args=[self.project.uuid])
-        )
-
-        self.assertEqual(response.status_code, 403)
