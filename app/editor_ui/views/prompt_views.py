@@ -118,10 +118,10 @@ class PromptCreateView(
 
         # Redirect to different pages based on the prompt type
         #
-        # TextPrompts go to detail view as there are no options to manage
-        if isinstance(self.object, TextPrompt):
+        # RangedPrompts go to detail view as there are no options to manage
+        if isinstance(self.object, RangedPrompt):
             return reverse(
-                "editor_ui:projects:feedback_forms:prompts:list",
+                "editor_ui:projects:feedback_forms:prompts:detail",
                 kwargs={
                     "project_uuid": project_uuid,
                     "feedback_form_uuid": feedback_form_uuid,
