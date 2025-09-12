@@ -38,9 +38,9 @@ class ProjectCreateForm(forms.ModelForm):
             "domain": [URLValidator()],
         }
         help_texts = {
-            "name": "A memorable name for your project",
-            "domain": "Enter the full URL this project will target, e.g. https://example.com",
-            "retention_period_days": "Data older than this will be periodically deleted",
+            "name": "Enter a memorable name for your project",
+            "domain": "Enter the full URL this project will target (for example, https://www.nationalarchives.gov.uk/)",
+            "retention_period_days": "Select a retention period for feedback responses. Responses in your project will be deleted when they reach this age.",
         }
 
     def clean_domain(self):
@@ -55,14 +55,17 @@ class ProjectUpdateForm(forms.ModelForm):
         fields = [
             "name",
             "domain",
+            "retention_period_days",
         ]
         widgets = {
             "name": forms.TextInput(),
             "domain": forms.URLInput(),
+            "retention_period_days": forms.Select(),
         }
         help_texts = {
-            "name": "A memorable name for your project",
-            "domain": "The full URL this project will target, e.g. https://example.com",
+            "name": "Enter a memorable name for your project",
+            "domain": "Enter the full URL this project will target (for example, https://www.nationalarchives.gov.uk/)",
+            "retention_period_days": "Select a retention period for feedback responses. Responses in your project will be deleted when they reach this age.",
         }
 
     def clean_domain(self):
