@@ -24,7 +24,7 @@
         {% if user_project_permissions.is_superuser or user_project_permissions.is_owner %}
           <a href="{{ url("editor_ui:projects:memberships:create", project_uuid=project_uuid) }}"
              class="tna-button"
-             data-testing-id="add-user-button">Grant access</a>
+             data-testing-id="add-user-button">Add member</a>
         {% endif %}
         {% if not members %}
           <p>No members found.</p>

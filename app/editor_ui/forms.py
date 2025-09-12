@@ -256,7 +256,7 @@ class ProjectMembershipCreateForm(forms.ModelForm):
     email = forms.EmailField(
         widget=forms.EmailInput(),
         label="User Email",
-        help_text="Enter the email address of the user you want to assign the permission.",
+        help_text="Enter the email address of the user you want to add to the project.",
     )
 
     def __init__(self, *args, **kwargs):
@@ -269,7 +269,9 @@ class ProjectMembershipCreateForm(forms.ModelForm):
         try:
             user = get_user_model().objects.get(email=email)
         except get_user_model().DoesNotExist:
-            raise forms.ValidationError("User not found.")
+            raise forms.ValidationError(
+                "No user account found for this email address."
+            )
 
         self.cleaned_data["user_obj"] = user
         return email

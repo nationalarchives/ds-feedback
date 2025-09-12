@@ -1,5 +1,23 @@
 {% extends "editor_ui/generic_creation_template.html" %}
 
+{% block heading %}
+  Add a project member
+{% endblock heading %}
+
+{% block description %}
+  <p>Add a new member to the project by entering their email address and selecting the role you want them to have.</p>
+  <p>Users must already have an account. To add a new user, contact your system owner.</p>
+  <p>Available roles are:</p>
+  <ul class="tna-ol">
+    <li>Owner - Can manage the project, all project content and memberships.</li>
+    <li>Editor - Can manage project content and leave project.</li>
+  </ul>
+{% endblock description %}
+
+{% block submit_button_text %}
+  Add member
+{% endblock submit_button_text %}
+
 {% block cancel_button %}
   <a href="{{ url('editor_ui:projects:memberships:list', project_uuid=project_uuid) }}" class="tna-button tna-button--plain">Cancel</a>
 {% endblock cancel_button %}
