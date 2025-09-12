@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
 )
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.db.models import BooleanField, Case, Value, When
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -168,6 +168,38 @@ class ProjectMembershipUpdateView(
             kwargs={"project_uuid": project_uuid},
         )
 
+    def form_valid(self, form):
+        # Ensure there is always at least one owner assigned to a project
+        original_role = form.initial.get("role")
+        new_role = form.cleaned_data.get("role")
+
+        if original_role == "owner" and new_role != "owner":
+            with transaction.atomic():
+                memberships = (
+                    ProjectMembership.objects.select_for_update().filter(
+                        project=self.object.project
+                    )
+                )
+
+                owners_count = (
+                    memberships.filter(role="owner")
+                    .exclude(pk=self.object.pk)
+                    .count()
+                )
+
+                if owners_count == 0:
+                    messages.error(
+                        self.request,
+                        f"Cannot update {self.object.user}. "
+                        "Each project must have at least one owner.",
+                    )
+                    return redirect(
+                        "editor_ui:project__memberships",
+                        project_uuid=self.object.project.uuid,
+                    )
+
+        return super().form_valid(form)
+
 
 class ProjectMembershipDeleteView(
     LoginRequiredMixin,
@@ -227,14 +259,28 @@ class ProjectMembershipDeleteView(
             project=self.object.project, role="owner"
         ).count()
 
-        if self.object.role == "owner" and owners_count <= 1:
-            messages.error(
-                self.request,
-                f"Cannot remove {self.object.user}. Each project must have at least one owner.",
-            )
-            return redirect(
-                "editor_ui:project__memberships",
-                project_uuid=self.object.project.uuid,
-            )
+        if self.object.role == "owner":
+            with transaction.atomic():
+                memberships = (
+                    ProjectMembership.objects.select_for_update().filter(
+                        project=self.object.project
+                    )
+                )
+
+                owners_count = (
+                    memberships.filter(role="owner")
+                    .exclude(pk=self.object.pk)
+                    .count()
+                )
+
+                if owners_count == 0:
+                    messages.error(
+                        self.request,
+                        f"Cannot remove {self.object.user}. Each project must have at least one owner.",
+                    )
+                    return redirect(
+                        "editor_ui:project__memberships",
+                        project_uuid=self.object.project.uuid,
+                    )
 
         return super().form_valid(form)
