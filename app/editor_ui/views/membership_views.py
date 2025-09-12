@@ -29,7 +29,7 @@ class ProjectMembershipListView(
     ListView,
 ):
     model = ProjectMembership
-    template_name = "editor_ui/projects/project_membership_list.html"
+    template_name = "editor_ui/project_memberships/project_membership_list.html"
     context_object_name = "members"
 
     # required by ProjectMembershipRequiredMixin
@@ -76,7 +76,9 @@ class ProjectMembershipCreateView(
     CustomCreateView,
 ):
     form_class = ProjectMembershipCreateForm
-    template_name = "editor_ui/projects/project_membership_create.html"
+    template_name = (
+        "editor_ui/project_memberships/project_membership_create.html"
+    )
 
     # required by ProjectMembershipRequiredMixin
     project_roles_required = ["owner"]
@@ -149,7 +151,9 @@ class ProjectMembershipUpdateView(
     CustomUpdateView,
 ):
     form_class = ProjectMembershipUpdateForm
-    template_name = "editor_ui/projects/project_membership_update.html"
+    template_name = (
+        "editor_ui/project_memberships/project_membership_update.html"
+    )
     slug_field = "uuid"
     slug_url_kwarg = "membership_uuid"
 
@@ -218,7 +222,9 @@ class ProjectMembershipDeleteView(
     DeleteView,
 ):
     model = ProjectMembership
-    template_name = "editor_ui/projects/project_membership_confirm_delete.html"
+    template_name = (
+        "editor_ui/project_memberships/project_membership_confirm_delete.html"
+    )
     slug_field = "uuid"
     slug_url_kwarg = "membership_uuid"
 
