@@ -10,13 +10,15 @@
         </p>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
-        <a href="{{ url("editor_ui:projects:feedback_forms:create", project_uuid=project_uuid) }}"
-           class="tna-button tna-button--icon-only-mobile"
-           aria-label="Create a feedback form"
-           title="Create a feedback form">
-          <i class="fa-solid fa-plus" aria-hidden="true"></i>
-          Create a feedback form
-        </a>
+        <div class="tna-button-group">
+          <a href="{{ url("editor_ui:projects:feedback_forms:create", project_uuid=project_uuid) }}"
+            class="tna-button"
+            aria-label="Create a feedback form"
+            title="Create a feedback form">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Create a feedback form
+          </a>
+        </div>
         {% if not feedback_forms %}
           <p>No feedback forms found for this project.</p>
         {% else %}

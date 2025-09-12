@@ -8,13 +8,15 @@
         <p>Below are the projects you can access. Select a project to view its details or create a new one.</p>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
-        <a href="{{ url("editor_ui:projects:create") }}"
-           class="tna-button tna-button--icon-only-mobile"
-           aria-label="Create a project"
-           title="Create a project">
-          <i class="fa-solid fa-plus" aria-hidden="true"></i>
-          Create a project
-        </a>
+        <div class="tna-button-group">
+          <a href="{{ url("editor_ui:projects:create") }}"
+             class="tna-button"
+             aria-label="Create a project"
+             title="Create a project">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Create a project
+          </a>
+        </div>
         {% if not projects %}
           <p>No projects found.</p>
         {% else %}

@@ -1,9 +1,9 @@
-<div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny tna-!--padding-top-m">
-    <div class="tna-table-wrapper">
-        <hgroup class="tna-hgroup-m">
-            <h2 class="tna-hgroup__title">Ranged prompt options</h2>
-        </hgroup>
-        {% if prompt_options %}
+<div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny tna-!--padding-top-xl">
+    <hgroup class="tna-hgroup-m">
+        <h2 class="tna-hgroup__title">Ranged prompt options</h2>
+    </hgroup>
+    {% if prompt_options %}
+        <div class="tna-table-wrapper tna-!--margin-top-s tna-!--margin-bottom-m">
             <table class="tna-table">
                 <thead class="tna-table__head">
                     <tr class="tna-table__row">
@@ -29,18 +29,17 @@
                     {% endfor %}
                 </tbody>
             </table>
-        {% else %}
-            <p>No ranged options</p>
-        {% endif %}
-        <div class="tna-button-group">
-            <a href="{{ url("editor_ui:projects:feedback_forms:prompts:options:create", project_uuid, feedback_form_uuid, prompt.uuid) }}"
-               class="tna-button"
-               class="tna-button tna-button--icon-only-mobile"
-               aria-label="Create a project"
-               title="Create a project">
-                <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                Create ranged prompt option
-            </a>
         </div>
+    {% else %}
+        <p>No ranged options</p>
+    {% endif %}
+    <div class="tna-button-group">
+        <a href="{{ url("editor_ui:projects:feedback_forms:prompts:options:create", project_uuid, feedback_form_uuid, prompt.uuid) }}"
+           class="tna-button"
+           aria-label="Create a prompt option"
+           title="Create a prompt option">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Create prompt option
+        </a>
     </div>
 </div>

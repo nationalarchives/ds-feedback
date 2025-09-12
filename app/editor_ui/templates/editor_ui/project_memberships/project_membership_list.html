@@ -11,19 +11,24 @@
             {% set ns.error_messages = ns.error_messages + [{"text": message|string}] %}
           {% endfor %}
           {{ tnaErrorSummary({
-                    "title": "There is a problem",
-                    "headingLevel": 2,
-                    "items": ns.error_messages,
-                    "disableAutoFocus": true
-                    }) }}
+            "title": "There is a problem",
+            "headingLevel": 2,
+            "items": ns.error_messages,
+            "disableAutoFocus": true
+            }) }}
         {% endif %}
         <h1 class="tna-heading-xl">Project members</h1>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
         {% if user_project_permissions.is_superuser or user_project_permissions.is_owner %}
-          <a href="{{ url("editor_ui:projects:memberships:create", project_uuid=project_uuid) }}"
-             class="tna-button"
-             data-testing-id="add-user-button">Add member</a>
+          <div class="tna-button-group">
+            <a href="{{ url("editor_ui:projects:memberships:create", project_uuid=project_uuid) }}"
+               class="tna-button"
+               data-testing-id="add-user-button">
+               <i class="fa-solid fa-plus" aria-hidden="true"></i>
+               Add member
+            </a>
+          </div>
         {% endif %}
         {% if not members %}
           <p>No members found.</p>
