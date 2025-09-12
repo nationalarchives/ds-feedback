@@ -62,7 +62,7 @@ class PromptAccessTests(TestCase):
 
     def get_feedback_form_detail_url(self, project, feedback_form):
         return reverse(
-            "editor_ui:project__feedback_form_detail",
+            "editor_ui:projects:feedback_forms:detail",
             args=[
                 str(project.uuid),
                 str(feedback_form.uuid),
@@ -71,13 +71,13 @@ class PromptAccessTests(TestCase):
 
     def get_prompt_create_url(self, project, feedback_form):
         return reverse(
-            "editor_ui:project__feedback_form__prompt_create",
+            "editor_ui:projects:feedback_forms:prompts:create",
             args=[str(project.uuid), str(feedback_form.uuid)],
         )
 
     def get_prompt_detail_url(self, project, feedback_form, prompt):
         return reverse(
-            "editor_ui:project__feedback_form__prompt_detail",
+            "editor_ui:projects:feedback_forms:prompts:detail",
             args=[
                 str(project.uuid),
                 str(feedback_form.uuid),
@@ -87,7 +87,7 @@ class PromptAccessTests(TestCase):
 
     def get_prompt_update_url(self, project, feedback_form, prompt):
         return reverse(
-            "editor_ui:project__feedback_form__prompt_edit",
+            "editor_ui:projects:feedback_forms:prompts:update",
             args=[
                 str(project.uuid),
                 str(feedback_form.uuid),
@@ -259,7 +259,7 @@ class RangedPromptAccessTests(TestCase):
 
     def get_prompt_detail_url(self, project, form, prompt):
         return reverse(
-            "editor_ui:project__feedback_form__prompt_detail",
+            "editor_ui:projects:feedback_forms:prompts:detail",
             args=[
                 str(project.uuid),
                 str(form.uuid),
@@ -271,7 +271,7 @@ class RangedPromptAccessTests(TestCase):
         self, project, form, ranged_prompt
     ):
         return reverse(
-            "editor_ui:project__feedback_form__prompt__ranged_prompt_options_create",
+            "editor_ui:projects:feedback_forms:prompts:options:create",
             args=[str(project.uuid), str(form.uuid), str(ranged_prompt.uuid)],
         )
 
@@ -279,7 +279,7 @@ class RangedPromptAccessTests(TestCase):
         self, project, form, ranged_prompt, ranged_prompt_option
     ):
         return reverse(
-            "editor_ui:project__feedback_form__prompt__ranged_prompt_options_edit",
+            "editor_ui:projects:feedback_forms:prompts:options:update",
             args=[
                 str(project.uuid),
                 str(form.uuid),
@@ -292,7 +292,7 @@ class RangedPromptAccessTests(TestCase):
         self, project, form, ranged_prompt, ranged_prompt_option
     ):
         return reverse(
-            "editor_ui:project__feedback_form__prompt__ranged_prompt_options_delete",
+            "editor_ui:projects:feedback_forms:prompts:options:delete",
             args=[
                 str(project.uuid),
                 str(form.uuid),

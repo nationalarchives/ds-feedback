@@ -46,14 +46,14 @@ class FeedbackFormAccessTests(TestCase):
     def get_feedback_form_list_url(self, project):
         """Helper to get feedback form list URL."""
         return reverse(
-            "editor_ui:project__feedback_form_list",
+            "editor_ui:projects:feedback_forms:list",
             args=[str(project.uuid)],
         )
 
     def get_feedback_form_detail_url(self, project, feedback_form):
         """Helper to get feedback form detail URL."""
         return reverse(
-            "editor_ui:project__feedback_form_detail",
+            "editor_ui:projects:feedback_forms:detail",
             args=[
                 str(project.uuid),
                 str(feedback_form.uuid),
@@ -63,14 +63,14 @@ class FeedbackFormAccessTests(TestCase):
     def get_feedback_form_create_url(self, project):
         """Helper to get feedback form create URL."""
         return reverse(
-            "editor_ui:project__feedback_form_create",
+            "editor_ui:projects:feedback_forms:create",
             args=[str(project.uuid)],
         )
 
     def get_feedback_form_delete_url(self, project, feedback_form):
         """Helper to get the feedback form delete URL."""
         return reverse(
-            "editor_ui:project__feedback_form_delete",
+            "editor_ui:projects:feedback_forms:delete",
             kwargs={
                 "project_uuid": str(project.uuid),
                 "feedback_form_uuid": str(feedback_form.uuid),
@@ -191,7 +191,7 @@ class PathPatternAccessTests(TestCase):
     def get_feedback_form_detail_url(self, project, feedback_form):
         """Helper to get feedback form detail URL."""
         return reverse(
-            "editor_ui:project__feedback_form_detail",
+            "editor_ui:projects:feedback_forms:detail",
             args=[
                 str(project.uuid),
                 str(feedback_form.uuid),
@@ -200,13 +200,13 @@ class PathPatternAccessTests(TestCase):
 
     def get_path_pattern_create_url(self, project, feedback_form):
         return reverse(
-            "editor_ui:project__feedback_form__path_pattern_create",
+            "editor_ui:projects:feedback_forms:path_patterns:create",
             args=[str(project.uuid), str(feedback_form.uuid)],
         )
 
     def get_path_pattern_update_url(self, project, feedback_form, path_pattern):
         return reverse(
-            "editor_ui:project__feedback_form__path_pattern_edit",
+            "editor_ui:projects:feedback_forms:path_patterns:update",
             args=[
                 str(project.uuid),
                 str(feedback_form.uuid),
@@ -217,7 +217,7 @@ class PathPatternAccessTests(TestCase):
     def get_path_pattern_delete_url(self, project, feedback_form, path_pattern):
         """Helper to get the path pattern delete URL."""
         return reverse(
-            "editor_ui:project__feedback_form__path_pattern_delete",
+            "editor_ui:projects:feedback_forms:path_patterns:delete",
             kwargs={
                 "project_uuid": str(project.uuid),
                 "feedback_form_uuid": str(feedback_form.uuid),
