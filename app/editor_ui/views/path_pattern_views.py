@@ -75,8 +75,12 @@ class PathPatternCreateView(
         # required for form cancel button
         project_uuid = self.kwargs.get("project_uuid")
         feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
-        context["project_uuid"] = project_uuid
-        context["feedback_form_uuid"] = feedback_form_uuid
+        context.update(
+            {
+                "project_uuid": project_uuid,
+                "feedback_form_uuid": feedback_form_uuid,
+            }
+        )
 
         return context
 
