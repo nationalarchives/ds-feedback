@@ -26,15 +26,15 @@
           </dd>
           <dt>Project</dt>
           <dd>
-            <a href="{{ url("editor_ui:project_detail", project_uuid) }}">{{ feedback_form.project }}</a>
+            <a href="{{ url("editor_ui:projects:detail", project_uuid) }}">{{ feedback_form.project }}</a>
           </dd>
         </dl>
         <div class="tna-button-group">
         {% if user_project_permissions.is_member %}
-            <a href="{{ url("editor_ui:project__feedback_form_edit", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
+            <a href="{{ url("editor_ui:projects:feedback_forms:update", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
                class="tna-button"
                data-testing-id="edit-feedback-form-button">Edit feedback form details</a>
-            <a href="{{ url("editor_ui:project__feedback_form_delete", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
+            <a href="{{ url("editor_ui:projects:feedback_forms:delete", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
                class="tna-button"
                data-testing-id="delete-feedback-form-button">Delete feedback form</a>
           {% endif %}
@@ -63,8 +63,8 @@
                     </th>
                     <td class="tna-table__cell">{{ path.created_by }}</td>
                     <td class="tna-table__cell tna-table__cell--button">
-                      <a href="{{ url("editor_ui:project__feedback_form__path_pattern_edit", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, path_pattern_uuid=path.uuid) }}" class="tna-button">Edit</a>
-                      <a href="{{ url("editor_ui:project__feedback_form__path_pattern_delete", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, path_pattern_uuid=path.uuid) }}" class="tna-button">Delete</a>
+                      <a href="{{ url("editor_ui:projects:feedback_forms:path_patterns:update", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, path_pattern_uuid=path.uuid) }}" class="tna-button">Edit</a>
+                      <a href="{{ url("editor_ui:projects:feedback_forms:path_patterns:delete", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, path_pattern_uuid=path.uuid) }}" class="tna-button">Delete</a>
                     </td>
                   </tr>
                 {% endfor %}
@@ -75,7 +75,7 @@
           <p>No path patterns</p>
         {% endif %}
         <div class="tna-button-group">
-          <a href="{{ url("editor_ui:project__feedback_form__path_pattern_create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
+          <a href="{{ url("editor_ui:projects:feedback_forms:path_patterns:create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
              class="tna-button tna-button--icon-only-mobile"
              aria-label="Create a path pattern"
              title="Create a path pattern">
@@ -106,7 +106,7 @@
                 {% for prompt in prompts %}
                   <tr class="tna-table__row">
                     <th class="tna-table__header">
-                      <a href="{{ url("editor_ui:project__feedback_form__prompt_detail", project_uuid, feedback_form.uuid, prompt.uuid) }}">{{ prompt.text }}</a>
+                      <a href="{{ url("editor_ui:projects:feedback_forms:prompts:detail", project_uuid, feedback_form.uuid, prompt.uuid) }}">{{ prompt.text }}</a>
                     </th>
                     <td class="tna-table__cell">{{ prompt.field_label }}</td>
                     <td class="tna-table__cell">{{ prompt.order }}</td>
@@ -119,10 +119,10 @@
                     </td>
                     <td class="tna-table__cell">{{ prompt.created_by }}</td>
                     <td class="tna-table__cell tna-table__cell--button">
-                      <a href="{{ url('editor_ui:project__feedback_form__prompt_edit', project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, prompt_uuid=prompt.uuid) }}"
+                      <a href="{{ url('editor_ui:projects:feedback_forms:prompts:update', project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, prompt_uuid=prompt.uuid) }}"
                        class="tna-button"
                        data-testing-id="edit-button">Edit</a>
-                      <a href="{{ url('editor_ui:project__feedback_form__prompt_delete', project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, prompt_uuid=prompt.uuid) }}"
+                      <a href="{{ url('editor_ui:projects:feedback_forms:prompts:delete', project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid, prompt_uuid=prompt.uuid) }}"
                        class="tna-button"
                        data-testing-id="edit-button">Delete</a>
                     </td>
@@ -135,7 +135,7 @@
           <p>No prompts</p>
         {% endif %}
         <div class="tna-button-group">
-          <a href="{{ url("editor_ui:project__feedback_form__prompt_create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
+          <a href="{{ url("editor_ui:projects:feedback_forms:prompts:create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
              class="tna-button"
              class="tna-button tna-button--icon-only-mobile"
              aria-label="Create a prompt"

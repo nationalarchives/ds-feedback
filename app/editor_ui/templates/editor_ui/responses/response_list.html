@@ -22,12 +22,12 @@
               <tbody class="tna-table__body">
                 {% for response in responses %}
                   <tr class="tna-table__row">
-                    <td class="tna-table__cell"><a href="{{ url("editor_ui:project__response_detail", project_uuid, response.uuid) }}">{{ response.created_at|date("Y/m/d H:i:s") }}</a></td>
+                    <td class="tna-table__cell"><a href="{{ url("editor_ui:projects:responses:detail", project_uuid, response.uuid) }}">{{ response.created_at|date("Y/m/d H:i:s") }}</a></td>
                     <th class="tna-table__header">
                       {{ response.url }}
                     </th>
                     <td class="tna-table__cell">
-                      <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid, response.feedback_form.uuid) }}">{{ response.feedback_form.name }}</a>
+                      <a href="{{ url("editor_ui:projects:feedback_forms:detail", project_uuid, response.feedback_form.uuid) }}">{{ response.feedback_form.name }}</a>
                     </td>
                   </tr>
                 {% endfor %}

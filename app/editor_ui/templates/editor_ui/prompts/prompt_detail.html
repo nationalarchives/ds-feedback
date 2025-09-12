@@ -13,7 +13,7 @@
                 <dl class="tna-dl">
                     <dt>Feedback form</dt>
                     <dd>
-                        <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid, feedback_form_uuid) }}">{{ prompt.feedback_form.name }}</a>
+                        <a href="{{ url("editor_ui:projects:feedback_forms:detail", project_uuid, feedback_form_uuid) }}">{{ prompt.feedback_form.name }}</a>
                     </dd>
                     <dt>Status</dt>
                     <dd>
@@ -56,10 +56,10 @@
                         {{ prompt.created_by }}
                     </dd>
                     <div class="tna-button-group">
-                        <a href="{{ url('editor_ui:project__feedback_form__prompt_edit', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid) }}"
+                        <a href="{{ url('editor_ui:projects:feedback_forms:prompts:update', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid) }}"
                            class="tna-button"
                            data-testing-id="edit-button">Edit Prompt</a>
-                           <a href="{{ url('editor_ui:project__feedback_form__prompt_delete', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid) }}"
+                           <a href="{{ url('editor_ui:projects:feedback_forms:prompts:delete', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid) }}"
                            class="tna-button"
                            data-testing-id="edit-button">Delete Prompt</a>
                     </div>

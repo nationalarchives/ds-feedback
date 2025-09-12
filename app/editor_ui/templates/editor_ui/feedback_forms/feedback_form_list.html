@@ -7,7 +7,7 @@
         <h1 class="tna-heading-xl">Feedback Forms</h1>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
-        <a href="{{ url("editor_ui:project__feedback_form_create", project_uuid=project_uuid) }}"
+        <a href="{{ url("editor_ui:projects:feedback_forms:create", project_uuid=project_uuid) }}"
            class="tna-button tna-button--icon-only-mobile"
            aria-label="Create a feedback form"
            title="Create a feedback form">
@@ -31,7 +31,7 @@
                 {% for feedback_form in feedback_forms %}
                   <tr class="tna-table__row">
                     <th class="tna-table__header">
-                      <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid, feedback_form.uuid) }}">{{ feedback_form.name }}</a>
+                      <a href="{{ url("editor_ui:projects:feedback_forms:detail", project_uuid, feedback_form.uuid) }}">{{ feedback_form.name }}</a>
                     </th>
                     <td class="tna-table__cell">
                       {% if feedback_form.is_enabled() %}

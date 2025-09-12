@@ -22,7 +22,7 @@
           </dd>
           <dt>Feedback Form</dt>
           <dd>
-            <a href="{{ url("editor_ui:project__feedback_form_detail", project_uuid, response.feedback_form.uuid) }}">{{ response.feedback_form.name }}</a>
+            <a href="{{ url("editor_ui:projects:feedback_forms:detail", project_uuid, response.feedback_form.uuid) }}">{{ response.feedback_form.name }}</a>
           </dd>
           {% if response.metadata %}
           <dt>Metadata</dt>

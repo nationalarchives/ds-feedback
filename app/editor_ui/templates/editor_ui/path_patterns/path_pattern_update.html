@@ -3,5 +3,5 @@
   Editing the path pattern details for feedback form '{{ object.feedback_form }}'.
 {% endblock heading_text %}
 {% block cancel_button %}
-  <a href="{{ url('editor_ui:project__feedback_form_detail', project_uuid=object.project.uuid, feedback_form_uuid=object.feedback_form.uuid) }}" class="tna-button tna-button--plain">Cancel</a>
+  <a href="{{ url('editor_ui:projects:feedback_forms:detail', project_uuid=object.project.uuid, feedback_form_uuid=object.feedback_form.uuid) }}" class="tna-button tna-button--plain">Cancel</a>
 {% endblock cancel_button %}

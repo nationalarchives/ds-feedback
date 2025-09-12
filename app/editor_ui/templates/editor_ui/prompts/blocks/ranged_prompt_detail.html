@@ -18,10 +18,10 @@
                             <td class="tna-table__cell">{{ option.label }}</td>
                             <td class="tna-table__cell">{{ option.value }}</td>
                             <td class="tna-table__cell tna-table__cell--button">
-                                <a href="{{ url('editor_ui:project__feedback_form__prompt__ranged_prompt_options_edit', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid, option_uuid=option.uuid) }}"
+                                <a href="{{ url('editor_ui:projects:feedback_forms:prompts:options:update', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid, option_uuid=option.uuid) }}"
                                    class="tna-button"
                                    data-testing-id="edit-button">Edit</a>
-                                <a href="{{ url('editor_ui:project__feedback_form__prompt__ranged_prompt_options_delete', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid, option_uuid=option.uuid) }}"
+                                <a href="{{ url('editor_ui:projects:feedback_forms:prompts:options:delete', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid, option_uuid=option.uuid) }}"
                                    class="tna-button"
                                    data-testing-id="edit-button">Delete</a>
                             </td>
@@ -33,7 +33,7 @@
             <p>No ranged options</p>
         {% endif %}
         <div class="tna-button-group">
-            <a href="{{ url("editor_ui:project__feedback_form__prompt__ranged_prompt_options_create", project_uuid, feedback_form_uuid, prompt.uuid) }}"
+            <a href="{{ url("editor_ui:projects:feedback_forms:prompts:options:create", project_uuid, feedback_form_uuid, prompt.uuid) }}"
                class="tna-button"
                class="tna-button tna-button--icon-only-mobile"
                aria-label="Create a project"
