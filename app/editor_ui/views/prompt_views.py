@@ -49,7 +49,7 @@ class PromptCreateView(
     """
 
     form_class = PromptForm
-    template_name = "editor_ui/path_patterns/path_pattern_create.html"
+    template_name = "editor_ui/prompts/prompt_create.html"
 
     # required by ProjectMembershipRequiredMixin
     parent_model = FeedbackForm
@@ -69,9 +69,9 @@ class PromptCreateView(
         )
 
     def form_valid(self, form):
-        data = form.cleaned_data
+        cleaned_data = form.cleaned_data
         feedback_form_uuid = self.kwargs["feedback_form_uuid"]
-        model_cls = Prompt.PROMPT_MAP[data["prompt_type"]]
+        model_cls = Prompt.PROMPT_MAP[cleaned_data["prompt_type"]]
 
         with transaction.atomic():
             # Lock the prompts rows of the feedback form to
@@ -79,14 +79,14 @@ class PromptCreateView(
             feedback_form = FeedbackForm.objects.get(uuid=feedback_form_uuid)
             prompts_locked = feedback_form.prompts.select_for_update().all()
 
-            # Count active prompts (not disabled) **after** acquiring the lock
+            # Count active prompts (published) **after** acquiring the lock
             active_count = prompts_locked.filter(
                 disabled_at__isnull=True
             ).count()
-            will_be_active = not data.get("is_disabled", False)
+            will_be_active = cleaned_data.get("is_published", True)
             if will_be_active and active_count >= settings.MAX_ACTIVE_PROMPTS:
                 form.add_error(
-                    "is_disabled",
+                    "is_published",
                     f"Cannot have more than {settings.MAX_ACTIVE_PROMPTS} active prompts.",
                 )
                 return self.form_invalid(form)
@@ -98,14 +98,14 @@ class PromptCreateView(
 
             # Create the appropriate Prompt subclass instance with required fields
             self.object = model_cls(
-                text=data["text"],
+                text=cleaned_data["text"],
                 order=next_order,
                 feedback_form=self.get_feedback_form(),
                 created_by=self.request.user,
             )
 
-            # If the prompt should be disabled, set the disabled timestamp
-            if data.get("is_disabled"):
+            # If the prompt should not be published, set the disabled timestamp
+            if cleaned_data.get("is_published") is False:
                 self.object.disabled_at = timezone.now()
                 self.object.disabled_by = self.request.user
 
@@ -146,7 +146,6 @@ class PromptCreateView(
         # required for form cancel button
         context.update(
             {
-                "prompt_uuid": self.kwargs.get("prompt_uuid"),
                 "feedback_form_uuid": self.kwargs.get("feedback_form_uuid"),
                 "project_uuid": self.kwargs.get("project_uuid"),
                 "max_active_prompts": settings.MAX_ACTIVE_PROMPTS,
@@ -251,7 +250,7 @@ class PromptUpdateView(
 
     def get_initial(self):
         initial = super().get_initial()
-        initial["is_disabled"] = bool(self.object.disabled_at)
+        initial["is_published"] = not bool(self.object.disabled_at)
         return initial
 
     def get_form_class(self):
@@ -261,7 +260,7 @@ class PromptUpdateView(
         return form
 
     def form_valid(self, form):
-        data = form.cleaned_data
+        cleaned_data = form.cleaned_data
         feedback_form_uuid = self.kwargs["feedback_form_uuid"]
 
         with transaction.atomic():
@@ -276,16 +275,16 @@ class PromptUpdateView(
                 .exclude(uuid=self.object.uuid)
                 .count()
             )
-            will_be_active = not data.get("is_disabled", False)
+            will_be_active = cleaned_data.get("is_published", True)
             if will_be_active and active_count >= settings.MAX_ACTIVE_PROMPTS:
                 form.add_error(
-                    "is_disabled",
+                    "is_published",
                     f"Cannot have more than {settings.MAX_ACTIVE_PROMPTS} active prompts.",
                 )
                 return self.form_invalid(form)
 
-            # If the prompt should be disabled, set the disabled timestamp
-            if data.get("is_disabled"):
+            # If the prompt should not be published, set the disabled timestamp
+            if cleaned_data.get("is_published") is False:
                 self.object.disabled_at = timezone.now()
                 self.object.disabled_by = self.request.user
             else:

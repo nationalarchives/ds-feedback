@@ -24,13 +24,13 @@
                         {% endif %}
                     </dd>
                     {% if not prompt.is_enabled() %}
-                        <dt>Deactivated by</dt>
+                        <dt>Unpublished by</dt>
                         <dd>
                             {{ prompt.disabled_by }}
                         </dd>
-                        <dt>Deactivated on</dt>
+                        <dt>Unpublished on</dt>
                         <dd>
-                            {{ prompt.disabled_at }}
+                            {{ prompt.disabled_at|date() }}
                         </dd>
                     {% endif %}
                     <dt>Type</dt>

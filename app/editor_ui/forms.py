@@ -135,14 +135,15 @@ class PromptForm(forms.ModelForm):
         widget=forms.Select(),
         required=True,
         label="Question Type",
+        help_text="Select the type of question you want to create",
     )
 
-    is_disabled = forms.BooleanField(
+    is_published = forms.BooleanField(
         required=False,
-        initial=False,
-        label="Disable this prompt",
-        help_text="Disabled prompts won't be shown to users",
-        widget=forms.CheckboxInput(attrs={"text": "Disable"}),
+        initial=True,
+        label="Publish this prompt",
+        help_text="Published prompts will be available externally for published feedback forms",
+        widget=forms.CheckboxInput(attrs={"text": "Publish"}),
     )
 
     class Meta:
@@ -150,10 +151,13 @@ class PromptForm(forms.ModelForm):
         fields = [
             "text",
         ]
+        labels = {
+            "text": "Question text",
+        }
         widgets = {
             "text": forms.TextInput(),
         }
-        help_texts = {"text": "The prompt to display to users"}
+        help_texts = {"text": "Enter the question text to display to users"}
 
 
 class PromptUpdateForm(forms.ModelForm):
@@ -163,12 +167,12 @@ class PromptUpdateForm(forms.ModelForm):
         if hasattr(cls, "Meta") and hasattr(cls.Meta, "model"):
             PROMPT_FORM_MAP[cls.Meta.model] = cls
 
-    is_disabled = forms.BooleanField(
+    is_published = forms.BooleanField(
         required=False,
-        initial=False,
-        label="Disable this prompt",
-        help_text="Disabled prompts won't be shown to users",
-        widget=forms.CheckboxInput(attrs={"text": "Disable"}),
+        initial=True,
+        label="Publish this prompt",
+        help_text="Published prompts will be available externally for published feedback forms",
+        widget=forms.CheckboxInput(attrs={"text": "Publish"}),
     )
 
     class Meta:
@@ -176,15 +180,19 @@ class PromptUpdateForm(forms.ModelForm):
         fields = [
             "text",
             "order",
-            "is_disabled",
+            "is_published",
         ]
+        labels = {
+            "text": "Question text",
+            "order": "Question order",
+        }
         widgets = {
             "text": forms.TextInput(),
             "order": forms.NumberInput(attrs={"class": "tna-text-input"}),
         }
         help_texts = {
-            "text": "The prompt to display to users",
-            "order": "The order in which this prompt appears",
+            "text": "Enter the question text to display to users",
+            "order": "Enter the order in which this question will appear in the feedback form",
         }
 
 
@@ -195,15 +203,19 @@ class TextPromptUpdateForm(PromptUpdateForm):
             "text",
             "order",
             "max_length",
-            "is_disabled",
+            "is_published",
         ]
+        labels = {
+            **PromptUpdateForm.Meta.labels,
+            "max_length": "Maximum length of the response",
+        }
         widgets = {
             **PromptUpdateForm.Meta.widgets,
             "max_length": forms.NumberInput(attrs={"class": "tna-text-input"}),
         }
         help_texts = {
             **PromptUpdateForm.Meta.help_texts,
-            "max_length": "The maximum length of the response",
+            "max_length": "Enter the maximum number of characters allowed in answer",
         }
 
 
@@ -215,8 +227,13 @@ class BinaryPromptUpdateForm(PromptUpdateForm):
             "order",
             "positive_answer_label",
             "negative_answer_label",
-            "is_disabled",
+            "is_published",
         ]
+        labels = {
+            **PromptUpdateForm.Meta.labels,
+            "positive_answer_label": "Positive answer text",
+            "negative_answer_label": "Negative answer text",
+        }
         widgets = {
             **PromptUpdateForm.Meta.widgets,
             "positive_answer_label": forms.TextInput(),
@@ -224,8 +241,8 @@ class BinaryPromptUpdateForm(PromptUpdateForm):
         }
         help_texts = {
             **PromptUpdateForm.Meta.help_texts,
-            "positive_answer_label": "The label for the positive answer option",
-            "negative_answer_label": "The label for the negative answer option",
+            "positive_answer_label": "Enter the display text for the positive answer option",
+            "negative_answer_label": "Enter the display text for the negative answer option",
         }
 
 
@@ -236,9 +253,17 @@ class RangedPromptOptionForm(forms.ModelForm):
             "label",
             "value",
         ]
+        labels = {
+            "label": "Option label",
+            "value": "Option value",
+        }
         widgets = {
             "label": forms.TextInput(),
             "value": forms.NumberInput(attrs={"class": "tna-text-input"}),
+        }
+        help_texts = {
+            "label": "Enter the display text for this option",
+            "value": "Enter the numeric value for this option",
         }
 
 
@@ -248,8 +273,11 @@ class RangedPromptUpdateForm(PromptUpdateForm):
         fields = [
             "text",
             "order",
-            "is_disabled",
+            "is_published",
         ]
+        labels = {
+            **PromptUpdateForm.Meta.labels,
+        }
         widgets = {
             **PromptUpdateForm.Meta.widgets,
         }
