@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import (
@@ -27,8 +28,6 @@ from app.prompts.models import (
     RangedPromptOption,
     TextPrompt,
 )
-
-MAX_ACTIVE_PROMPTS = 3
 
 
 class PromptCreateView(
@@ -85,10 +84,10 @@ class PromptCreateView(
                 disabled_at__isnull=True
             ).count()
             will_be_active = not data.get("is_disabled", False)
-            if will_be_active and active_count >= MAX_ACTIVE_PROMPTS:
+            if will_be_active and active_count >= settings.MAX_ACTIVE_PROMPTS:
                 form.add_error(
                     "is_disabled",
-                    f"Cannot have more than {MAX_ACTIVE_PROMPTS} active prompts.",
+                    f"Cannot have more than {settings.MAX_ACTIVE_PROMPTS} active prompts.",
                 )
                 return self.form_invalid(form)
 
@@ -150,6 +149,7 @@ class PromptCreateView(
                 "prompt_uuid": self.kwargs.get("prompt_uuid"),
                 "feedback_form_uuid": self.kwargs.get("feedback_form_uuid"),
                 "project_uuid": self.kwargs.get("project_uuid"),
+                "max_active_prompts": settings.MAX_ACTIVE_PROMPTS,
             }
         )
 
@@ -277,10 +277,10 @@ class PromptUpdateView(
                 .count()
             )
             will_be_active = not data.get("is_disabled", False)
-            if will_be_active and active_count >= MAX_ACTIVE_PROMPTS:
+            if will_be_active and active_count >= settings.MAX_ACTIVE_PROMPTS:
                 form.add_error(
                     "is_disabled",
-                    f"Cannot have more than {MAX_ACTIVE_PROMPTS} active prompts.",
+                    f"Cannot have more than {settings.MAX_ACTIVE_PROMPTS} active prompts.",
                 )
                 return self.form_invalid(form)
 
@@ -314,6 +314,7 @@ class PromptUpdateView(
                 "prompt_uuid": self.object.uuid,
                 "feedback_form_uuid": self.object.feedback_form.uuid,
                 "project_uuid": self.object.feedback_form.project.uuid,
+                "max_active_prompts": settings.MAX_ACTIVE_PROMPTS,
             }
         )
 
