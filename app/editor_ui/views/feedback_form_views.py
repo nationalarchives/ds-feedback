@@ -87,7 +87,9 @@ class FeedbackFormCreateView(
 
         # required for form cancel button
         project_uuid = self.kwargs.get("project_uuid")
-        context["project_uuid"] = project_uuid
+        context.update(
+            {"project_uuid": project_uuid},
+        )
 
         return context
 
@@ -136,7 +138,10 @@ class FeedbackFormListView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["project_uuid"] = self.kwargs.get("project_uuid")
+
+        context.update(
+            {"project_uuid": self.kwargs.get("project_uuid")},
+        )
 
         return context
 
@@ -191,6 +196,7 @@ class FeedbackFormDetailView(
                 ),
             }
         )
+
         return context
 
 

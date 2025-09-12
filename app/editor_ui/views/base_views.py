@@ -24,7 +24,11 @@ class CustomCreateView(CreateView):
                 f"{self.__class__.__name__} requires 'model_display_name' to be set as a string."
             )
         context = super().get_context_data(**kwargs)
-        context["model_display_name"] = self.model_display_name
+
+        context.update(
+            {"model_display_name": self.model_display_name},
+        )
+
         return context
 
 
@@ -50,5 +54,9 @@ class CustomUpdateView(UpdateView):
                 f"{self.__class__.__name__} requires 'model_display_name' to be set as a string."
             )
         context = super().get_context_data(**kwargs)
-        context["model_display_name"] = self.model_display_name
+
+        context.update(
+            {"model_display_name": self.model_display_name},
+        )
+
         return context

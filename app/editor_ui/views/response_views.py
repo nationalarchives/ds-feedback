@@ -35,7 +35,11 @@ class ResponseListingView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["project_uuid"] = self.kwargs.get("project_uuid")
+
+        context.update(
+            {"project_uuid": self.kwargs.get("project_uuid")},
+        )
+
         return context
 
 
@@ -73,6 +77,12 @@ class ResponseDetailView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["project_uuid"] = self.kwargs.get("project_uuid")
-        context["prompt_responses"] = self.object.prompt_responses.all()
+
+        context.update(
+            {
+                "project_uuid": self.kwargs.get("project_uuid"),
+                "prompt_responses": self.object.prompt_responses.all(),
+            }
+        )
+
         return context
