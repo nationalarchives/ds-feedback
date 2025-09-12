@@ -4,13 +4,15 @@
 {% block content %}
     <div class="tna-section">
         <div class="tna-container">
-            <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+            <div class="tna-column tna-column--width-full">
                 <h1 class="tna-heading-xl">
                     {% block heading %}
                     {% endblock heading %}
                 </h1>
                 {% block description %}
                 {% endblock description %}
+            </div>
+            <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
                 <form method="post" class="tna-form">
                     {{ csrf_input }}
                     {% set ns = namespace(items=[]) %}

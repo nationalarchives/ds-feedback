@@ -1,7 +1,7 @@
 {% extends "editor_ui/generic_update_template.html" %}
-{% block heading_text %}
+{% block description %}
   <p>Editing the feedback form '{{ object.name }}' in the '{{ object.project }}' project.</p>
-{% endblock heading_text %}
+{% endblock description %}
 {% block cancel_button %}
   <a href="{{ url('editor_ui:projects:feedback_forms:detail', project_uuid=object.project.uuid, feedback_form_uuid=object.uuid) }}"
      class="tna-button tna-button--plain">Cancel</a>

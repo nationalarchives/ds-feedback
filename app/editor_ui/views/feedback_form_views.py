@@ -66,8 +66,8 @@ class FeedbackFormCreateView(
         instance.project = Project.objects.get(
             uuid=self.kwargs.get("project_uuid")
         )
-        # If the prompt should be disabled, set the disabled timestamp
-        if form.cleaned_data.get("is_disabled"):
+        # If the feedback form should be unpublished, set the disabled timestamp
+        if form.cleaned_data.get("is_published") is False:
             instance.disabled_at = timezone.now()
             instance.disabled_by = self.request.user
 
@@ -230,12 +230,12 @@ class FeedbackFormUpdateView(
 
     def get_initial(self):
         initial = super().get_initial()
-        initial["is_disabled"] = bool(self.object.disabled_at)
+        initial["is_published"] = not bool(self.object.disabled_at)
         return initial
 
     def form_valid(self, form):
         instance = form.save(commit=False)
-        if form.cleaned_data.get("is_disabled"):
+        if form.cleaned_data.get("is_published") is False:
             instance.disabled_at = timezone.now()
             instance.disabled_by = self.request.user
         else:

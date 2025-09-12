@@ -75,22 +75,25 @@ class ProjectUpdateForm(forms.ModelForm):
 
 
 class FeedbackFormForm(forms.ModelForm):
-    is_disabled = forms.BooleanField(
+    is_published = forms.BooleanField(
         required=False,
-        initial=False,
-        label="Disable this feedback form",
-        help_text="Disabled feedback forms won't be shown to users",
-        widget=forms.CheckboxInput(attrs={"text": "Disable"}),
+        initial=True,
+        label="Publish this feedback form",
+        help_text="Check this box to publish the feedback form. Published forms will be visible externally via the API",
+        widget=forms.CheckboxInput(attrs={"text": "Publish"}),
     )
 
     class Meta:
         model = FeedbackForm
         fields = [
             "name",
-            "is_disabled",
+            "is_published",
         ]
         widgets = {
             "name": forms.TextInput(),
+        }
+        help_texts = {
+            "name": "Enter a memorable name for this feedback form",
         }
 
 
