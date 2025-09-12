@@ -100,8 +100,8 @@ class FeedbackFormForm(forms.ModelForm):
 class PathPatternForm(forms.ModelForm):
     pattern_with_wildcard = forms.CharField(
         widget=forms.TextInput(),
-        label="URL Pattern",
-        help_text="Enter a URL pattern. Add * at the end for wildcard matching.",
+        label="Path pattern",
+        help_text="Enter a path pattern",
     )
 
     class Meta:

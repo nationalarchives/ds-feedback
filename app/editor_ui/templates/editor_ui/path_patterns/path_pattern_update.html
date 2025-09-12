@@ -1,7 +1,25 @@
 {% extends "editor_ui/generic_update_template.html" %}
-{% block heading_text %}
-  Editing the path pattern details for feedback form '{{ object.feedback_form }}'.
-{% endblock heading_text %}
+{% block description %}
+  <p>Editing the path pattern details for the feedback form <b>{{ object.feedback_form }}</b>.</p>
+  <p>Enter the path pattern for the page on your project’s domain where this feedback form should appear.</p>
+  <ul class="tna-ol">
+    <li>Patterns must start <strong>and</strong> end with a forward slash (/).</li>
+    <li>Append an asterisk (*) to match all sub-paths.</li>
+    <li>When multiple patterns match a page, the <strong>most specific</strong> pattern takes precedence.</li>
+  </ul>
+  <p>Examples:</p>
+  <ul class="tna-ol">
+    <li>
+      <code>/blog/post/</code> - applies to only the "/blog/post/" page.
+    </li>
+    <li>
+      <code>/blog/*</code> - applies to all blog pages except "/blog/post/".
+    </li>
+    <li>
+      <code>/*</code> - applies to all pages of the project's domain except "/blog/" pages.
+    </li>
+  </ul>
+{% endblock description %}
 {% block cancel_button %}
   <a href="{{ url('editor_ui:projects:feedback_forms:detail', project_uuid=object.project.uuid, feedback_form_uuid=object.feedback_form.uuid) }}" class="tna-button tna-button--plain">Cancel</a>
 {% endblock cancel_button %}

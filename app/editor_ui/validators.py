@@ -11,18 +11,18 @@ def validate_path_pattern(value):
     """
     # check if pattern starts with forward slash
     if not value.startswith("/"):
-        raise ValidationError("Pattern must start with a forward slash (/)")
+        raise ValidationError("Pattern must start with a forward slash (/).")
 
     # check if pattern ends with forward slash or asterisk
     if not value.endswith(("/", "*")):
         raise ValidationError(
-            "Pattern must end with a forward slash (/) or asterisk (*)"
+            "Pattern must end with a forward slash (/) or asterisk (*)."
         )
 
     # check asterisk is at the end of the pattern
     if "*" in value and not value.endswith("*"):
         raise ValidationError(
-            "Asterisk (*) is only allowed at the end of the pattern"
+            "Asterisk (*) is only allowed at the end of the pattern."
         )
 
     # check for multiple asterisks
