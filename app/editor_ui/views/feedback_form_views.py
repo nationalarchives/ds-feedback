@@ -7,7 +7,7 @@ from django.db.models import (
 )
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import DetailView, ListView
+from django.views.generic import DeleteView, DetailView, ListView
 
 from app.editor_ui.forms import (
     FeedbackFormForm,
@@ -45,6 +45,7 @@ class FeedbackFormCreateView(
     """
 
     form_class = FeedbackFormForm
+    template_name = "editor_ui/feedback_forms/feedback_form_create.html"
     model_display_name = "Feedback Form"
 
     # ProjectMembershipRequiredMixin mixin attributes
@@ -80,6 +81,15 @@ class FeedbackFormCreateView(
                 "feedback_form_uuid": feedback_form_uuid,
             },
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # required for form cancel button
+        project_uuid = self.kwargs.get("project_uuid")
+        context["project_uuid"] = project_uuid
+
+        return context
 
 
 class FeedbackFormListView(
@@ -226,4 +236,36 @@ class FeedbackFormUpdateView(
                 "project_uuid": self.object.project.uuid,
                 "feedback_form_uuid": self.object.uuid,
             },
+        )
+
+
+class FeedbackFormDeleteView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
+    DeleteView,
+):
+    model = FeedbackForm
+    template_name = "editor_ui/feedback_forms/feedback_form_delete.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "feedback_form_uuid"
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["owner", "editor"]
+    parent_model = Project
+    parent_lookup_kwarg = "project_uuid"
+
+    breadcrumb = None
+
+    def get_queryset(self):
+        project_uuid = self.kwargs.get("project_uuid")
+        return FeedbackForm.objects.filter(
+            project__uuid=project_uuid
+        ).select_related("project")
+
+    def get_success_url(self):
+        project_uuid = self.kwargs.get("project_uuid")
+        return reverse(
+            "editor_ui:project__feedback_form_list",
+            kwargs={"project_uuid": project_uuid},
         )

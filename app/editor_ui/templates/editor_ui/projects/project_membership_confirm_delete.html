@@ -1,21 +1,19 @@
-{% extends "base.html" %}
-{% block content %}
-    <div class="tna-section">
-        <div class="tna-container">
-            <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
-                <h1 class="tna-heading-xl">Confirm Deletion</h1>
-                <p>
-                    Are you sure you want to remove <strong>{{ object.user.email }}</strong> from project <strong>{{ object.project.name }}</strong>?
-                </p>
-                <form method="post">
-                    {{ csrf_input }}
-                    <div class="tna-button-group">
-                        <a href="{{ url("editor_ui:project__memberships", project_uuid=object.project.uuid) }}"
-                           class="tna-button tna-button--accent">Cancel</a>
-                        <button type="submit" class="tna-button tna-button--danger">Confirm Removal</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-{% endblock %}
+{% extends "editor_ui/generic_deletion_template.html" %}
+{% set pageTitle = "Remove user" %}
+
+{% block heading %}
+    Confirm user removal
+{% endblock heading %}
+
+{% block heading_text %}
+    Are you sure you want to remove the user <strong>{{ object.user.email }}</strong> from project <strong>{{ object.project.name }}</strong>?
+{% endblock heading_text %}
+
+{% block submit_button_text %}
+    Remove user
+{% endblock submit_button_text %}
+
+{% block cancel_button %}
+    <a href="{{ url("editor_ui:project__memberships", project_uuid=object.project.uuid) }}"
+       class="tna-button tna-button--plain">Cancel</a>
+{% endblock cancel_button %}

@@ -1,4 +1,4 @@
-<div class="tna-column tna-column--full tna-!--padding-top-m">
+<div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny tna-!--padding-top-m">
     <div class="tna-table-wrapper">
         <hgroup class="tna-hgroup-m">
             <h2 class="tna-hgroup__title">Ranged prompt options</h2>
@@ -17,10 +17,13 @@
                         <tr class="tna-table__row">
                             <td class="tna-table__cell">{{ option.label }}</td>
                             <td class="tna-table__cell">{{ option.value }}</td>
-                            <td class="tna-table__cell">
+                            <td class="tna-table__cell tna-table__cell--button">
                                 <a href="{{ url('editor_ui:project__feedback_form__prompt__ranged_prompt_options_edit', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid, option_uuid=option.uuid) }}"
                                    class="tna-button"
                                    data-testing-id="edit-button">Edit</a>
+                                <a href="{{ url('editor_ui:project__feedback_form__prompt__ranged_prompt_options_delete', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid, option_uuid=option.uuid) }}"
+                                   class="tna-button"
+                                   data-testing-id="edit-button">Delete</a>
                             </td>
                         </tr>
                     {% endfor %}

@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
 from django.urls import reverse
+from django.views.generic import DeleteView
 
 from app.editor_ui.forms import (
     PathPatternForm,
@@ -23,6 +24,7 @@ class PathPatternCreateView(
     CustomCreateView,
 ):
     form_class = PathPatternForm
+    template_name = "editor_ui/path_patterns/path_pattern_create.html"
     model_display_name = "Path Pattern"
 
     # ProjectMembershipRequiredMixin mixin attributes
@@ -67,6 +69,17 @@ class PathPatternCreateView(
             },
         )
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # required for form cancel button
+        project_uuid = self.kwargs.get("project_uuid")
+        feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
+        context["project_uuid"] = project_uuid
+        context["feedback_form_uuid"] = feedback_form_uuid
+
+        return context
+
 
 class PathPatternUpdateView(
     LoginRequiredMixin,
@@ -107,5 +120,41 @@ class PathPatternUpdateView(
             kwargs={
                 "project_uuid": self.object.feedback_form.project.uuid,
                 "feedback_form_uuid": self.object.feedback_form.uuid,
+            },
+        )
+
+
+class PathPatternDeleteView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
+    DeleteView,
+):
+    model = PathPattern
+    template_name = "editor_ui/path_patterns/path_pattern_delete.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "path_pattern_uuid"
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["owner", "editor"]
+    parent_model = FeedbackForm
+    parent_lookup_kwarg = "feedback_form_uuid"
+
+    breadcrumb = None
+
+    def get_queryset(self):
+        feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
+        return PathPattern.objects.filter(
+            feedback_form__uuid=feedback_form_uuid
+        ).select_related("feedback_form")
+
+    def get_success_url(self):
+        project_uuid = self.kwargs.get("project_uuid")
+        feedback_form_uuid = self.kwargs.get("feedback_form_uuid")
+        return reverse(
+            "editor_ui:project__feedback_form_detail",
+            kwargs={
+                "project_uuid": project_uuid,
+                "feedback_form_uuid": feedback_form_uuid,
             },
         )
