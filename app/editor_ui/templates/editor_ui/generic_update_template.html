@@ -1,13 +1,13 @@
 {% extends "editor_ui/base_form_template.html" %}
-{% set pageTitle = "Edit " + model_display_name %}
+{% set pageTitle = "Edit " + model_display_name|lower %}
 
 {% block heading %}
-  Edit {{ object.name or model_display_name }}
+  Edit {{ object.name or model_display_name|lower }}
 {% endblock heading %}
 
 {% block heading_text %}
 {% endblock heading_text %}
 
 {% block submit_button_text %}
-  Update {{ model_display_name }}
+  Update {{ model_display_name|lower }}
 {% endblock submit_button_text %}
