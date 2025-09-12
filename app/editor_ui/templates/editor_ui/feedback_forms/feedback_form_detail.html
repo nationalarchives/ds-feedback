@@ -110,7 +110,7 @@
                 <tr class="tna-table__row">
                   <th class="tna-table__header tna-column--width-1-3">Text</th>
                   <th class="tna-table__header">Prompt Type</th>
-                  <th class="tna-table__header">Order</th>
+                  <th class="tna-table__header tna-table__header--numeric">Order</th>
                   <th class="tna-table__header">State</th>
                   <th class="tna-table__header">Created by</th>
                   <th class="tna-table__header"></th>
@@ -123,7 +123,7 @@
                       <a href="{{ url("editor_ui:projects:feedback_forms:prompts:detail", project_uuid, feedback_form.uuid, prompt.uuid) }}">{{ prompt.text|wordwrap(25) }}</a>
                     </th>
                     <td class="tna-table__cell">{{ prompt.field_label }}</td>
-                    <td class="tna-table__cell">{{ prompt.order }}</td>
+                    <td class="tna-table__cell tna-table__cell--numeric">{{ prompt.order }}</td>
                     <td class="tna-table__cell">
                       {% if prompt.is_enabled() %}
                         Active
