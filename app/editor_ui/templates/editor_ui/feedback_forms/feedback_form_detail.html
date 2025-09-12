@@ -1,9 +1,22 @@
 {% extends 'base.html' %}
+{% from "/components/error-summary/macro.html" import tnaErrorSummary %}
 {% set pageTitle = feedback_form.name|truncate(13, true) %}
 {% block content %}
   <div class="tna-section">
     <div class="tna-container">
       <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+        {% if messages %}
+          {% set ns = namespace(error_messages=[]) %}
+          {% for message in messages %}
+            {% set ns.error_messages = ns.error_messages + [{"text": message|string}] %}
+          {% endfor %}
+          {{ tnaErrorSummary({
+            "title": "There is a problem",
+            "headingLevel": 2,
+            "items": ns.error_messages,
+            "disableAutoFocus": true
+          }) }}
+        {% endif %}
         <hgroup class="tna-hgroup-xl">
           <p class="tna-hgroup__supertitle">Feedback form</p>
           <h1 class="tna-hgroup__title">{{ feedback_form.name|wordwrap(25) }}</h1>

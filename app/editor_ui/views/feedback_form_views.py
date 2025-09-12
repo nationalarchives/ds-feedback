@@ -1,10 +1,13 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.postgres.aggregates import StringAgg
 from django.db.models import (
     Count,
     F,
     Prefetch,
+    ProtectedError,
 )
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DeleteView, DetailView, ListView
@@ -285,3 +288,22 @@ class FeedbackFormDeleteView(
             "editor_ui:projects:feedback_forms:list",
             kwargs={"project_uuid": project_uuid},
         )
+
+    def form_valid(self, form):
+        success_url = self.get_success_url()
+
+        # Try to delete the object, but catch ProtectedError if it has related objects
+        try:
+            self.object.delete()
+        except ProtectedError:
+            messages.error(
+                self.request,
+                f"Cannot delete feedback form {self.object.name} because it is protected and may have responses.",
+            )
+            return redirect(
+                "editor_ui:project__feedback_form_detail",
+                project_uuid=self.object.project.uuid,
+                feedback_form_uuid=self.object.uuid,
+            )
+
+        return redirect(success_url)
