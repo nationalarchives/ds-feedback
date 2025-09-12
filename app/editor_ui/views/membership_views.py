@@ -31,13 +31,13 @@ class ProjectMembershipListView(
     model = ProjectMembership
     template_name = "editor_ui/projects/project_membership_list.html"
     context_object_name = "members"
-    required_project_roles = ["editor", "owner"]
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = "Project Members"
 
     def get_queryset(self):
@@ -77,13 +77,16 @@ class ProjectMembershipCreateView(
 ):
     form_class = ProjectMembershipCreateForm
     template_name = "editor_ui/projects/project_membership_create.html"
-    model_display_name = "Project Membership"
 
-    # ProjectMembershipRequiredMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["owner"]
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
 
+    # required by CustomCreateView
+    model_display_name = "Project membership"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def form_valid(self, form):
@@ -149,13 +152,16 @@ class ProjectMembershipUpdateView(
     template_name = "editor_ui/projects/project_membership_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "membership_uuid"
-    model_display_name = "Project Membership"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["owner"]
 
+    # required by CustomUpdateView
+    model_display_name = "Project membership"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_queryset(self):
@@ -216,11 +222,12 @@ class ProjectMembershipDeleteView(
     slug_field = "uuid"
     slug_url_kwarg = "membership_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_queryset(self):

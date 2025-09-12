@@ -51,13 +51,16 @@ class PromptCreateView(
 
     form_class = PromptForm
     template_name = "editor_ui/path_patterns/path_pattern_create.html"
-    model_display_name = "Prompt"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by CustomCreateView
+    model_display_name = "Prompt"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_feedback_form(self):
@@ -172,8 +175,11 @@ class PromptDetailView(
     slug_field = "uuid"
     slug_url_kwarg = "prompt_uuid"
     context_object_name = "prompt"
-    project_roles_required = ["owner", "editor"]
 
+    # required by ProjectMembershipRequiredMixin
+    project_roles_required = ["editor", "owner"]
+
+    # required by BreadCrumbsMixin
     breadcrumb_field = "text"
 
     def get_queryset(self):
@@ -226,11 +232,13 @@ class PromptUpdateView(
     slug_field = "uuid"
     slug_url_kwarg = "prompt_uuid"
 
-    model_display_name = "Prompt"
-
-    # ProjectOwnerMembershipMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["owner", "editor"]
 
+    # required by CustomUpdateView
+    model_display_name = "Prompt"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_queryset(self):
@@ -323,11 +331,12 @@ class PromptDeleteView(
     slug_field = "uuid"
     slug_url_kwarg = "prompt_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_queryset(self):
@@ -360,10 +369,11 @@ class RangedPromptOptionUpdateView(
     slug_field = "uuid"
     slug_url_kwarg = "option_uuid"
 
-    model_display_name = "Prompt Option"
-
-    # ProjectOwnerMembershipMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["editor", "owner"]
+
+    # required by CustomUpdateView
+    model_display_name = "Prompt option"
 
     breadcrumb = None
 
@@ -410,13 +420,16 @@ class RangedPromptOptionCreateView(
 ):
     form_class = RangedPromptOptionForm
     template_name = "editor_ui/prompts/ranged_prompt_create.html"
-    model_display_name = "Range Prompt Option"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = RangedPrompt
     parent_lookup_kwarg = "prompt_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by CustomCreateView
+    model_display_name = "Ranged prompt option"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_success_url(self):
@@ -470,11 +483,12 @@ class RangedPromptOptionDeleteView(
     slug_field = "uuid"
     slug_url_kwarg = "option_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["owner", "editor"]
     parent_model = Prompt
     parent_lookup_kwarg = "prompt_uuid"
 
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_queryset(self):

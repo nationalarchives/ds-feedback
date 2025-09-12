@@ -12,8 +12,10 @@ class CustomCreateView(CreateView):
     - Uses a default template 'editor_ui/generic_creation_template.html'.
     """
 
-    model_display_name = None
     template_name = "editor_ui/generic_creation_template.html"
+
+    # used to provide readable model name in templates.
+    model_display_name = None
 
     def get_context_data(self, **kwargs):
         if (
@@ -42,8 +44,10 @@ class CustomUpdateView(UpdateView):
     - Uses a default template 'editor_ui/generic_update_template.html'.
     """
 
-    model_display_name = None
     template_name = "editor_ui/generic_update_template.html"
+
+    # Used to provide human readable model name in templates.
+    model_display_name = None
 
     def get_context_data(self, **kwargs):
         if (

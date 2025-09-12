@@ -16,11 +16,12 @@ class ResponseListingView(
     template_name = "editor_ui/responses/response_list.html"
     context_object_name = "responses"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = "Responses"
 
     def get_queryset(self):
@@ -52,11 +53,13 @@ class ResponseDetailView(
     slug_field = "uuid"
     slug_url_kwarg = "response_uuid"
 
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["editor", "owner"]
 
-    breadcrumb = "Response Details"
+    # required by BreadCrumbsMixin
+    breadcrumb = "Response details"
 
     def get_queryset(self):
         return (

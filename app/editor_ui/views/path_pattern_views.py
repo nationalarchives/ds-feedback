@@ -25,14 +25,17 @@ class PathPatternCreateView(
 ):
     form_class = PathPatternForm
     template_name = "editor_ui/path_patterns/path_pattern_create.html"
-    model_display_name = "Path Pattern"
 
-    # ProjectMembershipRequiredMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["editor", "owner"]
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
 
-    breadcrumb = "Create a Path Pattern"
+    # required by CustomCreateView
+    model_display_name = "Path pattern"
+
+    # required by BreadCrumbsMixin
+    breadcrumb = None
 
     def form_valid(self, form):
         instance = form.save(commit=False)
@@ -88,6 +91,7 @@ class PathPatternCreateView(
 class PathPatternUpdateView(
     LoginRequiredMixin,
     ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
     CustomUpdateView,
 ):
     model = PathPattern
@@ -96,10 +100,14 @@ class PathPatternUpdateView(
     slug_field = "uuid"
     slug_url_kwarg = "path_pattern_uuid"
 
-    model_display_name = "Path Pattern"
-
-    # ProjectOwnerMembershipMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["editor", "owner"]
+
+    # required by CustomUpdateView
+    model_display_name = "Path pattern"
+
+    # required by BreadCrumbsMixin
+    breadcrumb = None
 
     def form_valid(self, form):
         instance = form.save(commit=False)
@@ -139,11 +147,12 @@ class PathPatternDeleteView(
     slug_field = "uuid"
     slug_url_kwarg = "path_pattern_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["owner", "editor"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_queryset(self):

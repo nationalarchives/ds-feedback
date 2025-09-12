@@ -35,9 +35,15 @@ class ProjectCreateView(
 ):
     form_class = ProjectCreateForm
     template_name = "editor_ui/projects/project_create.html"
-    model_display_name = "Project"
+
+    # required by PermissionRequiredMixin
     permission_required = ["projects.add_project"]
-    breadcrumb = "Create a Project"
+
+    # required by CustomCreateView
+    model_display_name = "Project"
+
+    # required by breadcrumbsMixin
+    breadcrumb = "None"
 
     def get_success_url(self):
         return reverse(
@@ -54,8 +60,11 @@ class ProjectListView(
     model = Project
     template_name = "editor_ui/projects/project_list.html"
     context_object_name = "projects"
+
+    # required by get_queryset method
     project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = "Projects"
 
     def get_queryset(self):
@@ -95,9 +104,10 @@ class ProjectDetailView(
     slug_field = "uuid"
     slug_url_kwarg = "project_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb_field = "name"
 
     def get_queryset(self):
@@ -153,14 +163,17 @@ class ProjectUpdateView(
 ):
     model = Project
     form_class = ProjectUpdateForm
-    model_display_name = "Project"
     template_name = "editor_ui/projects/project_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "project_uuid"
 
-    # ProjectOwnerMembershipMixin mixin attributes
+    # required by ProjectOwnerMembershipMixin
     project_roles_required = ["owner"]
 
+    # required by CustomUpdateView
+    model_display_name = "Project"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_success_url(self):
