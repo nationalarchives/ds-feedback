@@ -204,8 +204,11 @@ class ProjectMembershipUpdateView(
                 if owners_count == 0:
                     messages.error(
                         self.request,
-                        f"Cannot update {self.object.user}. "
-                        "Each project must have at least one owner.",
+                        f"Cannot update {self.object.user} as this would remove the project's only owner.",
+                    )
+                    messages.error(
+                        self.request,
+                        "Please assign a new owner before updating this user's role.",
                     )
                     return redirect(
                         "editor_ui:projects:memberships:list",
@@ -293,7 +296,11 @@ class ProjectMembershipDeleteView(
                 if owners_count == 0:
                     messages.error(
                         self.request,
-                        f"Cannot remove {self.object.user}. Each project must have at least one owner.",
+                        f"Cannot remove {self.object.user} as this would remove the project's only owner.",
+                    )
+                    messages.error(
+                        self.request,
+                        "Please assign a new owner before removing this user.",
                     )
                     return redirect(
                         "editor_ui:projects:memberships:list",

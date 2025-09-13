@@ -440,7 +440,53 @@ class ProjectMembershipAccessTests(TestCase):
         )
         self.assertContains(
             response,
-            f"Cannot remove {self.owner.email}. Each project must have at least one owner.",
+            f"Cannot remove {self.owner.email} as this would remove the project&#39;s only owner.",
+            status_code=200,
+        )
+        self.assertEqual(
+            ProjectMembership.objects.filter(
+                project=project_with_single_owner
+            ).count(),
+            1,
+            "Project should have exactly one owner membership after deletion attempt",
+        )
+
+    def test_owner_cannot_alter_their_own_membership_if_only_one_owner(self):
+        """
+        Test that a project owner cannot alter their own membership if they are the only
+        owner. This is an important restriction to prevent orphaned projects.
+        """
+        # Project with single owner membership
+        project_with_single_owner = ProjectFactory(created_by=self.owner)
+        self.owner_membership = ProjectMembership.objects.create(
+            project=project_with_single_owner,
+            user=self.owner,
+            role="owner",
+            created_by=self.owner,
+        )
+
+        self.assertEqual(
+            ProjectMembership.objects.filter(
+                project=project_with_single_owner
+            ).count(),
+            1,
+            "Project should have exactly one owner membership before deletion attempt",
+        )
+
+        # Try to update the only owner membership
+        url = self.get_project_membership_edit_url(
+            project_with_single_owner, self.owner_membership
+        )
+        self.client.force_login(self.owner)
+        response = self.client.post(url, {"role": "editor"}, follow=True)
+
+        self.assertRedirects(
+            response,
+            self.get_project_membership_list_url(project_with_single_owner),
+        )
+        self.assertContains(
+            response,
+            f"Cannot update {self.owner.email} as this would remove the project&#39;s only owner.",
             status_code=200,
         )
         self.assertEqual(
