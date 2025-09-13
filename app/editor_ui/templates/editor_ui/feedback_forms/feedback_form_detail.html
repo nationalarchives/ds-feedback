@@ -80,9 +80,19 @@
         <hgroup class="tna-hgroup-m">
           <h2 class="tna-hgroup__title">Path patterns</h2>
         </hgroup>
-        <p class="tna-body">Define the paths that should trigger this feedback form.</p>
+        <p class="tna-body">Paths will be matched against incoming requests to determine if this feedback form is applicable.</p>
+        {% if not path_patterns %}<p>Currently there are no path patterns defined.</p>{% endif %}
+        <div class="tna-button-group">
+          <a href="{{ url("editor_ui:projects:feedback_forms:path_patterns:create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
+             class="tna-button"
+             aria-label="Create a path pattern"
+             title="Create a path pattern">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Create a path pattern
+          </a>
+        </div>
         {% if path_patterns %}
-          <div class="tna-table-wrapper tna-!--margin-top-s tna-!--margin-bottom-m">
+          <div class="tna-table-wrapper">
             <table class="tna-table">
               <thead class="tna-table__head">
                 <tr class="tna-table__row">
@@ -107,26 +117,26 @@
               </tbody>
             </table>
           </div>
-        {% else %}
-          <p>No path patterns</p>
         {% endif %}
-        <div class="tna-button-group">
-          <a href="{{ url("editor_ui:projects:feedback_forms:path_patterns:create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
-             class="tna-button"
-             aria-label="Create a path pattern"
-             title="Create a path pattern">
-            <i class="fa-solid fa-plus" aria-hidden="true"></i>
-            Create a path pattern
-          </a>
-        </div>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-xl">
         <hgroup class="tna-hgroup-m">
           <h2 class="tna-hgroup__title">Prompts</h2>
         </hgroup>
-        <p class="tna-body">Define the prompts for this feedback form.</p>
+        <p class="tna-body">Prompts are the questions that will be displayed on this feedback form.</p>
+        {% if not prompts %}<p>Currently there are no prompts defined.</p>{% endif %}
+        <div class="tna-button-group">
+          <a href="{{ url("editor_ui:projects:feedback_forms:prompts:create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
+             class="tna-button"
+             class="tna-button"
+             aria-label="Create a prompt"
+             title="Create a prompt">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Create a prompt
+          </a>
+        </div>
         {% if prompts %}
-          <div class="tna-table-wrapper tna-!--margin-top-s tna-!--margin-bottom-m">
+          <div class="tna-table-wrapper">
             <table class="tna-table">
               <thead class="tna-table__head">
                 <tr class="tna-table__row">
@@ -167,19 +177,7 @@
               </tbody>
             </table>
           </div>
-        {% else %}
-          <p>No prompts</p>
         {% endif %}
-        <div class="tna-button-group">
-          <a href="{{ url("editor_ui:projects:feedback_forms:prompts:create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"
-             class="tna-button"
-             class="tna-button"
-             aria-label="Create a prompt"
-             title="Create a prompt">
-            <i class="fa-solid fa-plus" aria-hidden="true"></i>
-            Create a prompt
-          </a>
-        </div>
       </div>
     </div>
   </div>
