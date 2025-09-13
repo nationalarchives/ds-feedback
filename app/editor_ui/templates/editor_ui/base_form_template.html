@@ -21,10 +21,10 @@
                             {% set ns.items = ns.items + [{"text": error|string}] %}
                         {% endfor %}
                         {{ tnaErrorSummary({
-                            title: "There is a problem",
-                            headingLevel: 2,
-                            items: ns.items,
-                            disableAutoFocus: true
+                            "title": "There is a problem",
+                            "headingLevel": 2,
+                            "items": ns.items,
+                            "disableAutoFocus": true
                             }) }}
                     {% endif %}
                     {% for field in form %}{{ forms.renderField(field) }}{% endfor %}
