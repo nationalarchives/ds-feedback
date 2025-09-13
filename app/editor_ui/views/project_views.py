@@ -77,7 +77,6 @@ class ProjectListView(
         qs = qs.annotate(
             responses_count=Count(
                 "feedback_forms__responses",
-                filter=Q(feedback_forms__disabled_at=None),
                 distinct=True,
             ),
         )
@@ -120,12 +119,10 @@ class ProjectDetailView(
             .annotate(
                 forms_count=Count(
                     "feedback_forms",
-                    filter=Q(feedback_forms__disabled_at=None),
                     distinct=True,
                 ),
                 responses_count=Count(
                     "feedback_forms__responses",
-                    filter=Q(feedback_forms__disabled_at=None),
                     distinct=True,
                 ),
             )
