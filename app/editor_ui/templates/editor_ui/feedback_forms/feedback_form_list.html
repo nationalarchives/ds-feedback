@@ -40,9 +40,9 @@
                     </th>
                     <td class="tna-table__cell">
                       {% if feedback_form.is_enabled() %}
-                        Active
+                        Published
                       {% else %}
-                        Inactive
+                        Draft
                       {% endif %}
                     </td>
                     <td class="tna-table__cell tna-table__cell--numeric">{{ feedback_form.created_at|date }}</td>
