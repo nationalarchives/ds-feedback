@@ -73,8 +73,8 @@
     {% set nav_items = [
       {
         "text": "Projects",
-        "href": url("editor_ui:project_list"),
-        "selected": is_active_url(url("editor_ui:project_list"), request)
+        "href": url("editor_ui:projects:list"),
+        "selected": is_active_url(url("editor_ui:projects:list"), request)
       },
       {
         "text": "Log out",

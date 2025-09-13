@@ -3,6 +3,6 @@
   <p>Editing the project details for '{{ object.name }}'.</p>
 {% endblock heading_text %}
 {% block cancel_button %}
-  <a href="{{ url('editor_ui:project_detail', project_uuid=object.uuid) }}"
+  <a href="{{ url('editor_ui:projects:detail', project_uuid=object.uuid) }}"
      class="tna-button tna-button--plain">Cancel</a>
 {% endblock cancel_button %}

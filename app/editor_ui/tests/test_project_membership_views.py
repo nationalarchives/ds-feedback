@@ -29,7 +29,9 @@ class ProjectMembershipListViewTests(TestCase):
     def test_admin_sees_all_user_management_actions(self):
         self.client.force_login(self.admin)
         response = self.client.get(
-            reverse("editor_ui:project__memberships", args=[self.project.uuid])
+            reverse(
+                "editor_ui:projects:memberships:list", args=[self.project.uuid]
+            )
         )
 
         self.assertEqual(response.status_code, 200)
@@ -40,7 +42,9 @@ class ProjectMembershipListViewTests(TestCase):
     def test_owner_sees_all_user_management_actions(self):
         self.client.force_login(self.owner)
         response = self.client.get(
-            reverse("editor_ui:project__memberships", args=[self.project.uuid])
+            reverse(
+                "editor_ui:projects:memberships:list", args=[self.project.uuid]
+            )
         )
 
         self.assertEqual(response.status_code, 200)
@@ -51,7 +55,9 @@ class ProjectMembershipListViewTests(TestCase):
     def test_editor_sees_limited_user_management_actions(self):
         self.client.force_login(self.editor)
         response = self.client.get(
-            reverse("editor_ui:project__memberships", args=[self.project.uuid])
+            reverse(
+                "editor_ui:projects:memberships:list", args=[self.project.uuid]
+            )
         )
 
         self.assertEqual(response.status_code, 200)
@@ -83,7 +89,7 @@ class ProjectMembershipDetailViewTests(TestCase):
     def test_admin_sees_project_management_actions(self):
         self.client.force_login(self.admin)
         response = self.client.get(
-            reverse("editor_ui:project_detail", args=[self.project.uuid])
+            reverse("editor_ui:projects:detail", args=[self.project.uuid])
         )
 
         self.assertEqual(response.status_code, 200)
@@ -92,7 +98,7 @@ class ProjectMembershipDetailViewTests(TestCase):
     def test_owner_sees_project_management_actions(self):
         self.client.force_login(self.owner)
         response = self.client.get(
-            reverse("editor_ui:project_detail", args=[self.project.uuid])
+            reverse("editor_ui:projects:detail", args=[self.project.uuid])
         )
 
         self.assertEqual(response.status_code, 200)
@@ -101,7 +107,7 @@ class ProjectMembershipDetailViewTests(TestCase):
     def test_editor_cannot_see_project_management_actions(self):
         self.client.force_login(self.editor)
         response = self.client.get(
-            reverse("editor_ui:project_detail", args=[self.project.uuid])
+            reverse("editor_ui:projects:detail", args=[self.project.uuid])
         )
 
         self.assertEqual(response.status_code, 200)

@@ -17,7 +17,7 @@ class ProjectCreationTests(TestCase):
         """Set up users and project creation URL for each test."""
         self.creator_user = UserFactory(add_project_creation_permission=True)
         self.other_user = UserFactory()
-        self.project_create_url = reverse("editor_ui:project_create")
+        self.project_create_url = reverse("editor_ui:projects:create")
 
     def test_user_with_add_project_acl_can_create_project(self):
         """
@@ -50,7 +50,7 @@ class ProjectCreationTests(TestCase):
 
         project = Project.objects.get(name="Owner Project")
         expected_url = reverse(
-            "editor_ui:project_detail",
+            "editor_ui:projects:detail",
             kwargs={"project_uuid": str(project.uuid)},
         )
 
@@ -93,7 +93,7 @@ class ProjectMembershipAssignmentTests(TestCase):
         """Set up users and project creation URL for each test."""
         self.creator_user = UserFactory(add_project_creation_permission=True)
         self.other_user = UserFactory()
-        self.project_create_url = reverse("editor_ui:project_create")
+        self.project_create_url = reverse("editor_ui:projects:create")
 
     def test_project_creator_gets_owner_membership_on_creation(self):
         """
@@ -167,14 +167,14 @@ class ProjectAccessTests(TestCase):
     def project_detail_url(self, project):
         """Helper to get project detail URL."""
         return reverse(
-            "editor_ui:project_detail",
+            "editor_ui:projects:detail",
             kwargs={"project_uuid": str(project.uuid)},
         )
 
     def get_project_update_url(self, project):
         """Helper to get project update URL."""
         return reverse(
-            "editor_ui:project_update",
+            "editor_ui:projects:update",
             kwargs={"project_uuid": str(project.uuid)},
         )
 
@@ -252,14 +252,14 @@ class ProjectMembershipAccessTests(TestCase):
     def get_project_membership_list_url(self, project):
         """Helper to get project membership list URL."""
         return reverse(
-            "editor_ui:project__memberships",
+            "editor_ui:projects:memberships:list",
             kwargs={"project_uuid": str(project.uuid)},
         )
 
     def get_project_membership_edit_url(self, project, membership):
         """Helper to get the project membership edit URL."""
         return reverse(
-            "editor_ui:project__memberships_edit",
+            "editor_ui:projects:memberships:update",
             kwargs={
                 "project_uuid": str(project.uuid),
                 "membership_uuid": str(membership.uuid),
@@ -269,7 +269,7 @@ class ProjectMembershipAccessTests(TestCase):
     def get_project_membership_delete_url(self, project, membership):
         """Helper to get the project membership delete URL."""
         return reverse(
-            "editor_ui:project__memberships_delete",
+            "editor_ui:projects:memberships:delete",
             kwargs={
                 "project_uuid": str(project.uuid),
                 "membership_uuid": str(membership.uuid),
@@ -336,7 +336,8 @@ class ProjectMembershipAccessTests(TestCase):
         self.client.force_login(self.editor)
         response = self.client.get(
             reverse(
-                "editor_ui:project__memberships_add", args=[self.project.uuid]
+                "editor_ui:projects:memberships:create",
+                args=[self.project.uuid],
             )
         )
 
@@ -349,14 +350,14 @@ class ProjectMembershipAccessTests(TestCase):
         )
         response = self.client.post(
             reverse(
-                "editor_ui:project__memberships_delete",
+                "editor_ui:projects:memberships:delete",
                 args=[self.project.uuid, editor_membership.uuid],
             ),
             follow=True,
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertRedirects(response, reverse("editor_ui:project_list"))
+        self.assertRedirects(response, reverse("editor_ui:projects:list"))
         self.assertFalse(
             ProjectMembership.objects.filter(
                 project=self.project, user=self.editor
@@ -370,7 +371,7 @@ class ProjectMembershipAccessTests(TestCase):
         )
         response = self.client.post(
             reverse(
-                "editor_ui:project__memberships_delete",
+                "editor_ui:projects:memberships:delete",
                 args=[self.project.uuid, owner_membership.uuid],
             ),
             follow=True,
