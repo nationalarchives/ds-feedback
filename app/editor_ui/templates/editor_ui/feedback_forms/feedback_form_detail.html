@@ -30,6 +30,16 @@
               Published
             {% endif %}
           </dd>
+          {% if not feedback_form.is_enabled() %}
+            <dt>Unpublished by</dt>
+            <dd>
+                {{ feedback_form.disabled_by }}
+            </dd>
+            <dt>Unpublished on</dt>
+            <dd>
+                {{ feedback_form.disabled_at|date() }}
+            </dd>
+          {% endif %}
           <dt>ID</dt>
           <dd>
             {{ feedback_form.uuid }}
