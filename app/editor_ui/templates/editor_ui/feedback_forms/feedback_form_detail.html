@@ -22,12 +22,24 @@
           <h1 class="tna-hgroup__title">{{ feedback_form.name|wordwrap(25) }}</h1>
         </hgroup>
         <dl class="tna-dl tna-dl--plain">
+          <dt>Project</dt>
+          <dd>
+            <a href="{{ url("editor_ui:project_detail", project_uuid) }}">{{ feedback_form.project }}</a>
+          </dd>
+          <dt>ID</dt>
+          <dd>
+            {{ feedback_form.uuid }}
+          </dd>
+          <dt>Created by</dt>
+            <dd>
+                {{ feedback_form.created_by }}
+            </dd>
           <dt>Status</dt>
           <dd>
             {% if feedback_form.disabled_at %}
-              Draft
+            Draft
             {% else %}
-              Published
+            Published
             {% endif %}
           </dd>
           {% if not feedback_form.is_enabled() %}
@@ -35,18 +47,18 @@
             <dd>
                 {{ feedback_form.disabled_by }}
             </dd>
-            <dt>Unpublished on</dt>
+            <dt>Date unpublished</dt>
             <dd>
-                {{ feedback_form.disabled_at|date() }}
+                {{ feedback_form.disabled_at|date }}
             </dd>
           {% endif %}
-          <dt>ID</dt>
+          <dt>Date created</dt>
           <dd>
-            {{ feedback_form.uuid }}
+            {{ feedback_form.created_at|date }}
           </dd>
-          <dt>Created</dt>
+          <dt>Last updated</dt>
           <dd>
-            {{ feedback_form.created_at|date("d M Y") }}
+            {{ feedback_form.modified_at|date }}
           </dd>
           <dt>Project</dt>
           <dd>

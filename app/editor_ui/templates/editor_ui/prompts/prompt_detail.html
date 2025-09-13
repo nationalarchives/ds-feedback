@@ -15,6 +15,24 @@
                     <dd>
                         <a href="{{ url("editor_ui:projects:feedback_forms:detail", project_uuid, feedback_form_uuid) }}">{{ prompt.feedback_form.name }}</a>
                     </dd>
+                    <dt>Type</dt>
+                    <dd>
+                        {{ prompt.field_label }}
+                    </dd>
+                    <dt>Order</dt>
+                    <dd>
+                        {{ prompt.order }}
+                    </dd>
+                    <dt>Created by</dt>
+                    <dd>
+                        {{ prompt.created_by }}
+                    </dd>
+                    {% if promptType == "TextPrompt" %}
+                        {% include "editor_ui/prompts/blocks/text_prompt_detail.html" %}
+                    {% endif %}
+                    {% if promptType == "BinaryPrompt" %}
+                        {% include "editor_ui/prompts/blocks/binary_prompt_detail.html" %}
+                    {% endif %}
                     <dt>Status</dt>
                     <dd>
                         {% if prompt.is_enabled() %}
@@ -28,32 +46,18 @@
                         <dd>
                             {{ prompt.disabled_by }}
                         </dd>
-                        <dt>Unpublished on</dt>
+                        <dt>Date unpublished</dt>
                         <dd>
-                            {{ prompt.disabled_at|date() }}
+                            {{ prompt.disabled_at|date }}
                         </dd>
                     {% endif %}
-                    <dt>Type</dt>
+                    <dt>Date created</dt>
                     <dd>
-                        {{ prompt.field_label }}
+                        {{ prompt.created_at|date }}
                     </dd>
-                    <dt>Order</dt>
+                    <dt>Last updated</dt>
                     <dd>
-                        {{ prompt.order }}
-                    </dd>
-                    {% if promptType == "TextPrompt" %}
-                        {% include "editor_ui/prompts/blocks/text_prompt_detail.html" %}
-                    {% endif %}
-                    {% if promptType == "BinaryPrompt" %}
-                        {% include "editor_ui/prompts/blocks/binary_prompt_detail.html" %}
-                    {% endif %}
-                    <dt>Created on</dt>
-                    <dd>
-                        {{ prompt.created_at|date("d M Y") }}
-                    </dd>
-                    <dt>Created by</dt>
-                    <dd>
-                        {{ prompt.created_by }}
+                        {{ prompt.modified_at|date }}
                     </dd>
                 </dl>
                 <div class="tna-button-group">

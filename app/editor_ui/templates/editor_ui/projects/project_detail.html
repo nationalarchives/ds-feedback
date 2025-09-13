@@ -13,19 +13,23 @@
           <dd>
             {{ project.domain }}
           </dd>
-          <dt>Project ID</dt>
+          <dt>ID</dt>
           <dd>
             {{ project.uuid }}
           </dd>
-          <dt>Data retention</dt>
+          <dt>Created by</dt>
+            <dd>
+                {{ project.created_by }}
+            </dd>
+          <dt>Data retention period</dt>
           <dd>
             {{ project.retention_period_days }} days
           </dd>
-          <dt>Created on</dt>
+          <dt>Date created</dt>
           <dd>
             {{ project.created_at|date }}
           </dd>
-          <dt>last modified</dt>
+          <dt>Last updated</dt>
           <dd>
             {{ project.modified_at|date }}
           </dd>
