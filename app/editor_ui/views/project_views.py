@@ -82,6 +82,8 @@ class ProjectListView(
             ),
         )
 
+        qs = qs.order_by("name")
+
         if user.is_superuser:
             return qs
 

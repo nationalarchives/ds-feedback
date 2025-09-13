@@ -7,6 +7,7 @@ from django.db.models import (
     Prefetch,
     ProtectedError,
 )
+from django.db.models.functions import Length
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -135,10 +136,13 @@ class FeedbackFormListView(
             .annotate(project_uuid=F("project__uuid"))
             .annotate(
                 prompts_count=Count("prompts", distinct=True),
-                path_patterns_str=StringAgg(
-                    "path_patterns__pattern", delimiter=", "
-                ),
             )
+        )
+
+        # Order by disabled_at (enabled first), then by name
+        qs = qs.order_by(
+            F("disabled_at").asc(nulls_first=True),
+            "name",
         )
 
         return qs.filter(project__uuid=self.kwargs.get("project_uuid"))
@@ -197,13 +201,23 @@ class FeedbackFormDetailView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # order path patterns by length (shortest to longest)
+        path_patterns = (
+            self.object.path_patterns.all()
+            .annotate(length=Length("pattern"))
+            .order_by("length")
+        )
+
+        # order prompts by disabled_at (enabled first), then by order field
+        prompts = self.object.prompts.select_subclasses().order_by(
+            F("disabled_at").asc(nulls_first=True), "order"
+        )
+
         context.update(
             {
                 "project_uuid": self.kwargs.get("project_uuid"),
-                "path_patterns": self.object.path_patterns.all(),
-                "prompts": self.object.prompts.select_subclasses().order_by(
-                    "order"
-                ),
+                "path_patterns": path_patterns,
+                "prompts": prompts,
             }
         )
 
