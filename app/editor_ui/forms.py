@@ -2,9 +2,9 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.core.validators import URLValidator
 
-from app.editor_ui.validators import validate_path_pattern
 from app.api.models import ProjectAPIAccess
 from app.api.types import APIAccessLifespan
+from app.editor_ui.validators import validate_path_pattern
 from app.feedback_forms.models import FeedbackForm, PathPattern
 from app.projects.models import Project, ProjectMembership
 from app.prompts.models import (

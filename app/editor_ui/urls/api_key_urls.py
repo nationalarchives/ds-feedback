@@ -1,7 +1,6 @@
 from django.urls import path
 
-from app.editor_ui.views.api_key_views import ApiKeyListView, ApiKeyCreateView
-
+from app.editor_ui.views.api_key_views import ApiKeyCreateView, ApiKeyListView
 
 app_name = "api_keys"
 
