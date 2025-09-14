@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F
 from django.shortcuts import get_object_or_404
@@ -164,6 +165,23 @@ class APIAccessDeleteView(
         return ProjectAPIAccess.objects.filter(
             project__uuid=project_uuid
         ).select_related("project", "grantee")
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Allow users to delete their own API access if they are an editor.
+        Otherwise, require owner access to delete other user's API access.
+        """
+        self.object = self.get_object()
+        object_user = self.object.grantee
+        authenticated_user = request.user
+
+        # Bypass role checks for self-deleting users
+        if object_user == authenticated_user:
+            self.project_roles_required = ["editor", "owner"]
+        else:
+            self.project_roles_required = ["owner"]
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         project_uuid = self.kwargs.get("project_uuid")
