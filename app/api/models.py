@@ -57,6 +57,10 @@ class ProjectAPIAccess(
     def is_active(self) -> bool:
         return self.expires_at > timezone.now()
 
+    def get_parent_project(self):
+        """Helper to get the parent Project for use in mixins."""
+        return self.project
+
     def save(self, *args, **kwargs):
         if self.id is None and self.expires_at is None:
             self.expires_at = timezone.now() + datetime.timedelta(

@@ -3,7 +3,7 @@ from django.db.models import F
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import ListView
+from django.views.generic import ListView, DeleteView
 
 from app.api.models import ProjectAPIAccess
 from app.api.types import APIRole
@@ -135,6 +135,38 @@ class APIAccessCreateView(
 
     def get_success_url(self):
         project_uuid = self.object.project.uuid
+        return reverse(
+            "editor_ui:projects:api_access:list",
+            kwargs={"project_uuid": project_uuid},
+        )
+
+
+class APIAccessDeleteView(
+    LoginRequiredMixin,
+    ProjectMembershipRequiredMixin,
+    BreadCrumbsMixin,
+    DeleteView,
+):
+    model = ProjectAPIAccess
+    template_name = "editor_ui/api_access/api_access_delete.html"
+    slug_field = "uuid"
+    slug_url_kwarg = "api_access_uuid"
+
+    # ProjectMembershipRequiredMixin mixin attributes
+    project_roles_required = ["owner", "editor"]
+    parent_model = Project
+    parent_lookup_kwarg = "project_uuid"
+
+    breadcrumb = None
+
+    def get_queryset(self):
+        project_uuid = self.kwargs.get("project_uuid")
+        return ProjectAPIAccess.objects.filter(
+            project__uuid=project_uuid
+        ).select_related("project", "grantee")
+
+    def get_success_url(self):
+        project_uuid = self.kwargs.get("project_uuid")
         return reverse(
             "editor_ui:projects:api_access:list",
             kwargs={"project_uuid": project_uuid},
