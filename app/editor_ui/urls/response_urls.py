@@ -9,12 +9,12 @@ app_name = "responses"
 
 urlpatterns = [
     path(
-        "projects/<uuid:project_uuid>/responses/",
+        "",
         ResponseListingView.as_view(),
         name="list",
     ),
     path(
-        "projects/<uuid:project_uuid>/responses/<uuid:response_uuid>/",
+        "<uuid:response_uuid>/",
         ResponseDetailView.as_view(),
         name="detail",
     ),

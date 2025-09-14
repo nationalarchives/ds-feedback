@@ -12,38 +12,38 @@ app_name = "feedback_forms"
 
 urlpatterns = [
     path(
-        "projects/<uuid:project_uuid>/feedback-forms/",
+        "",
         FeedbackFormListView.as_view(),
         name="list",
     ),
     path(
-        "projects/<uuid:project_uuid>/feedback-forms/create/",
+        "create/",
         FeedbackFormCreateView.as_view(),
         name="create",
     ),
     path(
-        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/update/",
+        "<uuid:feedback_form_uuid>/update/",
         FeedbackFormUpdateView.as_view(),
         name="update",
     ),
     path(
-        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/",
+        "<uuid:feedback_form_uuid>/",
         FeedbackFormDetailView.as_view(),
         name="detail",
     ),
     path(
-        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/delete/",
+        "<uuid:feedback_form_uuid>/delete/",
         FeedbackFormDeleteView.as_view(),
         name="delete",
     ),
     path(
-        "path-pattern/",
+        "<uuid:feedback_form_uuid>/path-patterns/",
         include(
             "app.editor_ui.urls.path_pattern_urls", namespace="path_patterns"
         ),
     ),
     path(
-        "prompts/",
+        "<uuid:feedback_form_uuid>/prompts/",
         include("app.editor_ui.urls.prompt_urls", namespace="prompts"),
     ),
 ]
