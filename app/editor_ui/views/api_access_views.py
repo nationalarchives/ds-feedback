@@ -91,7 +91,7 @@ class APIAccessCreateView(
     """
 
     form_class = ProjectAPIAccessCreateForm
-    object_name = "API Access"
+    model_display_name = "API Access"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
@@ -121,11 +121,11 @@ class APIAccessCreateView(
             uuid=self.kwargs.get("project_uuid")
         )
 
-        # Set grantee based on user permissions
-        if hasattr(form.cleaned_data, "grantee_user"):
+        # Only Project Owners can specify which user to grant access to
+        if "grantee_user" in form.cleaned_data:
             instance.grantee = form.cleaned_data["grantee_user"]
         else:
-            # For editor users, grantee is themselves
+            # all other users can only give themselves access
             instance.grantee = self.request.user
 
         # Always set role to read-only access

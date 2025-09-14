@@ -14,6 +14,7 @@ from app.prompts.models import (
     RangedPromptOption,
     TextPrompt,
 )
+from app.users.models import User
 
 url_validator = URLValidator(
     schemes=["https"],
@@ -379,7 +380,7 @@ class ProjectAPIAccessCreateForm(forms.ModelForm):
             return grantee_email
 
         try:
-            user = get_user_model().objects.get(email=grantee_email)
+            user = User.objects.get(email=grantee_email)
 
             # Check if user has access to the project
             if not self.project.members.filter(id=user.id).exists():
@@ -387,7 +388,7 @@ class ProjectAPIAccessCreateForm(forms.ModelForm):
                     "User must be a member of this project to receive API access."
                 )
 
-        except get_user_model().DoesNotExist:
+        except User.DoesNotExist:
             raise forms.ValidationError("User not found.")
 
         self.cleaned_data["grantee_user"] = user
