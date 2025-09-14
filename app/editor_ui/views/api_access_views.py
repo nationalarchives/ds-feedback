@@ -136,6 +136,6 @@ class APIAccessCreateView(
     def get_success_url(self):
         project_uuid = self.object.project.uuid
         return reverse(
-            "editor_ui:project__api_access_list",
+            "editor_ui:projects:api_access:list",
             kwargs={"project_uuid": project_uuid},
         )

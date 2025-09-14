@@ -5,7 +5,7 @@
     <div class="tna-container">
       <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
         <h1 class="tna-heading-xl">API Access</h1>
-        <a href="{{ url('editor_ui:project__api_access_create', project_uuid=project_uuid) }}" class="tna-button">Create API access</a>
+        <a href="{{ url('editor_ui:projects:api_access:create', project_uuid=project_uuid) }}" class="tna-button">Create API access</a>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
         {% if not api_accesses %}
