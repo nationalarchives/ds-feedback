@@ -5,7 +5,11 @@ from django.utils import timezone
 
 from app.projects.models import Project
 from app.users.models import User
-from app.utils.models import CreatedByModelMixin, TimestampedModelMixin
+from app.utils.models import (
+    CreatedByModelMixin,
+    TimestampedModelMixin,
+    UUIDModelMixin,
+)
 
 from .types import APIAccessLifespan, APIRole
 
@@ -16,7 +20,7 @@ class ProjectAPIAccessQuerySet(models.QuerySet):
 
 
 class ProjectAPIAccess(
-    CreatedByModelMixin, TimestampedModelMixin, models.Model
+    CreatedByModelMixin, TimestampedModelMixin, UUIDModelMixin, models.Model
 ):
     objects = ProjectAPIAccessQuerySet.as_manager()
 
