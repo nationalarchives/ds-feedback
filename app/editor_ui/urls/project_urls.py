@@ -1,11 +1,5 @@
 from django.urls import include, path
 
-from app.editor_ui.views.membership_views import (
-    ProjectMembershipCreateView,
-    ProjectMembershipDeleteView,
-    ProjectMembershipListView,
-    ProjectMembershipUpdateView,
-)
 from app.editor_ui.views.project_views import (
     ProjectCreateView,
     ProjectDetailView,
@@ -37,17 +31,17 @@ urlpatterns = [
         name="update",
     ),
     path(
-        "feedback-forms/",
+        "<uuid:project_uuid>/feedback-forms/",
         include(
             "app.editor_ui.urls.feedback_form_urls", namespace="feedback_forms"
         ),
     ),
     path(
-        "responses/",
+        "<uuid:project_uuid>/responses/",
         include("app.editor_ui.urls.response_urls", namespace="responses"),
     ),
     path(
-        "members/",
+        "<uuid:project_uuid>/members/",
         include(
             "app.editor_ui.urls.project_membership_urls",
             namespace="memberships",

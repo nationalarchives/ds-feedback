@@ -11,27 +11,27 @@ app_name = "prompts"
 
 urlpatterns = [
     path(
-        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/add/",
+        "add/",
         PromptCreateView.as_view(),
         name="create",
     ),
     path(
-        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/",
+        "<uuid:prompt_uuid>/",
         PromptDetailView.as_view(),
         name="detail",
     ),
     path(
-        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/edit/",
+        "<uuid:prompt_uuid>/edit/",
         PromptUpdateView.as_view(),
         name="update",
     ),
     path(
-        "projects/<uuid:project_uuid>/feedback-forms/<uuid:feedback_form_uuid>/prompts/<uuid:prompt_uuid>/delete/",
+        "<uuid:prompt_uuid>/delete/",
         PromptDeleteView.as_view(),
         name="delete",
     ),
     path(
-        "options/",
+        "<uuid:prompt_uuid>/options/",
         include("app.editor_ui.urls.prompt_option_urls", namespace="options"),
     ),
 ]
