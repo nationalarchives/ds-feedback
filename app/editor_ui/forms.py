@@ -376,8 +376,10 @@ class ProjectAPIAccessCreateForm(forms.ModelForm):
     def clean_grantee_email(self):
         grantee_email = self.cleaned_data.get("grantee_email")
 
-        if not grantee_email:
-            return grantee_email
+        if not grantee_email or not self.has_owner_access:
+            # default to user making the request, if no grantee email specified
+            self.cleaned_data["grantee_user"] = self.user
+            return None
 
         try:
             user = User.objects.get(email=grantee_email)
@@ -393,14 +395,6 @@ class ProjectAPIAccessCreateForm(forms.ModelForm):
 
         self.cleaned_data["grantee_user"] = user
         return grantee_email
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        if not self.has_owner_access:
-            cleaned_data["grantee_user"] = self.user
-
-        return cleaned_data
 
     class Meta:
         model = ProjectAPIAccess
