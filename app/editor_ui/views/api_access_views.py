@@ -13,7 +13,7 @@ from app.editor_ui.mixins import (
     CreatedByUserMixin,
     ProjectMembershipRequiredMixin,
 )
-from app.editor_ui.views.base_views import BaseCreateView
+from app.editor_ui.views.base_views import CustomCreateView
 from app.projects.models import Project, ProjectMembership
 
 
@@ -79,7 +79,7 @@ class APIAccessCreateView(
     ProjectMembershipRequiredMixin,
     CreatedByUserMixin,
     BreadCrumbsMixin,
-    BaseCreateView,
+    CustomCreateView,
 ):
     """
     View for creating a new ProjectAPIAccess within a project.
