@@ -53,7 +53,8 @@ class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
         related_name="project_memberships",
     )
     normalised_domain = models.CharField(
-        max_length=256, editable=False, null=True
+        max_length=256,
+        editable=False,
     )
 
     def clean(self):
