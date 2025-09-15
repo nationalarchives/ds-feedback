@@ -15,11 +15,9 @@
             <table class="tna-table">
               <thead class="tna-table__head">
                 <tr class="tna-table__row">
-                  <th class="tna-table__header">Grantee</th>
-                  <th class="tna-table__header">Role</th>
+                  <th class="tna-table__header">API User</th>
                   <th class="tna-table__header">Created By</th>
                   <th class="tna-table__header">Expires At</th>
-                  <th class="tna-table__header">Status</th>
                   <th class="tna-table__header"></th>
                 </tr>
               </thead>
@@ -29,19 +27,11 @@
                     <td class="tna-table__cell">
                       {{ api_access.grantee.get_full_name() or api_access.grantee.email }}
                     </td>
-                    <td class="tna-table__cell">{{ api_access.get_role_display() }}</td>
                     <td class="tna-table__cell">
                       {{ api_access.created_by.get_full_name() or api_access.created_by.email }}
                     </td>
                     <td class="tna-table__cell">
                       {{ api_access.expires_at.strftime("%I:%M %p on %B %d, %Y") }}
-                    </td>
-                    <td class="tna-table__cell">
-                      {% if api_access.is_active %}
-                        <span class="tna-tag tna-tag--green">Active</span>
-                      {% else %}
-                        <span class="tna-tag tna-tag--red">Expired</span>
-                      {% endif %}
                     </td>
                     <td class="tna-table__cell tna-table__cell--button">
                       <a href="{{ url("editor_ui:projects:api_access:delete", project_uuid=project_uuid, api_access_uuid=api_access.uuid) }}" class="tna-button">Remove</a>
