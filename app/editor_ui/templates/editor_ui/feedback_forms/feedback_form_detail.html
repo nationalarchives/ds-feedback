@@ -8,14 +8,18 @@
         {% if messages %}
           {% set ns = namespace(error_messages=[]) %}
           {% for message in messages %}
-            {% set ns.error_messages = ns.error_messages + [{"text": message|string}] %}
+            {% if message.level == 40 %}
+              {% set ns.error_messages = ns.error_messages + [{"text": message|string}] %}
+            {% endif %}
           {% endfor %}
-          {{ tnaErrorSummary({
-            "title": "There is a problem",
-            "headingLevel": 2,
-            "items": ns.error_messages,
-            "disableAutoFocus": true
-          }) }}
+          {% if ns.error_messages %}
+            {{ tnaErrorSummary({
+              "title": "There is a problem",
+              "headingLevel": 2,
+              "items": ns.error_messages,
+              "disableAutoFocus": true
+            }) }}
+          {% endif %}
         {% endif %}
         <hgroup class="tna-hgroup-xl">
           <p class="tna-hgroup__supertitle">Feedback form</p>
