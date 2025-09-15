@@ -188,6 +188,18 @@ class ProjectUpdateView(
     # required by BreadCrumbsMixin
     breadcrumb = None
 
+    def form_valid(self, form):
+        try:
+            response = super().form_valid(form)
+        except IntegrityError:
+            form.add_error(
+                "domain",
+                "This domain is already in use with another project.",
+            )
+            return self.form_invalid(form)
+
+        return response
+
     def get_success_url(self):
         return reverse(
             "editor_ui:projects:detail",
