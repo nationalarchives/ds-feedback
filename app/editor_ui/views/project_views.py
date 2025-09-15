@@ -106,6 +106,19 @@ class ProjectListView(
 
         return qs.filter(**filter_kwargs).distinct()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "user_can_create_project": self.request.user.has_perm(
+                    "projects.add_project"
+                )
+                or self.request.user.is_superuser,
+            }
+        )
+
+        return context
+
 
 class ProjectDetailView(
     LoginRequiredMixin,

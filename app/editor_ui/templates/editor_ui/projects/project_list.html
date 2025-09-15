@@ -8,6 +8,7 @@
         <p>Below are the projects you can access. Select a project to view its details or create a new one.</p>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
+        {% if user_can_create_project %}
         <div class="tna-button-group">
           <a href="{{ url("editor_ui:projects:create") }}"
              class="tna-button"
@@ -17,6 +18,7 @@
             Create a project
           </a>
         </div>
+        {% endif %}
         {% if not projects %}
           <p>No projects found.</p>
         {% else %}
