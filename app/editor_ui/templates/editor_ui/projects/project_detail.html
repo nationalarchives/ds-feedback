@@ -52,7 +52,12 @@
         <div class="tna-aside tna-aside--tight tna-background-accent">
           <h2 class="tna-heading-m">
           </h2>
-            <span class="tna-heading-xl u-pl-s">{{ forms_count }}</span><a href="{{ url("editor_ui:projects:feedback_forms:list", project_uuid=project.uuid) }}">feedback form{{ forms_count|pluralize }}</a>
+            <span class="tna-heading-xl u-pl-s">{{ forms_count }}</span>
+            {% if forms_count > 0 %}
+              <a href="{{ url("editor_ui:projects:feedback_forms:list", project_uuid=project.uuid) }}">feedback form{{ forms_count|pluralize }}</a>
+            {% else %}
+              <a href="{{ url("editor_ui:projects:feedback_forms:create", project_uuid=project.uuid) }}">feedback form{{ forms_count|pluralize }}</a>
+            {% endif %}
         </div>
       </div>
       <div class="tna-column tna-column--width-1-3 tna-column--full-small tna-column--full-tiny tna-!--margin-top-l">
