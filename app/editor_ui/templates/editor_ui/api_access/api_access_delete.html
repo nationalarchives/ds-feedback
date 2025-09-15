@@ -7,7 +7,7 @@
 {% endblock heading %}
 
 {% block heading_text %}
-Are you sure you want to remove the API Access for <strong>{{ object.grantee.email }}</strong> from project <strong>{{ object.project.name }}</strong>, valid until <strong> {{ object.expires_at.strftime("%I:%M %p on %B %d, %Y") }}</strong>? 
+Are you sure you want to remove the API Access for <b>{{ object.grantee.email }}</b> from project <b>{{ object.project.name }}</b>, valid until <b> {{ object.expires_at.strftime("%I:%M %p on %B %d, %Y") }}</b>? 
 {% endblock heading_text %}
 
 {% block submit_button_text %}
