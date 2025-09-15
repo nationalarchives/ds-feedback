@@ -1,43 +1,41 @@
-{% extends 'base.html' %}
-{% if has_existing_token %}
-	{% set pageTitle = "Refresh API Key" %}
-{% else %}
-	{% set pageTitle = "Create API Key" %}
-{% endif %}
-{% block content %}
-  <div class="tna-section">
-    <div class="tna-container">
-      <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
-        <hgroup class="tna-hgroup-xl">
-          <p class="tna-hgroup__supertitle">User</p>
-          <h1 class="tna-hgroup__title">
-			{% if has_existing_token %}
-				Refresh API Key
-			{% else %}
-				Create API Key
-			{% endif %}
-		  </h1>
-        </hgroup>
-        
-        <p>Creating an API key will allow you to access the API programmatically.</p>
-        
-        {% if has_existing_token %}
-        <div class="tna-warning-callout">
-          <h2 class="tna-warning-callout__heading">Important</h2>
-          <div class="tna-warning-callout__body">
-            <p>You already have an API key. Creating a new one will replace your existing key and invalidate it.</p>
-          </div>
-        </div>
-        {% endif %}
+{% extends 'editor_ui/generic_creation_template.html' %}
+{% from "components/warning/macro.html" import tnaWarning %}
 
-        <form method="post" action="">
-          {{ csrf_input }}
-          <div class="tna-button-group">
-            <button type="submit" class="tna-button">Confirm</button>
-            <a href="{{ url('editor_ui:api_keys:list') }}" class="tna-button tna-button--plain">Cancel</a>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-{% endblock content %}
+{% if has_existing_token %}
+  {% set pageTitle = "Refresh API Key" %}
+{% else %}
+  {% set pageTitle = "Create API Key" %}
+{% endif %}
+
+{% block heading %}
+  <hgroup class="tna-hgroup-xl">
+    <p class="tna-hgroup__supertitle">User</p>
+    <h1 class="tna-hgroup__title">
+      {% if has_existing_token %}
+        Refresh API Key
+      {% else %}
+        Create API Key
+      {% endif %}
+    </h1>
+  </hgroup>
+{% endblock heading %}
+
+{% block heading_text %}
+  {% if not has_existing_token %}
+    <p>
+      Please confirm you wish to create a personal API key to access project details via the API.
+    </p>
+  {% else %}
+    <p>You already have an API key. Creating a new one will replace your existing key and invalidate it.</p>
+    <p>Do you want to proceed?</p>
+  {% endif %}
+{% endblock heading_text %}
+
+{% block submit_button_text %}
+  Confirm
+{% endblock submit_button_text %}
+
+{% block cancel_button %}
+  <a href="{{ url("editor_ui:api_keys:list") }}"
+     class="tna-button tna-button--plain">Cancel</a>
+{% endblock cancel_button %}

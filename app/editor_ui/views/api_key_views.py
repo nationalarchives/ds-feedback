@@ -6,6 +6,7 @@ from django.views.generic import CreateView, ListView
 from rest_framework.authtoken.models import Token
 
 from app.editor_ui.mixins import BreadCrumbsMixin
+from app.editor_ui.views.base_views import CustomCreateView
 
 
 class ApiKeyListView(LoginRequiredMixin, BreadCrumbsMixin, ListView):
@@ -27,7 +28,7 @@ class ApiKeyListView(LoginRequiredMixin, BreadCrumbsMixin, ListView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class ApiKeyCreateView(LoginRequiredMixin, BreadCrumbsMixin, CreateView):
+class ApiKeyCreateView(LoginRequiredMixin, BreadCrumbsMixin, CustomCreateView):
     """
     A view to confirm whether the user would like to create a API Key for their use.
     """
@@ -36,6 +37,8 @@ class ApiKeyCreateView(LoginRequiredMixin, BreadCrumbsMixin, CreateView):
     fields = []
     template_name = "editor_ui/user/api_key_create.html"
     success_url = reverse_lazy("editor_ui:api_keys:list")
+
+    model_display_name = "API Key"
 
     breadcrumb = "Create API Key"
 
