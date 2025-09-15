@@ -92,12 +92,14 @@ class APIAccessCreateView(
     """
 
     form_class = ProjectAPIAccessCreateForm
-    model_display_name = "API Access"
+    template_name = "editor_ui/api_access/api_access_create.html"
 
     # ProjectMembershipRequiredMixin mixin attributes
     project_roles_required = ["editor", "owner"]
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+
+    model_display_name = "API Access"
 
     breadcrumb = "Create API Access"
 
@@ -140,6 +142,15 @@ class APIAccessCreateView(
             "editor_ui:projects:api_access:list",
             kwargs={"project_uuid": project_uuid},
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # required for form cancel button
+        project_uuid = self.kwargs.get("project_uuid")
+        context["project_uuid"] = project_uuid
+
+        return context
 
 
 class APIAccessDeleteView(
