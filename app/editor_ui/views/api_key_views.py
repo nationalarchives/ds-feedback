@@ -35,7 +35,7 @@ class ApiKeyCreateView(LoginRequiredMixin, BreadCrumbsMixin, CreateView):
     model = Token
     fields = []
     template_name = "editor_ui/user/api_key_create.html"
-    success_url = reverse_lazy("editor_ui:api_key_list")
+    success_url = reverse_lazy("editor_ui:api_keys:list")
 
     breadcrumb = "Create API Key"
 

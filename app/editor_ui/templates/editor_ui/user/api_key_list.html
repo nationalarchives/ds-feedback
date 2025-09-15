@@ -19,10 +19,10 @@
               {{ token.created|date("d M Y") }}
             </dd>
           </dl>
-          <a href="{{ url('editor_ui:api_key_create') }}" class="tna-button">Generate New Key</a>
+          <a href="{{ url('editor_ui:api_keys:create') }}" class="tna-button">Generate New Key</a>
         {% else %}
           <p>You don't have an API key yet.</p>
-          <a href="{{ url('editor_ui:api_key_create') }}" class="tna-button">Create Key</a>
+          <a href="{{ url('editor_ui:api_keys:create') }}" class="tna-button">Create Key</a>
         {% endfor %}
       </div>
     </div>
