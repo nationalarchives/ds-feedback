@@ -60,10 +60,6 @@
           <dd>
             {{ feedback_form.modified_at|date }}
           </dd>
-          <dt>Project</dt>
-          <dd>
-            <a href="{{ url("editor_ui:projects:detail", project_uuid) }}">{{ feedback_form.project }}</a>
-          </dd>
         </dl>
         <div class="tna-button-group">
         {% if user_project_permissions.is_member %}
