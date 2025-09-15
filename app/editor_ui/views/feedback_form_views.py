@@ -312,10 +312,10 @@ class FeedbackFormDeleteView(
         except ProtectedError:
             messages.error(
                 self.request,
-                f"Cannot delete feedback form {self.object.name} because it is protected and may have responses.",
+                "Cannot delete feedback form as it has responses.",
             )
             return redirect(
-                "editor_ui:project__feedback_form_detail",
+                "editor_ui:projects:feedback_forms:detail",
                 project_uuid=self.object.project.uuid,
                 feedback_form_uuid=self.object.uuid,
             )
