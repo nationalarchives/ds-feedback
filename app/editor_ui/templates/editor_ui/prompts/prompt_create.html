@@ -6,6 +6,6 @@
 {% endblock description %}
 
 {% block cancel_button %}
-  <a href="{{ url('editor_ui:projects:feedback_forms:detail', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid }}"
+  <a href="{{ url('editor_ui:projects:feedback_forms:detail', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid) }}"
      class="tna-button tna-button--plain">Cancel</a>
 {% endblock cancel_button %}
