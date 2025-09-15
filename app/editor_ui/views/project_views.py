@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     PermissionRequiredMixin,
 )
+from django.db import IntegrityError
 from django.db.models import (
     Count,
     Prefetch,
@@ -44,6 +45,18 @@ class ProjectCreateView(
 
     # required by breadcrumbsMixin
     breadcrumb = "None"
+
+    def form_valid(self, form):
+        try:
+            response = super().form_valid(form)
+        except IntegrityError:
+            form.add_error(
+                "domain",
+                "This domain is already in use with another project.",
+            )
+            return self.form_invalid(form)
+
+        return response
 
     def get_success_url(self):
         return reverse(

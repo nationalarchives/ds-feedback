@@ -1,3 +1,5 @@
+import re
+
 from django.db import models
 from django.db.models.constraints import CheckConstraint
 
@@ -50,6 +52,24 @@ class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
         through_fields=("project", "user"),
         related_name="project_memberships",
     )
+    normalised_domain = models.CharField(
+        max_length=256, editable=False, null=True
+    )
+
+    def clean(self):
+        # Create normalized version for uniqueness check
+        if self.domain:
+            normalised = self.domain.lower()
+            normalised = re.sub(r"^https://", "", normalised)
+            normalised = re.sub(r"^www\.", "", normalised)
+            normalised = normalised.rstrip("/")
+            self.normalised_domain = normalised
+
+        return super().clean()
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
     class Meta:
         constraints = [
@@ -58,7 +78,12 @@ class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
                     retention_period_days__in=RETENTION_PERIOD_CHOICES
                 ),
                 name="retention_period_days_choices",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["normalised_domain"],
+                name="unique_normalised_domain",
+                violation_error_message="This domain is already in use with another project.",
+            ),
         ]
 
     def __str__(self):
