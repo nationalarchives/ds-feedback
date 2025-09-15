@@ -76,7 +76,7 @@
         <hgroup class="tna-hgroup-m">
           <h2 class="tna-hgroup__title">Path patterns</h2>
         </hgroup>
-        <p class="tna-body">Paths will be matched against incoming requests to determine if this feedback form is applicable.</p>
+        <p class="tna-body">Path patterns define which URLs within the project’s domain will display this feedback form.</p>
         {% if not path_patterns %}<p>Currently there are no path patterns defined.</p>{% endif %}
         <div class="tna-button-group">
           <a href="{{ url("editor_ui:projects:feedback_forms:path_patterns:create", project_uuid=project_uuid, feedback_form_uuid=feedback_form.uuid) }}"

@@ -142,7 +142,7 @@ class PromptForm(forms.ModelForm):
         required=False,
         initial=True,
         label="Publish this prompt",
-        help_text="Published prompts will be available externally for published feedback forms",
+        help_text="Check this box to publish the prompt. Published prompts will be available externally if the parent feedback form is published",
         widget=forms.CheckboxInput(attrs={"text": "Publish"}),
     )
 
