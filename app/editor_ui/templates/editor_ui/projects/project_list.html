@@ -22,7 +22,7 @@
             <table class="tna-table">
               <thead class="tna-table__head">
                 <tr class="tna-table__row">
-                  <th class="tna-table__header">Name</th>
+                  <th class="tna-table__header tna-column--width-1-4">Name</th>
                   <th class="tna-table__header">Domain</th>
                   <th class="tna-table__header tna-table__header--numeric">Date created</th>
                   <th class="tna-table__header tna-table__header--numeric">Last updated</th>
@@ -33,10 +33,10 @@
                 {% for project in projects %}
                   <tr class="tna-table__row">
                     <th class="tna-table__header">
-                      <a href="{{ url("editor_ui:projects:detail", project_uuid=project.uuid) }}">{{ project.name }}</a>
+                      <a href="{{ url("editor_ui:projects:detail", project_uuid=project.uuid) }}">{{ project.name|wordwrap(25) }}</a>
                     </th>
                     <td class="tna-table__cell">{{ project.domain }}</td>
-                    <td class="tna-table__cell tna-table__cell--numeric">{{ project.created_at|date }}</td>
+                    <td class="tna-table__cell tna-table__cell--numeric tna-column--width-min-content">{{ project.created_at|date }}</td>
                     <td class="tna-table__cell tna-table__cell--numeric">{{ project.modified_at|date }}</td>
                     <td class="tna-table__cell tna-table__cell--numeric">{{ project.responses_count }}</td>
                   </tr>
