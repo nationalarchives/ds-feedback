@@ -1,5 +1,3 @@
-import re
-
 from django.db import models
 from django.db.models.constraints import CheckConstraint
 
@@ -61,8 +59,6 @@ class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
         # Create normalized version for uniqueness check
         if self.domain:
             normalised = self.domain.lower()
-            normalised = re.sub(r"^https://", "", normalised)
-            normalised = re.sub(r"^www\.", "", normalised)
             normalised = normalised.rstrip("/")
             self.normalised_domain = normalised
 
