@@ -1,14 +1,13 @@
 {% extends "editor_ui/generic_deletion_template.html" %}
-{% set pageTitle = "Remove API Access" %}
-
+{% set pageTitle = "Remove API access" %}
 
 {% block heading %}
 	Confirm removal
 {% endblock heading %}
 
-{% block heading_text %}
+{% block description %}
 Are you sure you want to remove the API Access for <b>{{ object.grantee.email }}</b> from project <b>{{ object.project.name }}</b>, valid until <b> {{ object.expires_at.strftime("%I:%M %p on %B %d, %Y") }}</b>? 
-{% endblock heading_text %}
+{% endblock description %}
 
 {% block submit_button_text %}
     Remove API access

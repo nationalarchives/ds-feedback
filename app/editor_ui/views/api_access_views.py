@@ -42,7 +42,7 @@ class APIAccessListView(
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
 
-    breadcrumb = "API Access"
+    breadcrumb = "API access"
 
     def get_queryset(self):
         project_uuid = self.kwargs.get("project_uuid")

@@ -7,7 +7,7 @@
       <div class="tna-column tna-column--full">
         <hgroup class="tna-hgroup-xl">
           <p class="tna-hgroup__supertitle">User</p>
-          <h1 class="tna-hgroup__title">API Key</h1>
+          <h1 class="tna-hgroup__title">API key</h1>
         </hgroup>
         <p>
           An API key allows you to access project data via the API.
@@ -28,11 +28,11 @@
       <div class="tna-column tna-column--full tna-!--padding-top-m tna-!--padding-bottom-m">
         {% for token in tokens %}
           <dl class="tna-dl tna-dl--plain">
-            <dt>API Key</dt>
+            <dt>API key</dt>
             <dd>
               <code>{{ token.key }}</code>
             </dd>
-            <dt>Created on</dt>
+            <dt>Date created</dt>
             <dd>
               {{ token.created|date("d M Y") }}
             </dd>

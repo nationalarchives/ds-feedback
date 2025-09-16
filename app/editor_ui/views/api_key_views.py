@@ -38,9 +38,9 @@ class ApiKeyCreateView(LoginRequiredMixin, BreadCrumbsMixin, CustomCreateView):
     template_name = "editor_ui/user/api_key_create.html"
     success_url = reverse_lazy("editor_ui:api_keys:list")
 
-    model_display_name = "API Key"
+    model_display_name = "API key"
 
-    breadcrumb = "Create API Key"
+    breadcrumb = "Create API key"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

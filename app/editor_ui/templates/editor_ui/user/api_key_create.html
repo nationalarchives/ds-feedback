@@ -12,15 +12,15 @@
     <p class="tna-hgroup__supertitle">User</p>
     <h1 class="tna-hgroup__title">
       {% if has_existing_token %}
-        Refresh API Key
+        Refresh API key
       {% else %}
-        Create API Key
+        Create API key
       {% endif %}
     </h1>
   </hgroup>
 {% endblock heading %}
 
-{% block heading_text %}
+{% block description %}
   {% if not has_existing_token %}
     <p>
       Please confirm you wish to create a personal API key to access project details via the API.
@@ -29,7 +29,7 @@
     <p>You already have an API key. Creating a new one will replace your existing key and invalidate it.</p>
     <p>Do you want to proceed?</p>
   {% endif %}
-{% endblock heading_text %}
+{% endblock description %}
 
 {% block submit_button_text %}
   Confirm

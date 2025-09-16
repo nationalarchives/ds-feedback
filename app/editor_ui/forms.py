@@ -291,7 +291,7 @@ class RangedPromptUpdateForm(PromptUpdateForm):
 class ProjectMembershipCreateForm(forms.ModelForm):
     email = forms.EmailField(
         widget=forms.EmailInput(),
-        label="User Email",
+        label="User email",
         help_text="Enter the email address of the user you want to add to the project.",
     )
 
@@ -340,7 +340,7 @@ class ProjectMembershipUpdateForm(forms.ModelForm):
 class ProjectAPIAccessCreateForm(forms.ModelForm):
     grantee_email = forms.EmailField(
         widget=forms.EmailInput(),
-        label="User Email",
+        label="User email",
         help_text="Enter the email address of the user to grant API access to. Leave it empty to to grant yourself access.",
         required=False,
     )
@@ -348,7 +348,7 @@ class ProjectAPIAccessCreateForm(forms.ModelForm):
     lifespan_days = forms.ChoiceField(
         choices=APIAccessLifespan.choices,
         widget=forms.Select(attrs={"class": "tna-select"}),
-        label="Access Duration",
+        label="Access duration",
         help_text="How long the API access should remain active.",
     )
 
@@ -390,7 +390,9 @@ class ProjectAPIAccessCreateForm(forms.ModelForm):
                 )
 
         except get_user_model().DoesNotExist:
-            raise forms.ValidationError("User not found.")
+            raise forms.ValidationError(
+                "No user account found for this email address."
+            )
 
         self.cleaned_data["grantee_user"] = user
         return grantee_email
