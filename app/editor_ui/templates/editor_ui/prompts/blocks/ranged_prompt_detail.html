@@ -7,7 +7,7 @@
             <table class="tna-table">
                 <thead class="tna-table__head">
                     <tr class="tna-table__row">
-                        <th class="tna-table__header">Label</th>
+                        <th class="tna-table__header tna-column--width-1-2">Label</th>
                         <th class="tna-table__header">Value</th>
                         <th class="tna-table__header"></th>
                     </tr>
@@ -15,7 +15,7 @@
                 <tbody class="tna-table__body">
                     {% for option in prompt_options %}
                         <tr class="tna-table__row">
-                            <td class="tna-table__cell">{{ option.label }}</td>
+                            <td class="tna-table__cell">{{ option.label|wordwrap(25) }}</td>
                             <td class="tna-table__cell">{{ option.value }}</td>
                             <td class="tna-table__cell tna-table__cell--button">
                                 <a href="{{ url('editor_ui:projects:feedback_forms:prompts:options:update', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid, option_uuid=option.uuid) }}"

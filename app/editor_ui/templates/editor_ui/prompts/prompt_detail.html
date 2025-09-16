@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% set pageTitle = prompt.text %}
+{% set pageTitle = prompt.text|truncate(13, true) %}
 {% set promptType = prompt.type() %}
 {% block content %}
     <div class="tna-section">
@@ -7,7 +7,7 @@
             <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
                 <hgroup class="tna-hgroup-xl">
                     <p class="tna-hgroup__supertitle">Prompt</p>
-                    <h1 class="tna-hgroup__title">{{ prompt.text }}</h1>
+                    <h1 class="tna-hgroup__title">{{ prompt.text|wordwrap(25) }}</h1>
                 </hgroup>
                 <h2 class="tna-heading-l" id="details">Details</h2>
                 <dl class="tna-dl">

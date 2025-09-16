@@ -21,7 +21,7 @@
             <table class="tna-table">
               <thead class="tna-table__head">
                 <tr class="tna-table__row">
-                  <th class="tna-table__header">Name</th>
+                  <th class="tna-table__header tna-column--width-1-3">Name</th>
                   <th class="tna-table__header">State</th>
                   <th class="tna-table__header tna-table__header--numeric">Date created</th>
                   <th class="tna-table__header tna-table__header--numeric">Last modified</th>
@@ -31,7 +31,7 @@
                 {% for feedback_form in feedback_forms %}
                   <tr class="tna-table__row">
                     <th class="tna-table__header">
-                      <a href="{{ url("editor_ui:projects:feedback_forms:detail", project_uuid, feedback_form.uuid) }}">{{ feedback_form.name }}</a>
+                      <a href="{{ url("editor_ui:projects:feedback_forms:detail", project_uuid, feedback_form.uuid) }}">{{ feedback_form.name|wordwrap(25) }}</a>
                     </th>
                     <td class="tna-table__cell">
                       {% if feedback_form.is_enabled() %}

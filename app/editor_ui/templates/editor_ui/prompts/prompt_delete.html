@@ -1,5 +1,5 @@
 {% extends "editor_ui/generic_deletion_template.html" %}
-{% set pageTitle = "Delete " + object.text %}
+{% set pageTitle = "Delete " + object.text|truncate(13 ,true) %}
 
 {% block heading_text %}
     Are you sure you want to remove the prompt <strong>{{ object }}</strong> from feedback form <strong>{{ object.feedback_form.name }}</strong>?
