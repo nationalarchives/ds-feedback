@@ -15,24 +15,6 @@
                     <dd>
                         <a href="{{ url("editor_ui:projects:feedback_forms:detail", project_uuid, feedback_form_uuid) }}">{{ prompt.feedback_form.name }}</a>
                     </dd>
-                    <dt>Status</dt>
-                    <dd>
-                        {% if prompt.is_enabled() %}
-                            Active
-                        {% else %}
-                            Inactive
-                        {% endif %}
-                    </dd>
-                    {% if not prompt.is_enabled() %}
-                        <dt>Deactivated by</dt>
-                        <dd>
-                            {{ prompt.disabled_by }}
-                        </dd>
-                        <dt>Deactivated on</dt>
-                        <dd>
-                            {{ prompt.disabled_at }}
-                        </dd>
-                    {% endif %}
                     <dt>Type</dt>
                     <dd>
                         {{ prompt.field_label }}
@@ -41,29 +23,51 @@
                     <dd>
                         {{ prompt.order }}
                     </dd>
+                    <dt>Created by</dt>
+                    <dd>
+                        {{ prompt.created_by }}
+                    </dd>
                     {% if promptType == "TextPrompt" %}
                         {% include "editor_ui/prompts/blocks/text_prompt_detail.html" %}
                     {% endif %}
                     {% if promptType == "BinaryPrompt" %}
                         {% include "editor_ui/prompts/blocks/binary_prompt_detail.html" %}
                     {% endif %}
-                    <dt>Created on</dt>
+                    <dt>Status</dt>
                     <dd>
-                        {{ prompt.created_at|date("d M Y") }}
+                        {% if prompt.is_enabled() %}
+                            Published
+                        {% else %}
+                            Draft
+                        {% endif %}
                     </dd>
-                    <dt>Created by</dt>
+                    {% if not prompt.is_enabled() %}
+                        <dt>Unpublished by</dt>
+                        <dd>
+                            {{ prompt.disabled_by }}
+                        </dd>
+                        <dt>Date unpublished</dt>
+                        <dd>
+                            {{ prompt.disabled_at|date }}
+                        </dd>
+                    {% endif %}
+                    <dt>Date created</dt>
                     <dd>
-                        {{ prompt.created_by }}
+                        {{ prompt.created_at|date }}
                     </dd>
-                    <div class="tna-button-group">
-                        <a href="{{ url('editor_ui:projects:feedback_forms:prompts:update', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid) }}"
-                           class="tna-button"
-                           data-testing-id="edit-button">Edit Prompt</a>
-                           <a href="{{ url('editor_ui:projects:feedback_forms:prompts:delete', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid) }}"
-                           class="tna-button"
-                           data-testing-id="edit-button">Delete Prompt</a>
-                    </div>
+                    <dt>Last updated</dt>
+                    <dd>
+                        {{ prompt.modified_at|date }}
+                    </dd>
                 </dl>
+                <div class="tna-button-group">
+                    <a href="{{ url('editor_ui:projects:feedback_forms:prompts:update', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid) }}"
+                        class="tna-button"
+                        data-testing-id="edit-button">Edit Prompt</a>
+                        <a href="{{ url('editor_ui:projects:feedback_forms:prompts:delete', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid) }}"
+                        class="tna-button"
+                        data-testing-id="edit-button">Delete Prompt</a>
+                </div>
             </div>
             {% if promptType == "RangedPrompt" %}
                 {% include "editor_ui/prompts/blocks/ranged_prompt_detail.html" %}

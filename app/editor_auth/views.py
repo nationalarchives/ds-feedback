@@ -20,7 +20,7 @@ from app.editor_auth.forms import (
 class CustomLoginView(LoginView):
     authentication_form = CustomAuthenticationForm
     template_name = "registration/login.html"
-    next_page = reverse_lazy("main:index")
+    next_page = reverse_lazy("editor_ui:projects:list")
 
 
 class CustomLogoutConfirmationView(TemplateView):
@@ -28,7 +28,7 @@ class CustomLogoutConfirmationView(TemplateView):
 
 
 class CustomLogoutView(LogoutView):
-    next_page = reverse_lazy("main:index")
+    next_page = reverse_lazy("editor_ui:projects:list")
 
 
 class CustomResetPasswordView(SuccessMessageMixin, PasswordResetView):

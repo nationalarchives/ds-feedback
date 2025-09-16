@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import (
@@ -28,8 +29,6 @@ from app.prompts.models import (
     TextPrompt,
 )
 
-MAX_ACTIVE_PROMPTS = 3
-
 
 class PromptCreateView(
     LoginRequiredMixin,
@@ -50,14 +49,17 @@ class PromptCreateView(
     """
 
     form_class = PromptForm
-    template_name = "editor_ui/path_patterns/path_pattern_create.html"
-    model_display_name = "Prompt"
+    template_name = "editor_ui/prompts/prompt_create.html"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by CustomCreateView
+    model_display_name = "Prompt"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_feedback_form(self):
@@ -67,9 +69,9 @@ class PromptCreateView(
         )
 
     def form_valid(self, form):
-        data = form.cleaned_data
+        cleaned_data = form.cleaned_data
         feedback_form_uuid = self.kwargs["feedback_form_uuid"]
-        model_cls = Prompt.PROMPT_MAP[data["prompt_type"]]
+        model_cls = Prompt.PROMPT_MAP[cleaned_data["prompt_type"]]
 
         with transaction.atomic():
             # Lock the prompts rows of the feedback form to
@@ -77,15 +79,15 @@ class PromptCreateView(
             feedback_form = FeedbackForm.objects.get(uuid=feedback_form_uuid)
             prompts_locked = feedback_form.prompts.select_for_update().all()
 
-            # Count active prompts (not disabled) **after** acquiring the lock
+            # Count active prompts (published) **after** acquiring the lock
             active_count = prompts_locked.filter(
                 disabled_at__isnull=True
             ).count()
-            will_be_active = not data.get("is_disabled", False)
-            if will_be_active and active_count >= MAX_ACTIVE_PROMPTS:
+            will_be_active = cleaned_data.get("is_published", True)
+            if will_be_active and active_count >= settings.MAX_ACTIVE_PROMPTS:
                 form.add_error(
-                    "is_disabled",
-                    f"Cannot have more than {MAX_ACTIVE_PROMPTS} active prompts.",
+                    "is_published",
+                    f"Cannot have more than {settings.MAX_ACTIVE_PROMPTS} active prompts.",
                 )
                 return self.form_invalid(form)
 
@@ -96,14 +98,14 @@ class PromptCreateView(
 
             # Create the appropriate Prompt subclass instance with required fields
             self.object = model_cls(
-                text=data["text"],
+                text=cleaned_data["text"],
                 order=next_order,
                 feedback_form=self.get_feedback_form(),
                 created_by=self.request.user,
             )
 
-            # If the prompt should be disabled, set the disabled timestamp
-            if data.get("is_disabled"):
+            # If the prompt should not be published, set the disabled timestamp
+            if cleaned_data.get("is_published") is False:
                 self.object.disabled_at = timezone.now()
                 self.object.disabled_by = self.request.user
 
@@ -144,9 +146,9 @@ class PromptCreateView(
         # required for form cancel button
         context.update(
             {
-                "prompt_uuid": self.kwargs.get("prompt_uuid"),
                 "feedback_form_uuid": self.kwargs.get("feedback_form_uuid"),
                 "project_uuid": self.kwargs.get("project_uuid"),
+                "max_active_prompts": settings.MAX_ACTIVE_PROMPTS,
             }
         )
 
@@ -172,8 +174,11 @@ class PromptDetailView(
     slug_field = "uuid"
     slug_url_kwarg = "prompt_uuid"
     context_object_name = "prompt"
-    project_roles_required = ["owner", "editor"]
 
+    # required by ProjectMembershipRequiredMixin
+    project_roles_required = ["editor", "owner"]
+
+    # required by BreadCrumbsMixin
     breadcrumb_field = "text"
 
     def get_queryset(self):
@@ -226,11 +231,13 @@ class PromptUpdateView(
     slug_field = "uuid"
     slug_url_kwarg = "prompt_uuid"
 
-    model_display_name = "Prompt"
-
-    # ProjectOwnerMembershipMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["owner", "editor"]
 
+    # required by CustomUpdateView
+    model_display_name = "Prompt"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_queryset(self):
@@ -243,7 +250,7 @@ class PromptUpdateView(
 
     def get_initial(self):
         initial = super().get_initial()
-        initial["is_disabled"] = bool(self.object.disabled_at)
+        initial["is_published"] = not bool(self.object.disabled_at)
         return initial
 
     def get_form_class(self):
@@ -253,7 +260,7 @@ class PromptUpdateView(
         return form
 
     def form_valid(self, form):
-        data = form.cleaned_data
+        cleaned_data = form.cleaned_data
         feedback_form_uuid = self.kwargs["feedback_form_uuid"]
 
         with transaction.atomic():
@@ -268,16 +275,16 @@ class PromptUpdateView(
                 .exclude(uuid=self.object.uuid)
                 .count()
             )
-            will_be_active = not data.get("is_disabled", False)
-            if will_be_active and active_count >= MAX_ACTIVE_PROMPTS:
+            will_be_active = cleaned_data.get("is_published", True)
+            if will_be_active and active_count >= settings.MAX_ACTIVE_PROMPTS:
                 form.add_error(
-                    "is_disabled",
-                    f"Cannot have more than {MAX_ACTIVE_PROMPTS} active prompts.",
+                    "is_published",
+                    f"Cannot have more than {settings.MAX_ACTIVE_PROMPTS} active prompts.",
                 )
                 return self.form_invalid(form)
 
-            # If the prompt should be disabled, set the disabled timestamp
-            if data.get("is_disabled"):
+            # If the prompt should not be published, set the disabled timestamp
+            if cleaned_data.get("is_published") is False:
                 self.object.disabled_at = timezone.now()
                 self.object.disabled_by = self.request.user
             else:
@@ -306,6 +313,7 @@ class PromptUpdateView(
                 "prompt_uuid": self.object.uuid,
                 "feedback_form_uuid": self.object.feedback_form.uuid,
                 "project_uuid": self.object.feedback_form.project.uuid,
+                "max_active_prompts": settings.MAX_ACTIVE_PROMPTS,
             }
         )
 
@@ -323,11 +331,12 @@ class PromptDeleteView(
     slug_field = "uuid"
     slug_url_kwarg = "prompt_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = FeedbackForm
     parent_lookup_kwarg = "feedback_form_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_queryset(self):
@@ -360,10 +369,11 @@ class RangedPromptOptionUpdateView(
     slug_field = "uuid"
     slug_url_kwarg = "option_uuid"
 
-    model_display_name = "Prompt Option"
-
-    # ProjectOwnerMembershipMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["editor", "owner"]
+
+    # required by CustomUpdateView
+    model_display_name = "Prompt option"
 
     breadcrumb = None
 
@@ -410,13 +420,16 @@ class RangedPromptOptionCreateView(
 ):
     form_class = RangedPromptOptionForm
     template_name = "editor_ui/prompts/ranged_prompt_create.html"
-    model_display_name = "Range Prompt Option"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = RangedPrompt
     parent_lookup_kwarg = "prompt_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by CustomCreateView
+    model_display_name = "Ranged prompt option"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_success_url(self):
@@ -470,11 +483,12 @@ class RangedPromptOptionDeleteView(
     slug_field = "uuid"
     slug_url_kwarg = "option_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["owner", "editor"]
     parent_model = Prompt
     parent_lookup_kwarg = "prompt_uuid"
 
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_queryset(self):

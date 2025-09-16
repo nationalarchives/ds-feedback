@@ -3,18 +3,22 @@
 {% block content %}
   <div class="tna-section">
     <div class="tna-container">
-      <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+      <div class="tna-column tna-column--full">
         <h1 class="tna-heading-xl">Projects</h1>
-        <p>These are the projects you have access to. Select a project to edit details or manage access.</p>
+        <p>Below are the projects you can access. Select a project to view its details or create a new one.</p>
       </div>
       <div class="tna-column tna-column--full tna-!--padding-top-m">
-        <a href="{{ url("editor_ui:projects:create") }}"
-           class="tna-button tna-button--icon-only-mobile"
-           aria-label="Create a project"
-           title="Create a project">
-          <i class="fa-solid fa-plus" aria-hidden="true"></i>
-          Create a project
-        </a>
+        {% if user_can_create_project %}
+        <div class="tna-button-group">
+          <a href="{{ url("editor_ui:projects:create") }}"
+             class="tna-button"
+             aria-label="Create a project"
+             title="Create a project">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Create a project
+          </a>
+        </div>
+        {% endif %}
         {% if not projects %}
           <p>No projects found.</p>
         {% else %}

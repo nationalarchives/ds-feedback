@@ -1,7 +1,7 @@
 {% extends "editor_ui/generic_update_template.html" %}
-{% block heading_text %}
-  <p>Editing the project details for '{{ object.name }}'.</p>
-{% endblock heading_text %}
+{% block description %}
+  <p>Editing the project details for <b>{{ object.name }}</b>.</p>
+{% endblock description %}
 {% block cancel_button %}
   <a href="{{ url('editor_ui:projects:detail', project_uuid=object.uuid) }}"
      class="tna-button tna-button--plain">Cancel</a>

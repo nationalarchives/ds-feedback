@@ -2,12 +2,12 @@
 {% set pageTitle = "Remove user" %}
 
 {% block heading %}
-    Confirm user removal
+    Confirm project member removal
 {% endblock heading %}
 
-{% block heading_text %}
-    Are you sure you want to remove the user <strong>{{ object.user.email }}</strong> from project <strong>{{ object.project.name }}</strong>?
-{% endblock heading_text %}
+{% block description %}
+    Are you sure you want to remove the user <b>{{ object.user.email }}</b> from project <b>{{ object.project.name }}</b>?
+{% endblock description %}
 
 {% block submit_button_text %}
     Remove user

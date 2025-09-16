@@ -1,9 +1,9 @@
 {% extends "editor_ui/generic_deletion_template.html" %}
 {% set pageTitle = "Delete " + object.text|truncate(13, true) %}
 
-{% block heading_text %}
-    Are you sure you want to remove the prompt <strong>{{ object }}</strong> from feedback form <strong>{{ object.feedback_form.name }}</strong>?
-{% endblock heading_text %}
+{% block description %}
+    <p>Are you sure you want to remove the prompt <b>{{ object }}</b> from feedback form <b>{{ object.feedback_form.name }}</b>?</p>
+{% endblock description %}
 
 {% block submit_button_text %}
     Delete

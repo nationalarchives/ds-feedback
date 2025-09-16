@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     PermissionRequiredMixin,
 )
+from django.db import IntegrityError
 from django.db.models import (
     Count,
     Prefetch,
@@ -35,9 +36,27 @@ class ProjectCreateView(
 ):
     form_class = ProjectCreateForm
     template_name = "editor_ui/projects/project_create.html"
-    model_display_name = "Project"
+
+    # required by PermissionRequiredMixin
     permission_required = ["projects.add_project"]
-    breadcrumb = "Create a Project"
+
+    # required by CustomCreateView
+    model_display_name = "Project"
+
+    # required by breadcrumbsMixin
+    breadcrumb = "None"
+
+    def form_valid(self, form):
+        try:
+            response = super().form_valid(form)
+        except IntegrityError:
+            form.add_error(
+                "domain",
+                "This domain is already in use with another project.",
+            )
+            return self.form_invalid(form)
+
+        return response
 
     def get_success_url(self):
         return reverse(
@@ -54,8 +73,11 @@ class ProjectListView(
     model = Project
     template_name = "editor_ui/projects/project_list.html"
     context_object_name = "projects"
+
+    # required by get_queryset method
     project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = "Projects"
 
     def get_queryset(self):
@@ -68,10 +90,11 @@ class ProjectListView(
         qs = qs.annotate(
             responses_count=Count(
                 "feedback_forms__responses",
-                filter=Q(feedback_forms__disabled_at=None),
                 distinct=True,
             ),
         )
+
+        qs = qs.order_by("name")
 
         if user.is_superuser:
             return qs
@@ -82,6 +105,19 @@ class ProjectListView(
         }
 
         return qs.filter(**filter_kwargs).distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "user_can_create_project": self.request.user.has_perm(
+                    "projects.add_project"
+                )
+                or self.request.user.is_superuser,
+            }
+        )
+
+        return context
 
 
 class ProjectDetailView(
@@ -95,9 +131,10 @@ class ProjectDetailView(
     slug_field = "uuid"
     slug_url_kwarg = "project_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb_field = "name"
 
     def get_queryset(self):
@@ -108,12 +145,10 @@ class ProjectDetailView(
             .annotate(
                 forms_count=Count(
                     "feedback_forms",
-                    filter=Q(feedback_forms__disabled_at=None),
                     distinct=True,
                 ),
                 responses_count=Count(
                     "feedback_forms__responses",
-                    filter=Q(feedback_forms__disabled_at=None),
                     distinct=True,
                 ),
             )
@@ -153,15 +188,30 @@ class ProjectUpdateView(
 ):
     model = Project
     form_class = ProjectUpdateForm
-    model_display_name = "Project"
     template_name = "editor_ui/projects/project_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "project_uuid"
 
-    # ProjectOwnerMembershipMixin mixin attributes
+    # required by ProjectOwnerMembershipMixin
     project_roles_required = ["owner"]
 
+    # required by CustomUpdateView
+    model_display_name = "Project"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
+
+    def form_valid(self, form):
+        try:
+            response = super().form_valid(form)
+        except IntegrityError:
+            form.add_error(
+                "domain",
+                "This domain is already in use with another project.",
+            )
+            return self.form_invalid(form)
+
+        return response
 
     def get_success_url(self):
         return reverse(

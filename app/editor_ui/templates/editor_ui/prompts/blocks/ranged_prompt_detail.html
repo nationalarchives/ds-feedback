@@ -1,14 +1,14 @@
-<div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny tna-!--padding-top-m">
-    <div class="tna-table-wrapper">
-        <hgroup class="tna-hgroup-m">
-            <h2 class="tna-hgroup__title">Ranged prompt options</h2>
-        </hgroup>
-        {% if prompt_options %}
+<div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny tna-!--padding-top-xl">
+    <hgroup class="tna-hgroup-m">
+        <h2 class="tna-hgroup__title">Ranged prompt options</h2>
+    </hgroup>
+    {% if prompt_options %}
+        <div class="tna-table-wrapper tna-!--margin-top-s tna-!--margin-bottom-m">
             <table class="tna-table">
                 <thead class="tna-table__head">
                     <tr class="tna-table__row">
                         <th class="tna-table__header tna-column--width-1-2">Label</th>
-                        <th class="tna-table__header">Value</th>
+                        <th class="tna-table__header tna-table__header--numeric">Value</th>
                         <th class="tna-table__header"></th>
                     </tr>
                 </thead>
@@ -16,31 +16,30 @@
                     {% for option in prompt_options %}
                         <tr class="tna-table__row">
                             <td class="tna-table__cell">{{ option.label|wordwrap(25) }}</td>
-                            <td class="tna-table__cell">{{ option.value }}</td>
+                            <td class="tna-table__cell tna-table__cell--numeric">{{ option.value }}</td>
                             <td class="tna-table__cell tna-table__cell--button">
                                 <a href="{{ url('editor_ui:projects:feedback_forms:prompts:options:update', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid, option_uuid=option.uuid) }}"
-                                   class="tna-button"
+                                   class="tna-button tna-button--plain"
                                    data-testing-id="edit-button">Edit</a>
                                 <a href="{{ url('editor_ui:projects:feedback_forms:prompts:options:delete', project_uuid=project_uuid, feedback_form_uuid=feedback_form_uuid, prompt_uuid=prompt.uuid, option_uuid=option.uuid) }}"
-                                   class="tna-button"
+                                   class="tna-button tna-button--plain"
                                    data-testing-id="edit-button">Delete</a>
                             </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% else %}
-            <p>No ranged options</p>
-        {% endif %}
-        <div class="tna-button-group">
-            <a href="{{ url("editor_ui:projects:feedback_forms:prompts:options:create", project_uuid, feedback_form_uuid, prompt.uuid) }}"
-               class="tna-button"
-               class="tna-button tna-button--icon-only-mobile"
-               aria-label="Create a project"
-               title="Create a project">
-                <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                Create ranged prompt option
-            </a>
         </div>
+    {% else %}
+        <p>No ranged options</p>
+    {% endif %}
+    <div class="tna-button-group">
+        <a href="{{ url("editor_ui:projects:feedback_forms:prompts:options:create", project_uuid, feedback_form_uuid, prompt.uuid) }}"
+           class="tna-button"
+           aria-label="Create a prompt option"
+           title="Create a prompt option">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Create prompt option
+        </a>
     </div>
 </div>

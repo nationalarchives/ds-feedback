@@ -9,13 +9,13 @@
                     {% endblock heading %}
                 </h1>
                 <p>
-                    {% block heading_text %}
-                    {% endblock heading_text %}
+                    {% block description %}
+                    {% endblock description %}
                 </p>
                 <form method="post">
                     {{ csrf_input }}
                     <div class="tna-button-group">
-                        <button type="submit" class="tna-button tna-button--accent">
+                        <button type="submit" class="tna-button">
                             {% block submit_button_text %}
                             {% endblock submit_button_text %}
                         </button>

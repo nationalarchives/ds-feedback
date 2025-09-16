@@ -29,15 +29,15 @@ class ProjectMembershipListView(
     ListView,
 ):
     model = ProjectMembership
-    template_name = "editor_ui/projects/project_membership_list.html"
+    template_name = "editor_ui/project_memberships/project_membership_list.html"
     context_object_name = "members"
-    required_project_roles = ["editor", "owner"]
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = "Project Members"
 
     def get_queryset(self):
@@ -59,9 +59,11 @@ class ProjectMembershipListView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        project_uuid = self.kwargs.get("project_uuid")
 
-        context["project_uuid"] = project_uuid
+        project_uuid = self.kwargs.get("project_uuid")
+        context.update(
+            {"project_uuid": project_uuid},
+        )
 
         return context
 
@@ -74,14 +76,19 @@ class ProjectMembershipCreateView(
     CustomCreateView,
 ):
     form_class = ProjectMembershipCreateForm
-    template_name = "editor_ui/projects/project_membership_create.html"
-    model_display_name = "Project Membership"
+    template_name = (
+        "editor_ui/project_memberships/project_membership_create.html"
+    )
 
-    # ProjectMembershipRequiredMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["owner"]
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
 
+    # required by CustomCreateView
+    model_display_name = "Project membership"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def form_valid(self, form):
@@ -129,7 +136,9 @@ class ProjectMembershipCreateView(
 
         # required for form cancel button
         project_uuid = self.kwargs.get("project_uuid")
-        context["project_uuid"] = project_uuid
+        context.update(
+            {"project_uuid": project_uuid},
+        )
 
         return context
 
@@ -142,16 +151,21 @@ class ProjectMembershipUpdateView(
     CustomUpdateView,
 ):
     form_class = ProjectMembershipUpdateForm
-    template_name = "editor_ui/projects/project_membership_update.html"
+    template_name = (
+        "editor_ui/project_memberships/project_membership_update.html"
+    )
     slug_field = "uuid"
     slug_url_kwarg = "membership_uuid"
-    model_display_name = "Project Membership"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["owner"]
 
+    # required by CustomUpdateView
+    model_display_name = "Project membership"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_queryset(self):
@@ -190,8 +204,11 @@ class ProjectMembershipUpdateView(
                 if owners_count == 0:
                     messages.error(
                         self.request,
-                        f"Cannot update {self.object.user}. "
-                        "Each project must have at least one owner.",
+                        f"Cannot update {self.object.user} as this would remove the project's only owner.",
+                    )
+                    messages.error(
+                        self.request,
+                        "Please assign a new owner before updating this user's role.",
                     )
                     return redirect(
                         "editor_ui:projects:memberships:list",
@@ -208,15 +225,18 @@ class ProjectMembershipDeleteView(
     DeleteView,
 ):
     model = ProjectMembership
-    template_name = "editor_ui/projects/project_membership_confirm_delete.html"
+    template_name = (
+        "editor_ui/project_memberships/project_membership_confirm_delete.html"
+    )
     slug_field = "uuid"
     slug_url_kwarg = "membership_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_queryset(self):
@@ -276,7 +296,11 @@ class ProjectMembershipDeleteView(
                 if owners_count == 0:
                     messages.error(
                         self.request,
-                        f"Cannot remove {self.object.user}. Each project must have at least one owner.",
+                        f"Cannot remove {self.object.user} as this would remove the project's only owner.",
+                    )
+                    messages.error(
+                        self.request,
+                        "Please assign a new owner before removing this user.",
                     )
                     return redirect(
                         "editor_ui:projects:memberships:list",

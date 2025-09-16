@@ -7,19 +7,21 @@ from app.users.factories import StaffUserFactory
 from app.utils.testing import ResetFactorySequencesMixin, reverse_with_query
 
 
-class TestIndexView(ResetFactorySequencesMixin, TestCase):
+class TestDocumentationView(ResetFactorySequencesMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.admin_user = StaffUserFactory()
 
     def test_get_index_not_authorised(self):
-        response = self.client.get(reverse("main:index"))
-        login_url = reverse_with_query("editor_auth:login", {"next": "/"})
+        response = self.client.get(reverse("documentation"))
+        login_url = reverse_with_query(
+            "editor_auth:login", {"next": "/documentation/"}
+        )
         self.assertRedirects(response, login_url)
 
     def test_get_index_authorised(self):
         self.client.force_login(self.admin_user)
-        response = self.client.get(reverse("main:index"))
+        response = self.client.get(reverse("documentation"))
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
 

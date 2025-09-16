@@ -1,9 +1,0 @@
-{% extends "editor_ui/generic_update_template.html" %}
-
-{% block heading_text %}
-  Editing the membership role for {{ object.user }} in the {{ object.project }} project.
-{% endblock heading_text %}
-
-{% block cancel_button %}
-  <a href="{{ url('editor_ui:projects:memberships:list', project_uuid=object.project.uuid) }}" class="tna-button tna-button--plain">Cancel</a>
-{% endblock cancel_button %}

@@ -4,13 +4,15 @@
 {% block content %}
     <div class="tna-section">
         <div class="tna-container">
-            <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
+            <div class="tna-column tna-column--full">
                 <h1 class="tna-heading-xl">
                     {% block heading %}
                     {% endblock heading %}
                 </h1>
-                {% block heading_text %}
-                {% endblock heading_text %}
+                {% block description %}
+                {% endblock description %}
+            </div>
+            <div class="tna-column tna-column--width-2-3 tna-column--width-5-6-medium tna-column--full-small tna-column--full-tiny">
                 <form method="post" class="tna-form">
                     {{ csrf_input }}
                     {% set ns = namespace(items=[]) %}
@@ -19,15 +21,15 @@
                             {% set ns.items = ns.items + [{"text": error|string}] %}
                         {% endfor %}
                         {{ tnaErrorSummary({
-                            title: "There is a problem",
-                            headingLevel: 2,
-                            items: ns.items,
-                            disableAutoFocus: true
+                            "title": "There is a problem",
+                            "headingLevel": 2,
+                            "items": ns.items,
+                            "disableAutoFocus": true
                             }) }}
                     {% endif %}
                     {% for field in form %}{{ forms.renderField(field) }}{% endfor %}
                     <div class="tna-button-group">
-                        <button type="submit" class="tna-button tna-button--accent">
+                        <button type="submit" class="tna-button">
                             {% block submit_button_text %}
                             {% endblock submit_button_text %}
                         </button>

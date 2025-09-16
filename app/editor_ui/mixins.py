@@ -160,8 +160,8 @@ class ProjectMembershipRequiredMixin:
         Update template context with `user_project_permissions` to be used for
         """
         context = super().get_context_data(*args, **kwargs)
-        context["user_project_permissions"] = (
-            self.get_user_project_permissions()
+        context.update(
+            {"user_project_permissions": (self.get_user_project_permissions())}
         )
         return context
 
@@ -227,7 +227,9 @@ class BreadCrumbsMixin:
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["breadcrumbs"] = self._breadcrumb_calculator()
+        context.update(
+            {"breadcrumbs": self._breadcrumb_calculator()},
+        )
         return context
 
     def _breadcrumb_calculator(self):

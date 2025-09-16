@@ -1,9 +1,9 @@
 {% extends "editor_ui/generic_deletion_template.html" %}
-{% set pageTitle = "Delete " + object.pattern %}
+{% set pageTitle = "Delete path pattern" %}
 
-{% block heading_text %}
-    Are you sure you want to remove the path pattern <strong>{{ object.pattern }}</strong> from feedback form <strong>{{ object.feedback_form.name }}</strong>?
-{% endblock heading_text %}
+{% block description %}
+    Are you sure you want to remove the path pattern <b>{{ object.pattern }}</b> from feedback form <b>{{ object.feedback_form.name }}</b>?
+{% endblock description %}
 
 {% block submit_button_text %}
     Delete path pattern

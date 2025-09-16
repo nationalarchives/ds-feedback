@@ -1,10 +1,14 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.postgres.aggregates import StringAgg
 from django.db.models import (
     Count,
     F,
     Prefetch,
+    ProtectedError,
 )
+from django.db.models.functions import Length
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DeleteView, DetailView, ListView
@@ -46,13 +50,16 @@ class FeedbackFormCreateView(
 
     form_class = FeedbackFormForm
     template_name = "editor_ui/feedback_forms/feedback_form_create.html"
-    model_display_name = "Feedback Form"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by CustomCreateView
+    model_display_name = "Feedback form"
+
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def form_valid(self, form):
@@ -63,8 +70,8 @@ class FeedbackFormCreateView(
         instance.project = Project.objects.get(
             uuid=self.kwargs.get("project_uuid")
         )
-        # If the prompt should be disabled, set the disabled timestamp
-        if form.cleaned_data.get("is_disabled"):
+        # If the feedback form should be unpublished, set the disabled timestamp
+        if form.cleaned_data.get("is_published") is False:
             instance.disabled_at = timezone.now()
             instance.disabled_by = self.request.user
 
@@ -87,7 +94,9 @@ class FeedbackFormCreateView(
 
         # required for form cancel button
         project_uuid = self.kwargs.get("project_uuid")
-        context["project_uuid"] = project_uuid
+        context.update(
+            {"project_uuid": project_uuid},
+        )
 
         return context
 
@@ -111,12 +120,13 @@ class FeedbackFormListView(
     template_name = "editor_ui/feedback_forms/feedback_form_list.html"
     context_object_name = "feedback_forms"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["editor", "owner"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["editor", "owner"]
 
-    breadcrumb = "Feedback Forms"
+    # required by BreadCrumbsMixin for breadcrumb name
+    breadcrumb = "Feedback forms"
 
     def get_queryset(self):
         qs = (
@@ -126,17 +136,23 @@ class FeedbackFormListView(
             .annotate(project_uuid=F("project__uuid"))
             .annotate(
                 prompts_count=Count("prompts", distinct=True),
-                path_patterns_str=StringAgg(
-                    "path_patterns__pattern", delimiter=", "
-                ),
             )
+        )
+
+        # Order by disabled_at (enabled first), then by name
+        qs = qs.order_by(
+            F("disabled_at").asc(nulls_first=True),
+            "name",
         )
 
         return qs.filter(project__uuid=self.kwargs.get("project_uuid"))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["project_uuid"] = self.kwargs.get("project_uuid")
+
+        context.update(
+            {"project_uuid": self.kwargs.get("project_uuid")},
+        )
 
         return context
 
@@ -158,11 +174,14 @@ class FeedbackFormDetailView(
 
     model = FeedbackForm
     template_name = "editor_ui/feedback_forms/feedback_form_detail.html"
+    context_object_name = "feedback_form"
     slug_field = "uuid"
     slug_url_kwarg = "feedback_form_uuid"
-    context_object_name = "feedback_form"
+
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb_field = "name"
 
     def get_queryset(self):
@@ -182,15 +201,26 @@ class FeedbackFormDetailView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # order path patterns by length (shortest to longest)
+        path_patterns = (
+            self.object.path_patterns.all()
+            .annotate(length=Length("pattern"))
+            .order_by("length")
+        )
+
+        # order prompts by disabled_at (enabled first), then by order field
+        prompts = self.object.prompts.select_subclasses().order_by(
+            F("disabled_at").asc(nulls_first=True), "order"
+        )
+
         context.update(
             {
                 "project_uuid": self.kwargs.get("project_uuid"),
-                "path_patterns": self.object.path_patterns.all(),
-                "prompts": self.object.prompts.select_subclasses().order_by(
-                    "order"
-                ),
+                "path_patterns": path_patterns,
+                "prompts": prompts,
             }
         )
+
         return context
 
 
@@ -206,21 +236,23 @@ class FeedbackFormUpdateView(
     slug_field = "uuid"
     slug_url_kwarg = "feedback_form_uuid"
 
-    model_display_name = "Feedback Form"
+    # required by CustomUpdateView
+    model_display_name = "Feedback form"
 
-    # ProjectOwnerMembershipMixin mixin attributes
+    # required by ProjectMembershipRequiredMixin
     project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_initial(self):
         initial = super().get_initial()
-        initial["is_disabled"] = bool(self.object.disabled_at)
+        initial["is_published"] = not bool(self.object.disabled_at)
         return initial
 
     def form_valid(self, form):
         instance = form.save(commit=False)
-        if form.cleaned_data.get("is_disabled"):
+        if form.cleaned_data.get("is_published") is False:
             instance.disabled_at = timezone.now()
             instance.disabled_by = self.request.user
         else:
@@ -250,11 +282,12 @@ class FeedbackFormDeleteView(
     slug_field = "uuid"
     slug_url_kwarg = "feedback_form_uuid"
 
-    # ProjectMembershipRequiredMixin mixin attributes
-    project_roles_required = ["owner", "editor"]
+    # required by ProjectMembershipRequiredMixin
     parent_model = Project
     parent_lookup_kwarg = "project_uuid"
+    project_roles_required = ["editor", "owner"]
 
+    # required by BreadCrumbsMixin
     breadcrumb = None
 
     def get_queryset(self):
@@ -269,3 +302,22 @@ class FeedbackFormDeleteView(
             "editor_ui:projects:feedback_forms:list",
             kwargs={"project_uuid": project_uuid},
         )
+
+    def form_valid(self, form):
+        success_url = self.get_success_url()
+
+        # Try to delete the object, but catch ProtectedError if it has related objects
+        try:
+            self.object.delete()
+        except ProtectedError:
+            messages.error(
+                self.request,
+                "Cannot delete feedback form as it has responses.",
+            )
+            return redirect(
+                "editor_ui:projects:feedback_forms:detail",
+                project_uuid=self.object.project.uuid,
+                feedback_form_uuid=self.object.uuid,
+            )
+
+        return redirect(success_url)

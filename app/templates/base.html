@@ -60,7 +60,7 @@
 {% if request and (not request.COOKIES.get('cookie_preferences_set', False)) %}
 {{ tnaCookieBanner({
   'serviceName': 'The National Archives',
-  'cookiesUrl': url('main:cookies'),
+  'cookiesUrl': url('cookies'),
   'cookiesDomain': app_config.COOKIE_DOMAIN
 }) | indent(6) }}
 {% endif %}
@@ -101,8 +101,8 @@
     "navigation": nav_items,
     "topNavigation": [
       {
-        "text": "API Documentation",
-        "href": url("api:schema_swagger")
+        "text": "Documentation",
+        "href": url("documentation")
       }
     ]
   }) }}
