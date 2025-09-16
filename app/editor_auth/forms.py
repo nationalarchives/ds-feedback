@@ -76,7 +76,7 @@ class CustomSetPasswordForm(SetPasswordForm):
                 "spellcheck": "false",
             }
         ),
-        help_text=password_validation.password_validators_help_text_html(),
+        # help_text=password_validation.password_validators_help_text_html(),
     )
     new_password2 = forms.CharField(
         label="New password confirmation",
