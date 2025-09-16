@@ -19,8 +19,8 @@ USE_X_FORWARDED_HOST = strtobool(os.getenv("USE_X_FORWARDED_HOST", "False"))
 
 AUTH_USER_MODEL = "users.User"
 LOGIN_URL = "editor_auth:login"
-LOGIN_REDIRECT_URL = "main:index"
-LOGOUT_REDIRECT_URL = "main:index"
+LOGIN_REDIRECT_URL = "editor_ui:projects:list"
+LOGOUT_REDIRECT_URL = "editor_ui:projects:list"
 
 # Application definition
 INSTALLED_APPS = [

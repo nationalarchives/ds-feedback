@@ -21,12 +21,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from app.main import views as main_views
+
 urlpatterns = [
-    path("", include(("app.main.urls", "main"), namespace="main")),
+    path("", include("app.editor_ui.urls")),
+    path("documentation/", main_views.index, name="documentation"),
+    path("cookies/", main_views.cookies, name="cookies"),
     path("healthcheck/", include("app.healthcheck.urls")),
     path("admin/", admin.site.urls),
     path("auth/", include("app.editor_auth.urls")),
-    path("editor/", include("app.editor_ui.urls")),
     path("api/v1/", include("app.api.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
