@@ -1,5 +1,5 @@
 {% extends "editor_ui/generic_deletion_template.html" %}
- {% set pageTitle = "Delete " + object.label|truncate(13 ,true) %}
+ {% set pageTitle = "Delete " + object.label|truncate(13, true) %}
 
 {% block heading_text %}
     Are you sure you want to remove the ranged prompt option <strong>{{ object }}</strong> from prompt <strong>{{ object.ranged_prompt }}</strong>?
