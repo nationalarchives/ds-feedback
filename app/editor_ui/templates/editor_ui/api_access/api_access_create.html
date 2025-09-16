@@ -1,0 +1,24 @@
+{% extends "editor_ui/generic_creation_template.html" %}
+{% set pageTitle = "Create " + model_display_name %}
+
+{% block heading %}
+    Create {{ model_display_name }}
+{% endblock heading %}
+
+{% block description %}
+<p>This form allows you to grant API access to a project member, enabling them access project detail via the API.</p>
+<p>What you're granting:</p>
+<ul class="tna-ul">
+  <li><b>Access level</b>: User will be able to explore and export feedback responses via API</li>
+  <li><b>Access duration</b>: Access will automatically expire after the selected period</li>
+  <li><b>User-specific</b>: Access is granted to a specific project member</li>
+</ul>
+{% endblock description %}
+
+{% block submit_button_text %}
+    Create {{ model_display_name }}
+{% endblock submit_button_text %}
+
+{% block cancel_button %}
+  <a href="{{ url('editor_ui:projects:api_access:list', project_uuid=project_uuid) }}" class="tna-button tna-button--plain">Cancel</a>
+{% endblock cancel_button %}

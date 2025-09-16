@@ -31,6 +31,10 @@ urlpatterns = [
         name="update",
     ),
     path(
+        "<uuid:project_uuid>/api-access/",
+        include("app.editor_ui.urls.api_access_urls", namespace="api_access"),
+    ),
+    path(
         "<uuid:project_uuid>/feedback-forms/",
         include(
             "app.editor_ui.urls.feedback_form_urls", namespace="feedback_forms"

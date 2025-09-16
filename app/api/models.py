@@ -5,7 +5,11 @@ from django.utils import timezone
 
 from app.projects.models import Project
 from app.users.models import User
-from app.utils.models import CreatedByModelMixin, TimestampedModelMixin
+from app.utils.models import (
+    CreatedByModelMixin,
+    TimestampedModelMixin,
+    UUIDModelMixin,
+)
 
 from .types import APIAccessLifespan, APIRole
 
@@ -16,7 +20,7 @@ class ProjectAPIAccessQuerySet(models.QuerySet):
 
 
 class ProjectAPIAccess(
-    CreatedByModelMixin, TimestampedModelMixin, models.Model
+    CreatedByModelMixin, TimestampedModelMixin, UUIDModelMixin, models.Model
 ):
     objects = ProjectAPIAccessQuerySet.as_manager()
 
@@ -52,6 +56,10 @@ class ProjectAPIAccess(
     @property
     def is_active(self) -> bool:
         return self.expires_at > timezone.now()
+
+    def get_parent_project(self):
+        """Helper to get the parent Project for use in mixins."""
+        return self.project
 
     def save(self, *args, **kwargs):
         if self.id is None and self.expires_at is None:

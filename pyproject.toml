@@ -26,10 +26,11 @@ factory-boy = "^3.3.3"
 optional = true
 
 [tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
 factory-boy = "^3.3.3"
+isort = "^6.0.1"
 pytest = "^8.1.1"
 requests-mock = "^1.12.1"
-
 
 # Group for dev dependencies used in app container
 [tool.poetry.group.dev-app]

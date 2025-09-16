@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DeleteView, ListView
 
+from app.api.models import ProjectAPIAccess
 from app.editor_ui.forms import (
     ProjectMembershipCreateForm,
     ProjectMembershipUpdateForm,
@@ -306,5 +307,22 @@ class ProjectMembershipDeleteView(
                         "editor_ui:projects:memberships:list",
                         project_uuid=self.object.project.uuid,
                     )
+
+        if (
+            ProjectAPIAccess.objects.filter(
+                project=self.object.project, grantee=self.object.user
+            )
+            .active()
+            .exists()
+        ):
+            messages.error(
+                self.request,
+                f"Cannot remove {self.object.user}, as they have API access to the Project.",
+            )
+
+            return redirect(
+                "editor_ui:projects:memberships:list",
+                project_uuid=self.object.project.uuid,
+            )
 
         return super().form_valid(form)

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% set pageTitle = "API Access" %}
+{% block content %}
+  <div class="tna-section">
+    <div class="tna-container">
+      <div class="tna-column tna-column--full">
+        <h1 class="tna-heading-xl">API Access</h1>
+        <p>These are the API access entries for this project. They show which users' personal API keys have access to this project's data via the API.</p>
+      </div>
+      <div class="tna-column tna-column--full tna-!--padding-top-m">
+        <a href="{{ url('editor_ui:projects:api_access:create', project_uuid=project_uuid) }}"
+           class="tna-button"
+           aria-label="Create a project"
+           title="Create a project">
+           <i class="fa-solid fa-plus" aria-hidden="true"></i>
+           Add API access
+        </a>
+        {% if not api_accesses %}
+          <p>No API access entries found for this project.</p>
+        {% else %}
+          <div class="tna-table-wrapper">
+            <table class="tna-table">
+              <thead class="tna-table__head">
+                <tr class="tna-table__row">
+                  <th class="tna-table__header">API User</th>
+                  <th class="tna-table__header">Created By</th>
+                  <th class="tna-table__header">Expires at</th>
+                  <th class="tna-table__header"></th>
+                </tr>
+              </thead>
+              <tbody class="tna-table__body">
+                {% for api_access in api_accesses %}
+                  <tr class="tna-table__row">
+                    <td class="tna-table__cell">{{ api_access.grantee.email }}</td>
+                    <td class="tna-table__cell">{{ api_access.created_by.email }}</td>
+                    <td class="tna-table__cell">{{ api_access.expires_at.strftime("%I:%M %p on %B %d, %Y") }}</td>
+                    <td class="tna-table__cell tna-table__cell--button">
+                      <a href="{{ url("editor_ui:projects:api_access:delete", project_uuid=project_uuid, api_access_uuid=api_access.uuid) }}"
+                         class="tna-button">Remove</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}
