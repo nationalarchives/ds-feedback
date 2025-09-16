@@ -342,7 +342,7 @@ class ProjectAPIAccessCreateForm(forms.ModelForm):
     grantee_email = forms.EmailField(
         widget=forms.EmailInput(),
         label="User Email",
-        help_text="Enter the email address of the user to grant API access to.",
+        help_text="Enter the email address of the user to grant API access to. Leave it empty to to grant yourself access.",
         required=False,
     )
 
