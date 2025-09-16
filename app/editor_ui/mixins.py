@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.shortcuts import get_object_or_404
+from django.template.defaultfilters import truncatechars
 from django.urls import Resolver404, resolve
 from django.views.generic import DeleteView, DetailView, UpdateView
 
@@ -270,7 +271,10 @@ class BreadCrumbsMixin:
                                 view_class, resolved.kwargs, field_name
                             )
                             if obj and hasattr(obj, field_name):
-                                text = getattr(obj, field_name)
+                                text = truncatechars(
+                                    getattr(obj, field_name),
+                                    10,
+                                )
                             else:
                                 text = "Unknown"
                         except Exception:
