@@ -1,4 +1,4 @@
-ARG IMAGE=ghcr.io/nationalarchives/tna-python-django
+ARG IMAGE=ghcr.io/nationalarchives/tna-python
 ARG IMAGE_TAG=latest
 
 FROM "$IMAGE":"$IMAGE_TAG"
@@ -18,8 +18,8 @@ RUN mkdir /app/app/static/assets; \
 	cp -r /app/node_modules/@nationalarchives/frontend/nationalarchives/assets/* /app/app/static/assets; \
 	poetry run python /app/manage.py collectstatic --no-input --clear
 
-# Delete source files, tests and docs
-RUN rm -fR /app/src /app/test /app/docs
+# Clean up build dependencies
+RUN tna-clean
 
 # Run the application
-CMD ["tna-run", "config.wsgi:application"]
+CMD ["tna-wsgi", "config.wsgi:application"]

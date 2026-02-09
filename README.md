@@ -54,13 +54,13 @@ docker compose exec app cp -r /app/node_modules/@nationalarchives/frontend/natio
 ### Run tests
 
 ```sh
-docker compose exec dev poetry run python /app/manage.py test
+docker compose exec app poetry run python /app/manage.py test
 ```
 
 ### Format and lint code
 
 ```sh
-docker compose run dev ./format.sh
+docker compose run app format
 ```
 
 ### Dependency management

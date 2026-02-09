@@ -3,10 +3,9 @@ services:
     build:
       context: .
       args:
-        IMAGE: ghcr.io/nationalarchives/tna-python-django-root
-        IMAGE_TAG: preview
+        IMAGE: ghcr.io/nationalarchives/tna-python-dev
+        IMAGE_TAG: latest
     environment:
-      - RUNTIME=develop
       - DJANGO_SETTINGS_MODULE=config.settings.develop
       - SECRET_KEY=abc123
       - NPM_DEVELOP_COMMAND=dev
@@ -22,7 +21,9 @@ services:
       - db
     volumes:
       - ./:/app
-    command: ./run.sh
+    healthcheck:
+      start_period: 10s
+      start_interval: 2s
 
   db:
     image: postgres:latest
@@ -31,12 +32,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=postgres
     volumes:
-      - pgdata:/var/lib/postgresql/data
-
-  dev:
-    image: ghcr.io/nationalarchives/tna-python-dev:preview
-    volumes:
-      - ./:/app
+      - pgdata:/var/lib/postgresql
 
   docs:
     image: squidfunk/mkdocs-material

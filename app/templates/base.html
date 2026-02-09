@@ -30,7 +30,7 @@
     <link rel="apple-touch-icon" sizes="256x256" href="{{ static('assets/images/icon-256x256.png') }}">
     <link rel="apple-touch-icon" sizes="512x512" href="{{ static('assets/images/icon-512x512.png') }}">
     <link rel="apple-touch-icon" sizes="1024x1024" href="{{ static('assets/images/icon-1024x1024.png') }}">
-{% endblock %}
+{% endblock headIcons %}
 
 {% block head %}
     <meta name="tna.response.generated" content="{{ now_iso_8601() }}">
@@ -38,7 +38,7 @@
     <meta name="tna.app.tna-frontend" content="{{ app_config.TNA_FRONTEND_VERSION }}">
     <meta name="tna.app.build-version" content="{{ app_config.BUILD_VERSION }}">
     <meta name="tna.settings.theme" content="{{ theme }}">
-{% endblock %}
+{% endblock head %}
 
 {% block stylesheets %}
     <link rel="preconnect" href="https://use.typekit.net">
@@ -50,7 +50,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400..700&family=Roboto+Mono:wght@400..500&display=swap" media="screen,print">
     <link rel="stylesheet" href="{{ static('ie.css') }}?v={{ app_config.BUILD_VERSION }}" media="all and (-ms-high-contrast: none), (-ms-high-contrast: active)">
     <link rel="stylesheet" href="{{ static("feedback.css") }}">
-{% endblock %}
+{% endblock stylesheets %}
 
 {% block bodyStart %}
   {% include "atoms/sprites/sprites.html" %}
@@ -64,7 +64,7 @@
   'cookiesDomain': app_config.COOKIE_DOMAIN
 }) | indent(6) }}
 {% endif %}
-{% endblock %}
+{% endblock cookies %}
 
 {% block header %}
 {% set nav_items = [] %}
@@ -111,7 +111,7 @@
       }
     ]
   }) }}
-{% endblock %}
+{% endblock header %}
 
 {% block beforeContent %}
 {% if breadcrumbs and breadcrumbs | length > 0 %}
@@ -124,7 +124,7 @@
         </div>
       </div>
 {% endif %}
-{% endblock %}
+{% endblock beforeContent %}
 
 {% block footer %}
 {{ tnaFooter({
@@ -132,9 +132,9 @@
   'currentTheme': theme,
   'classes': 'tna-!--margin-top-l'
 }) | indent(4) }}
-{% endblock %}
+{% endblock footer %}
 
 {% block bodyEnd %}
 <script src="{{ static('main.min.js') }}?v={{ app_config.BUILD_VERSION }}" defer></script>
 <script src="{{ static('analytics.min.js') }}?v={{ app_config.BUILD_VERSION }}" defer></script>
-{% endblock %}
+{% endblock bodyEnd %}

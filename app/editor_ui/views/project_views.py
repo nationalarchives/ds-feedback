@@ -7,7 +7,6 @@ from django.db import IntegrityError
 from django.db.models import (
     Count,
     Prefetch,
-    Q,
 )
 from django.urls import reverse
 from django.views.generic import DetailView, ListView

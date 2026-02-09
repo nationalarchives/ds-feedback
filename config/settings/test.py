@@ -2,9 +2,9 @@ import os
 
 import dj_database_url
 
-from .base import *
-from .base import BASE_DIR, INSTALLED_APPS
-from .features import *
+from .features import *  # noqa: F401, F403
+from .production import *  # noqa: F401, F403
+from .production import BASE_DIR, INSTALLED_APPS
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
