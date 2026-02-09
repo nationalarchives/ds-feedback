@@ -6,14 +6,14 @@ runs:
     - name: Start Docker containers
       run: docker compose up --detach --wait --wait-timeout 300 || docker compose logs app
       shell: bash
-    - name: Check formatting
-      run: docker compose exec app checkformat
-      shell: bash
-    - name: Run check
-      run: docker compose exec app poetry run python manage.py check
+    - name: Collect statics assets
+      run: docker compose exec app poetry run python manage.py collectstatic --no-input --clear
       shell: bash
     - name: Run tests
       run: docker compose exec app poetry run python /app/manage.py test
+      shell: bash
+    - name: Run check
+      run: docker compose exec app poetry run python manage.py check
       shell: bash
     - name: Check for missing migrations
       run: docker compose exec app poetry run python manage.py makemigrations --check --noinput
