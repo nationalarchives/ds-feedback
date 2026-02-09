@@ -28,8 +28,10 @@ docker compose exec app poetry run python /app/manage.py migrate
 You will also need to create a superuser account:
 
 ```sh
-docker compose exec app poetry run python /app/manage.py createsuperuser
+docker compose exec app poetry run python /app/manage.py createsuperuser --no-input
 ```
+
+The default superuser is `admin@tna.dev`/`admin`.
 
 Then access the server at [http://localhost:65527/](http://localhost:65527/) and login.
 
@@ -54,7 +56,7 @@ docker compose exec app cp -r /app/node_modules/@nationalarchives/frontend/natio
 ### Run tests
 
 ```sh
-docker compose exec app poetry run python /app/manage.py test
+docker compose exec app poetry run pytest --ds=config.settings.test
 ```
 
 ### Format and lint code

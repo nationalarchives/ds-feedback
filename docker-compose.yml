@@ -8,10 +8,12 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings.develop
       - SECRET_KEY=abc123
+      - DEBUG=True
       - NPM_DEVELOP_COMMAND=dev
       - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
       - DJANGO_SUPERUSER_PASSWORD=admin
       - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_EMAIL=admin@tna.dev
       - COOKIE_DOMAIN=localhost
       - CSP_STYLE_SRC_ELEM='self',fonts.googleapis.com,p.typekit.net,use.typekit.net
       - CSP_FONT_SRC='self',fonts.gstatic.com,use.typekit.net

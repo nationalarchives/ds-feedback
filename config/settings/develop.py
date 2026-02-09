@@ -7,11 +7,10 @@ from .production import *  # noqa: F403
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
-DEBUG = strtobool(os.getenv("DEBUG", "False"))
-
-
 # Display sent emails in the console while developing locally.
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DEBUG = strtobool(os.getenv("DEBUG", "False"))
 
 if DEBUG:
     # Adds Django Silk
@@ -19,6 +18,8 @@ if DEBUG:
     INSTALLED_APPS.append("silk")  # noqa
 
     try:
+        import debug_toolbar  # noqa: F401
+
         INSTALLED_APPS += [  # noqa: F405
             "debug_toolbar",
         ]
@@ -32,4 +33,5 @@ if DEBUG:
             "SHOW_COLLAPSED": True,
         }
     except ImportError:
+        # Django debug toolbar is not available
         pass
