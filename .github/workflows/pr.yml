@@ -21,9 +21,11 @@ jobs:
       - name: Run tests
         uses: ./.github/actions/python-tests
 
-  check-format:
+  check-formatting:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
-      - name: Check formatting
-        uses: ./.github/actions/check-format
+      - name: Run tests
+        uses: ./.github/actions/check-formatting

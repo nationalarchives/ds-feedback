@@ -13,7 +13,7 @@ runs:
       run: docker compose exec app poetry run python manage.py check
       shell: bash
     - name: Run tests
-      run: docker compose exec app poetry run pytest --ds=config.settings.test
+      run: docker compose exec app poetry run python /app/manage.py test
       shell: bash
     - name: Check for missing migrations
       run: docker compose exec app poetry run python manage.py makemigrations --check --noinput
