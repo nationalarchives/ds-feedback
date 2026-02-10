@@ -9,8 +9,13 @@ runs:
     - name: Collect statics assets
       run: docker compose exec app poetry run python manage.py collectstatic --no-input --clear
       shell: bash
+    - name: Perform database migrations and create superuser
+      run: |
+        docker compose exec app poetry run python manage.py migrate
+        docker compose exec app poetry run python manage.py createsuperuser --no-input
+      shell: bash
     - name: Run tests
-      run: docker compose exec app poetry run python /app/manage.py test
+      run: docker compose exec app poetry run pytest --ds=config.settings.test
       shell: bash
     - name: Run check
       run: docker compose exec app poetry run python manage.py check
