@@ -7,5 +7,5 @@ runs:
       run: npm install
       shell: bash
     - name: Check formatting
-      run: docker run --rm -v "$(pwd)":/app/ ghcr.io/nationalarchives/tna-python-dev:latest checkformat
+      run: docker run --rm -v "$(pwd)":/app/ ghcr.io/nationalarchives/tna-python-dev:preview checkformat
       shell: bash
