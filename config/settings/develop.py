@@ -14,8 +14,8 @@ DEBUG = strtobool(os.getenv("DEBUG", "False"))
 
 if DEBUG:
     # Adds Django Silk
-    MIDDLEWARE.insert(0, "silk.middleware.SilkyMiddleware")  # noqa
-    INSTALLED_APPS.append("silk")  # noqa
+    # MIDDLEWARE.insert(0, "silk.middleware.SilkyMiddleware")  # noqa
+    # INSTALLED_APPS.append("silk")  # noqa
 
     try:
         import debug_toolbar  # noqa: F401
