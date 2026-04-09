@@ -482,9 +482,11 @@ class ResponseList(
         ).prefetch_related(
             Prefetch(
                 "prompt_responses",
-                queryset=PromptResponse.objects.select_subclasses().prefetch_related(
+                queryset=PromptResponse.objects.select_subclasses()
+                .prefetch_related(
                     "rangedpromptresponse__value",
-                ),
+                )
+                .order_by("prompt__order", "created_at", "id"),
             ),
             Prefetch(
                 "prompt_responses__prompt",
@@ -507,7 +509,7 @@ class ResponseList(
             queryset, "feedback_form__uuid", "feedback_form"
         )
 
-        return queryset
+        return queryset.order_by("created_at", "id")
 
     @extend_schema(
         description="Get a list of all user's responses to feedback forms including all prompt responses.",
@@ -555,7 +557,9 @@ class ResponseDetail(generics.RetrieveAPIView, CheckProjectAccessMixin):
             .prefetch_related(
                 Prefetch(
                     "prompt_responses",
-                    queryset=PromptResponse.objects.select_subclasses(),
+                    queryset=PromptResponse.objects.select_subclasses().order_by(
+                        "prompt__order", "created_at", "id"
+                    ),
                 ),
                 Prefetch(
                     "prompt_responses__prompt",
@@ -621,7 +625,13 @@ class PromptResponseList(
         queryset = self.filter_queryset_param(
             queryset, "prompt__uuid", "prompt"
         )
-        return queryset
+        return queryset.order_by(
+            "response__created_at",
+            "response_id",
+            "prompt__order",
+            "created_at",
+            "id",
+        )
 
     def list(self, request, *args, **kwargs):
         self.validate_uuid_param(request.query_params, "project")
