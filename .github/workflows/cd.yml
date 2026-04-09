@@ -13,14 +13,18 @@ jobs:
   test-node:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        with:
+          persist-credentials: false
       - name: Run tests
         uses: ./.github/actions/node-tests
 
   test-python:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        with:
+          persist-credentials: false
       - name: Run tests
         uses: ./.github/actions/python-tests
 
@@ -29,7 +33,9 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        with:
+          persist-credentials: false
       - name: Run tests
         uses: ./.github/actions/check-formatting
 
@@ -43,12 +49,14 @@ jobs:
       packages: write
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        with:
+          persist-credentials: false
       - name: Generate version tag
         id: version-tag
-        uses: nationalarchives/ds-docker-actions/.github/actions/get-version-tag@main
+        uses: nationalarchives/ds-docker-actions/.github/actions/get-version-tag@4d515aace91022b74e25baadedc5711d85023690 # main
       - name: Build Docker image
-        uses: nationalarchives/ds-docker-actions/.github/actions/build@main
+        uses: nationalarchives/ds-docker-actions/.github/actions/build@4d515aace91022b74e25baadedc5711d85023690 # main
         with:
           version: ${{ steps.version-tag.outputs.version-tag }}
           latest: ${{ github.ref == 'refs/heads/main' }}
@@ -60,7 +68,7 @@ jobs:
           wiz-project-id: ${{ secrets.WIZ_PROJECT_DIGITALSERVICES }}
       - name: Create tag
         if: github.ref == 'refs/heads/main'
-        uses: actions/github-script@v5
+        uses: actions/github-script@211cb3fefb35a799baa5156f9321bb774fe56294 # v5
         with:
           script: |
             github.rest.git.createRef({
@@ -78,7 +86,7 @@ jobs:
       - build
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
         with:
           repository: nationalarchives/ds-infrastructure-web
           ref: main
