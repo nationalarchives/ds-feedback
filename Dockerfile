@@ -8,7 +8,7 @@ ARG BUILD_VERSION
 ENV BUILD_VERSION="$BUILD_VERSION"
 
 # Copy in the application code
-COPY --chown=app . .
+COPY . .
 
 # Install dependencies
 RUN tna-build
@@ -21,6 +21,12 @@ RUN mkdir -p /app/app/static/assets; \
 
 # Clean up build dependencies
 RUN tna-clean
+
+# Allow non-root runtime user to update npm/node metadata in home directory
+RUN mkdir -p /home/app/.npm && chown -R app:app /home/app/.nvm /home/app/.npm
+
+# Run as non-root user
+USER app
 
 # Run the application
 CMD ["tna-wsgi", "config.wsgi:application"]
