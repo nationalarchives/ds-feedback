@@ -3,6 +3,9 @@ ARG IMAGE_TAG=latest
 
 FROM "$IMAGE":"$IMAGE_TAG"
 
+# Ensure build/install steps run with sufficient permissions
+USER root
+
 ENV NPM_BUILD_COMMAND=compile
 ARG BUILD_VERSION
 ENV BUILD_VERSION="$BUILD_VERSION"
