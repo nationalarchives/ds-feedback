@@ -278,7 +278,7 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.JSONParser",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    # Not included authenticated "user" throttle rates 
+    # Not included authenticated "user" throttle rates
     # since is a public site and we have no login mechanism
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
