@@ -3,6 +3,7 @@
 .gitkeep
 docker-compose.yml
 Dockerfile
+LICENCE
 README.md
 node_modules
 .babelrc.json
@@ -10,4 +11,7 @@ node_modules
 .flake8
 .gitignore
 .prettierignore
+.pytest_cache
 stylelint.config.mjs
+docs
+test

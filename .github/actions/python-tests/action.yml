@@ -3,27 +3,23 @@ name: Run Python tests
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-python@v5
-      with:
-        python-version: 3.12
-    - uses: snok/install-poetry@v1
-      with:
-        version: 1.8.1
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-        virtualenvs-path: .venv
-    - name: Install Poetry dependencies
-      run: poetry install --no-interaction --no-root --with dev
+    - name: Start Docker containers
+      run: docker compose up --detach --wait --wait-timeout 300 || docker compose logs app
       shell: bash
-    - name: Collect static assets
-      run: poetry run python manage.py collectstatic --no-input
+    - name: Collect statics assets
+      run: docker compose exec app poetry run python manage.py collectstatic --no-input --clear
       shell: bash
-    - name: Django checks
-      run: poetry run python manage.py check
+    - name: Perform database migrations and create superuser
+      run: |
+        docker compose exec app poetry run python manage.py migrate
+        docker compose exec app poetry run python manage.py createsuperuser --no-input
       shell: bash
-    - name: Check migrations
-      run: poetry run python manage.py makemigrations --check --noinput
+    - name: Run tests
+      run: docker compose exec app poetry run pytest --ds=config.settings.test
       shell: bash
-    - name: Run Python tests
-      run: poetry run python manage.py test
+    - name: Run check
+      run: docker compose exec app poetry run python manage.py check
+      shell: bash
+    - name: Check for missing migrations
+      run: docker compose exec app poetry run python manage.py makemigrations --check --noinput
       shell: bash

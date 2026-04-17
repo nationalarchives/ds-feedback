@@ -3,16 +3,17 @@ services:
     build:
       context: .
       args:
-        IMAGE: ghcr.io/nationalarchives/tna-python-django-root
-        IMAGE_TAG: preview
+        IMAGE: ghcr.io/nationalarchives/tna-python-dev
+        IMAGE_TAG: latest
     environment:
-      - RUNTIME=develop
       - DJANGO_SETTINGS_MODULE=config.settings.develop
       - SECRET_KEY=abc123
+      - DEBUG=True
       - NPM_DEVELOP_COMMAND=dev
       - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
       - DJANGO_SUPERUSER_PASSWORD=admin
       - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_EMAIL=admin@tna.dev
       - COOKIE_DOMAIN=localhost
       - CSP_STYLE_SRC_ELEM='self',fonts.googleapis.com,p.typekit.net,use.typekit.net
       - CSP_FONT_SRC='self',fonts.gstatic.com,use.typekit.net
@@ -22,7 +23,9 @@ services:
       - db
     volumes:
       - ./:/app
-    command: ./run.sh
+    healthcheck:
+      start_period: 10s
+      start_interval: 2s
 
   db:
     image: postgres:latest
@@ -31,12 +34,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=postgres
     volumes:
-      - pgdata:/var/lib/postgresql/data
-
-  dev:
-    image: ghcr.io/nationalarchives/tna-python-dev:preview
-    volumes:
-      - ./:/app
+      - pgdata:/var/lib/postgresql
 
   docs:
     image: squidfunk/mkdocs-material

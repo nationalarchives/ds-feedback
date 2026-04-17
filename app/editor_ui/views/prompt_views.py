@@ -26,7 +26,6 @@ from app.prompts.models import (
     Prompt,
     RangedPrompt,
     RangedPromptOption,
-    TextPrompt,
 )
 
 

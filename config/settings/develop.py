@@ -2,27 +2,36 @@ import os
 
 from config.util import strtobool
 
-from .base import *
-from .features import *
+from .features import *  # noqa: F403
+from .production import *  # noqa: F403
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
-DEBUG: bool = strtobool(os.getenv("DEBUG", "True"))
-
-# Adds Django Debug Toolbar
-INSTALLED_APPS.append("debug_toolbar")  # noqa
-MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")  # noqa
-SHOW_TOOLBAR = True
-DEBUG_TOOLBAR_CONFIG = {
-    # The default debug_toolbar_middleware.show_toolbar function checks whether the
-    # request IP is in settings.INTERNAL_IPS. In Docker, the request IP can vary, so
-    # we set it in settings.local instead.
-    "SHOW_TOOLBAR_CALLBACK": lambda x: SHOW_TOOLBAR,
-}
-
-# Adds Django Silk
-MIDDLEWARE.insert(0, "silk.middleware.SilkyMiddleware")  # noqa
-INSTALLED_APPS.append("silk")  # noqa
-
 # Display sent emails in the console while developing locally.
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DEBUG = strtobool(os.getenv("DEBUG", "False"))
+
+if DEBUG:
+    # Adds Django Silk
+    # MIDDLEWARE.insert(0, "silk.middleware.SilkyMiddleware")  # noqa
+    # INSTALLED_APPS.append("silk")  # noqa
+
+    try:
+        import debug_toolbar  # noqa: F401
+
+        INSTALLED_APPS += [  # noqa: F405
+            "debug_toolbar",
+        ]
+
+        MIDDLEWARE = [
+            "debug_toolbar.middleware.DebugToolbarMiddleware",
+        ] + MIDDLEWARE  # noqa: F405
+
+        DEBUG_TOOLBAR_CONFIG = {
+            "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+            "SHOW_COLLAPSED": True,
+        }
+    except ImportError:
+        # Django debug toolbar is not available
+        pass

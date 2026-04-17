@@ -1,6 +1,8 @@
 import os
 
-from .base import *
-from .features import *
+from config.util import strtobool
 
-pass
+from .features import *  # noqa: F401, F403
+from .production import *  # noqa: F401, F403
+
+DEBUG = strtobool(os.getenv("DEBUG", "False"))

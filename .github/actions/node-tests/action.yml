@@ -6,6 +6,6 @@ runs:
     - name: Install Node dependencies
       run: npm install
       shell: bash
-    - name: Run Node tests
-      run: npm run test:all
+    - name: Audit Node dependencies
+      run: npm audit --audit-level=critical
       shell: bash

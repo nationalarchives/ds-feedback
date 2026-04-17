@@ -1,4 +1,4 @@
-from factory import LazyAttribute, Sequence
+from factory import Sequence
 from factory.django import DjangoModelFactory
 
 from app.projects.models import RETENTION_PERIOD_CHOICES, Project
