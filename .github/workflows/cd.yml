@@ -13,7 +13,9 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Run tests
         uses: ./.github/actions/node-tests
 
@@ -22,7 +24,9 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Run tests
         uses: ./.github/actions/python-tests
 
@@ -31,7 +35,9 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Run tests
         uses: ./.github/actions/check-formatting
 
@@ -45,12 +51,14 @@ jobs:
       packages: write
       contents: write
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Generate version tag
         id: version-tag
-        uses: nationalarchives/ds-docker-actions/.github/actions/get-version-tag@main
+        uses: nationalarchives/ds-docker-actions/.github/actions/get-version-tag@main # zizmor: ignore[unpinned-uses] Owned by The National Archives
       - name: Build Docker image
-        uses: nationalarchives/ds-docker-actions/.github/actions/build@main
+        uses: nationalarchives/ds-docker-actions/.github/actions/build@main # zizmor: ignore[unpinned-uses] Owned by The National Archives
         with:
           version: ${{ steps.version-tag.outputs.version-tag }}
           latest: ${{ github.ref == 'refs/heads/main' }}
@@ -82,7 +90,7 @@ jobs:
       - build
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: nationalarchives/ds-infrastructure-web
           ref: main
