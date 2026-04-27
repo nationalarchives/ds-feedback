@@ -3,8 +3,8 @@ name: Run Python tests
 runs:
   using: "composite"
   steps:
-    - name: Start Docker containers
-      run: docker compose up --detach --wait --wait-timeout 300 || docker compose logs app
+    - name: Start app container
+      run: docker compose up --detach --wait --wait-timeout 300 app || docker compose logs app
       shell: bash
     - name: Collect statics assets
       run: docker compose exec app poetry run python manage.py collectstatic --no-input --clear
