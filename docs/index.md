@@ -1,4 +1,4 @@
-# Introduction
+# Introduction to `ds-feedback`
 
 This project is An API and administrative tool for collecting quick user feedback across TNA sites, in the style of the [GOV.UK feedback component](https://insidegovuk.blog.gov.uk/2022/03/28/making-the-gov-uk-feedback-component-more-accessible/).
 
