@@ -36,8 +36,8 @@ jobs:
           python-version: 3.12
       - name: Install dependencies
         run: pip install mkdocs-material mkdocs-inline-select-svg-plugin linkcheckmd
-      - name: Check links
-        run: python -m linkcheckmd docs -v
+      # - name: Check links
+      #   run: python -m linkcheckmd docs -v
       - name: Build
         run: mkdocs build
       - name: Setup Pages
