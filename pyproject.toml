@@ -24,7 +24,7 @@ optional = true
 
 [tool.poetry.group.dev.dependencies]
 factory-boy = "^3.3.3"
-pytest = "^8.1.1"
+pytest = ">=8.1.1,<10.0.0"
 requests-mock = "^1.12.1"
 django-silk = "^5.3.2"
 pytest-django = "^4.11.1"
