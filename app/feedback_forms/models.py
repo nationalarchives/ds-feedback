@@ -1,6 +1,3 @@
-import warnings
-
-import django
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import UniqueConstraint
@@ -43,9 +40,7 @@ class PathPattern(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
     feedback_form = models.ForeignKey(
         FeedbackForm, on_delete=models.CASCADE, related_name="path_patterns"
     )
-    project = models.ForeignKey(
-        Project, on_delete=models.PROTECT, related_name="+"
-    )
+    project = models.ForeignKey(Project, on_delete=models.PROTECT, related_name="+")
 
     @property
     def pattern_with_wildcard(self):
@@ -63,11 +58,11 @@ class PathPattern(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
     def clean(self):
         super().clean()
 
-        if django.VERSION >= (5, 2):
-            warnings.warn(
-                "Custom validation no longer needed, since UniqueConstraint now supports custom error messages",
-                DeprecationWarning,
-            )
+        # if django.VERSION >= (5, 2):
+        #     warnings.warn(
+        #         "Custom validation no longer needed, since UniqueConstraint now supports custom error messages",
+        #         DeprecationWarning,
+        #     )
 
         if (
             PathPattern.objects.filter(

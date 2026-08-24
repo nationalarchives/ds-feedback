@@ -81,9 +81,7 @@ class ProjectCreationTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(
-            Project.objects.count(), 0, "No projects should be created"
-        )
+        self.assertEqual(Project.objects.count(), 0, "No projects should be created")
 
 
 class ProjectMembershipAssignmentTests(TestCase):
@@ -182,9 +180,7 @@ class ProjectAccessTests(TestCase):
         for user in self.authorised_users:
             with self.subTest(user=user):
                 self.client.force_login(user)
-                response = self.client.get(
-                    self.project_detail_url(self.project)
-                )
+                response = self.client.get(self.project_detail_url(self.project))
                 self.assertEqual(response.status_code, 200)
 
     def test_other_user_cannot_access_project_detail(self):
@@ -295,12 +291,8 @@ class ProjectMembershipAccessTests(TestCase):
     def test_unauthorised_users_cannot_access_project_membership_views(self):
         for url in [
             self.get_project_membership_list_url(self.project),
-            self.get_project_membership_delete_url(
-                self.project, self.owner_membership
-            ),
-            self.get_project_membership_edit_url(
-                self.project, self.owner_membership
-            ),
+            self.get_project_membership_delete_url(self.project, self.owner_membership),
+            self.get_project_membership_edit_url(self.project, self.owner_membership),
         ]:
             with self.subTest(url=url):
                 self.client.force_login(self.other_user)
@@ -420,9 +412,7 @@ class ProjectMembershipAccessTests(TestCase):
         )
 
         self.assertEqual(
-            ProjectMembership.objects.filter(
-                project=project_with_single_owner
-            ).count(),
+            ProjectMembership.objects.filter(project=project_with_single_owner).count(),
             1,
             "Project should have exactly one owner membership before deletion attempt",
         )
@@ -444,9 +434,7 @@ class ProjectMembershipAccessTests(TestCase):
             status_code=200,
         )
         self.assertEqual(
-            ProjectMembership.objects.filter(
-                project=project_with_single_owner
-            ).count(),
+            ProjectMembership.objects.filter(project=project_with_single_owner).count(),
             1,
             "Project should have exactly one owner membership after deletion attempt",
         )
@@ -466,9 +454,7 @@ class ProjectMembershipAccessTests(TestCase):
         )
 
         self.assertEqual(
-            ProjectMembership.objects.filter(
-                project=project_with_single_owner
-            ).count(),
+            ProjectMembership.objects.filter(project=project_with_single_owner).count(),
             1,
             "Project should have exactly one owner membership before deletion attempt",
         )
@@ -490,9 +476,7 @@ class ProjectMembershipAccessTests(TestCase):
             status_code=200,
         )
         self.assertEqual(
-            ProjectMembership.objects.filter(
-                project=project_with_single_owner
-            ).count(),
+            ProjectMembership.objects.filter(project=project_with_single_owner).count(),
             1,
             "Project should have exactly one owner membership after deletion attempt",
         )

@@ -93,9 +93,7 @@ class IsDisabledHiddenCheckboxForm(IsDisabledCheckboxForm):
     )
 
 
-def disallow_duplicates(
-    forms: list[forms.ModelForm], field_name: str, error: str
-):
+def disallow_duplicates(forms: list[forms.ModelForm], field_name: str, error: str):
     """
     Adds validation errors if there are any duplicate values for a field in a list of forms
     """

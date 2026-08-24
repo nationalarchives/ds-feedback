@@ -11,7 +11,6 @@
 {%- set theme = request.COOKIES.get('theme', 'system') if request else 'system' -%}
 {%- set themeAccent = themeAccent if themeAccent else 'blue' -%}
 {%- set htmlAttributes = {
-  'data-ga4id': app_config.GA4_ID or '',
   'data-cookiesdomain': app_config.COOKIE_DOMAIN or ''
 } -%}
 
@@ -136,5 +135,4 @@
 
 {% block bodyEnd %}
 <script src="{{ static('main.min.js') }}?v={{ app_config.BUILD_VERSION }}" defer></script>
-<script src="{{ static('analytics.min.js') }}?v={{ app_config.BUILD_VERSION }}" defer></script>
 {% endblock bodyEnd %}

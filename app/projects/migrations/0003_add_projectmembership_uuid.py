@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0002_remove_project_owned_by_projectmembership_and_more"),
     ]

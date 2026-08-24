@@ -13,7 +13,6 @@ def set_uuid(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("prompts", "0003_rangedprompt_rangedpromptoption"),
     ]

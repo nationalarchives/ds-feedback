@@ -1,9 +1,7 @@
 from datetime import datetime
-from functools import cache
 
 from django.db.models import F, Prefetch, Q, Value
 from django.db.models.functions import Length
-
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import (
     OpenApiExample,
@@ -163,9 +161,7 @@ class ValidateUUIDMixin:
         """
         if param in query_params:
             if not is_valid_uuid(query_params[param]):
-                raise NotFound(
-                    f"{param}={query_params[param]} is not a valid UUID."
-                )
+                raise NotFound(f"{param}={query_params[param]} is not a valid UUID.")
 
 
 class FeedbackFormDetail(generics.RetrieveAPIView, CheckProjectAccessMixin):
@@ -252,9 +248,7 @@ class FeedbackFormList(
         return super().get(request, *args, **kwargs)
 
 
-class FeedbackFormPathPatternDetail(
-    generics.RetrieveAPIView, CheckProjectAccessMixin
-):
+class FeedbackFormPathPatternDetail(generics.RetrieveAPIView, CheckProjectAccessMixin):
     queryset = FeedbackForm.objects.all()
     serializer_class = FeedbackFormSerializer
     allowed_roles = [APIRole.SUBMIT_RESPONSES, APIRole.EXPLORE_RESPONSES]
@@ -314,9 +308,7 @@ class ResponseCreate(generics.CreateAPIView, CheckProjectAccessMixin):
     allowed_roles = [APIRole.SUBMIT_RESPONSES]
 
     def get_queryset(self):
-        queryset = self.queryset.select_related(
-            "feedback_form"
-        ).prefetch_related(
+        queryset = self.queryset.select_related("feedback_form").prefetch_related(
             Prefetch(
                 "prompt_responses",
                 queryset=PromptResponse.objects.select_subclasses().prefetch_related(
@@ -333,9 +325,9 @@ class ResponseCreate(generics.CreateAPIView, CheckProjectAccessMixin):
 
     def get_project(self, data: dict[str, str]) -> Project:
         feedback_form = generics.get_object_or_404(
-            FeedbackForm.objects.filter(
-                uuid=data["feedback_form"]
-            ).select_related("project")
+            FeedbackForm.objects.filter(uuid=data["feedback_form"]).select_related(
+                "project"
+            )
         )
         return feedback_form.project
 
@@ -347,7 +339,7 @@ class ResponseCreate(generics.CreateAPIView, CheckProjectAccessMixin):
 
             if not feedback_form_query.exists():
                 raise NotFound(
-                    f"Feedback form id={data["feedback_form"]} is disabled.",
+                    f"Feedback form id={data['feedback_form']} is disabled.",
                 )
 
     @extend_schema(
@@ -415,7 +407,7 @@ class PromptResponseCreate(generics.CreateAPIView, CheckProjectAccessMixin):
 
             if not feedback_form_query.exists():
                 raise NotFound(
-                    f"Feedback form id={data["response"]} is disabled.",
+                    f"Feedback form id={data['response']} is disabled.",
                 )
 
     @extend_schema(
@@ -477,9 +469,7 @@ class ResponseList(
     allowed_roles = [APIRole.EXPLORE_RESPONSES]
 
     def get_queryset(self):
-        queryset = self.queryset.select_related(
-            "feedback_form"
-        ).prefetch_related(
+        queryset = self.queryset.select_related("feedback_form").prefetch_related(
             Prefetch(
                 "prompt_responses",
                 queryset=PromptResponse.objects.select_subclasses()
@@ -498,9 +488,7 @@ class ResponseList(
             allowed_projects = acl.get_accessible_projects_with_role(
                 user=self.request.user, allowed_roles=self.allowed_roles
             )
-            queryset = queryset.filter(
-                feedback_form__project__in=allowed_projects
-            )
+            queryset = queryset.filter(feedback_form__project__in=allowed_projects)
 
         queryset = self.filter_queryset_param(
             queryset, "feedback_form__project__uuid", "project"
@@ -569,7 +557,7 @@ class ResponseDetail(generics.RetrieveAPIView, CheckProjectAccessMixin):
         )
 
     # Cache allows the project access check to use the same query as the get
-    @cache
+    # @cache
     def get_object(self):
         return generics.get_object_or_404(self.get_queryset())
 
@@ -622,9 +610,7 @@ class PromptResponseList(
         queryset = self.filter_queryset_param(
             queryset, "response__feedback_form__uuid", "feedback_form"
         )
-        queryset = self.filter_queryset_param(
-            queryset, "prompt__uuid", "prompt"
-        )
+        queryset = self.filter_queryset_param(queryset, "prompt__uuid", "prompt")
         return queryset.order_by(
             "response__created_at",
             "response_id",
@@ -691,7 +677,7 @@ class PromptResponseDetail(generics.RetrieveAPIView, CheckProjectAccessMixin):
         )
 
     # Cache allows the project access check to use the same query as the get
-    @cache
+    # @cache
     def get_object(self):
         return generics.get_object_or_404(self.get_queryset())
 

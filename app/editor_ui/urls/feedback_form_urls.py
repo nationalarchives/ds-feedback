@@ -38,9 +38,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:feedback_form_uuid>/path-patterns/",
-        include(
-            "app.editor_ui.urls.path_pattern_urls", namespace="path_patterns"
-        ),
+        include("app.editor_ui.urls.path_pattern_urls", namespace="path_patterns"),
     ),
     path(
         "<uuid:feedback_form_uuid>/prompts/",

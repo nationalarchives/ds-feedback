@@ -1,7 +1,6 @@
-from django.urls import path, re_path
-
 from csp.constants import SELF, UNSAFE_INLINE
 from csp.decorators import csp_update
+from django.urls import path, re_path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from app.api.views import (

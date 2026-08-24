@@ -3,7 +3,6 @@ from typing import Self
 
 from django.apps import apps
 from django.db import models
-
 from model_utils.managers import InheritanceManager
 
 from app.users.models import User
@@ -98,9 +97,9 @@ class CreateSubclassModelMixin(models.Model):
         """
         Converts a model into a multi-table inheritance subclass
         """
-        assert issubclass(
-            subclass, type(self)
-        ), f"{subclass} must be a subclass of {type(self)}"
+        assert issubclass(subclass, type(self)), (
+            f"{subclass} must be a subclass of {type(self)}"
+        )
 
         instance = subclass()
         setattr(instance, subclass._meta.model_name + "_ptr", self)
@@ -122,9 +121,9 @@ class GetSubclassesModelMixin(models.Model):
         """
         Uses the InheritanceManager to return a mapping of model names to subclasses
         """
-        assert isinstance(
-            cls.objects, InheritanceManager
-        ), f"{cls} must use InheritanceManager to support LookupSubclasses"
+        assert isinstance(cls.objects, InheritanceManager), (
+            f"{cls} must use InheritanceManager to support LookupSubclasses"
+        )
 
         return {
             model_name: apps.get_model(

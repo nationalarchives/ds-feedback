@@ -21,9 +21,7 @@ def validate_path_pattern(value):
 
     # check asterisk is at the end of the pattern
     if "*" in value and not value.endswith("*"):
-        raise ValidationError(
-            "Asterisk (*) is only allowed at the end of the pattern."
-        )
+        raise ValidationError("Asterisk (*) is only allowed at the end of the pattern.")
 
     # check for multiple asterisks
     if value.count("*") > 1:

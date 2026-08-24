@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -96,9 +95,7 @@ class Migration(migrations.Migration):
                         name="api_access_role_valid_choice",
                     ),
                     models.CheckConstraint(
-                        condition=models.Q(
-                            ("lifespan_days__in", [30, 60, 90, 180])
-                        ),
+                        condition=models.Q(("lifespan_days__in", [30, 60, 90, 180])),
                         name="api_access_role_valid_lifespan",
                     ),
                 ],

@@ -7,7 +7,6 @@ from django.template.defaultfilters import date as dj_date
 from django.template.defaultfilters import pluralize as dj_pluralize
 from django.templatetags.static import static
 from django.urls import reverse
-
 from jinja2 import Environment
 from markupsafe import Markup
 
@@ -75,7 +74,6 @@ def environment(**options):
         {
             "static": static,
             "app_config": {
-                "GA4_ID": settings.GA4_ID,
                 "TNA_FRONTEND_VERSION": TNA_FRONTEND_VERSION,
                 "BUILD_VERSION": settings.BUILD_VERSION,
                 "COOKIE_DOMAIN": settings.COOKIE_DOMAIN,

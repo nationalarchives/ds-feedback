@@ -2,7 +2,6 @@ from http import HTTPStatus
 
 from django.urls import reverse
 from django.utils import timezone
-
 from rest_framework.test import APITestCase
 
 from app.api.factories import APIAccessLifespanFactory, TokenFactory
@@ -115,9 +114,7 @@ class TestResponseCreate(APITestCase, ResetFactorySequencesMixin):
             response.data["metadata"],
             {"user-agent": "Mozilla/5.0 Firefox/133.0"},
         )
-        self.assertEqual(
-            response.data["feedback_form"], self.feedback_form_1.uuid
-        )
+        self.assertEqual(response.data["feedback_form"], self.feedback_form_1.uuid)
         self.assertEqual(len(response.data["prompt_responses"]), 1)
         self.assertEqual(
             response.data["prompt_responses"][0]["prompt"],
@@ -403,9 +400,7 @@ class TestPromptResponseCreate(APITestCase, ResetFactorySequencesMixin):
         self.assertEqual(response.status_code, HTTPStatus.CREATED)
 
         self.assertEqual(response.data["prompt"], self.text_prompt.uuid)
-        self.assertEqual(
-            response.data["value"], "More pictures of cats please!"
-        )
+        self.assertEqual(response.data["value"], "More pictures of cats please!")
 
     def test_create_prompt_response_invalid_prompt(self):
         other_feedback_form = FeedbackFormFactory.create(

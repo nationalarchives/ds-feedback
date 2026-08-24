@@ -30,9 +30,7 @@ class ProjectAPIAccess(
     grantee = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=18, choices=APIRole.choices)
     expires_at = models.DateTimeField(editable=False)
-    lifespan_days = models.PositiveSmallIntegerField(
-        choices=APIAccessLifespan.choices
-    )
+    lifespan_days = models.PositiveSmallIntegerField(choices=APIAccessLifespan.choices)
 
     class Meta:
         constraints = [
@@ -41,9 +39,7 @@ class ProjectAPIAccess(
                 name="api_access_role_valid_choice",
             ),
             models.CheckConstraint(
-                condition=models.Q(
-                    lifespan_days__in=list(APIAccessLifespan.values)
-                ),
+                condition=models.Q(lifespan_days__in=list(APIAccessLifespan.values)),
                 name="api_access_role_valid_lifespan",
             ),
         ]

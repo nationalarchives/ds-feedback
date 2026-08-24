@@ -15,9 +15,7 @@ def is_valid_uuid(uuid: str, version=4):
         return False
 
 
-def get_admin_viewname(
-    *, app_label: str, model: models.Model, view_name: str
-) -> str:
+def get_admin_viewname(*, app_label: str, model: models.Model, view_name: str) -> str:
     """
     Gets an admin viewname for a model
     """

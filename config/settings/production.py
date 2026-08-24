@@ -2,10 +2,9 @@ import json
 import os
 from sysconfig import get_path
 
-from django.core.exceptions import ImproperlyConfigured
-
 import dj_database_url
 from csp.constants import NONE, SELF
+from django.core.exceptions import ImproperlyConfigured
 
 from config.util import strtobool
 
@@ -261,8 +260,6 @@ CONTENT_SECURITY_POLICY = {
         }
     )
 }
-
-GA4_ID = os.environ.get("GA4_ID", "")
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

@@ -2,7 +2,6 @@ from http import HTTPStatus
 
 from django.urls import reverse
 from django.utils import timezone
-
 from rest_framework.test import APITestCase
 
 from app.api.factories import APIAccessLifespanFactory, TokenFactory
@@ -99,9 +98,7 @@ class TestFeedbackFormDetail(APITestCase, ResetFactorySequencesMixin):
         prompt_2 = response.data["prompts"][1]
         self.assertEqual(prompt_2["prompt_type"], self.binary_prompt.type())
         self.assertEqual(prompt_2["text"], self.binary_prompt.text)
-        self.assertEqual(
-            prompt_2["is_enabled"], self.binary_prompt.is_enabled()
-        )
+        self.assertEqual(prompt_2["is_enabled"], self.binary_prompt.is_enabled())
         self.assertEqual(
             prompt_2["positive_answer_label"],
             self.binary_prompt.positive_answer_label,
@@ -114,9 +111,7 @@ class TestFeedbackFormDetail(APITestCase, ResetFactorySequencesMixin):
         prompt_3 = response.data["prompts"][2]
         self.assertEqual(prompt_3["prompt_type"], self.ranged_prompt.type())
         self.assertEqual(prompt_3["text"], self.ranged_prompt.text)
-        self.assertEqual(
-            prompt_3["is_enabled"], self.ranged_prompt.is_enabled()
-        )
+        self.assertEqual(prompt_3["is_enabled"], self.ranged_prompt.is_enabled())
         self.assertEqual(len(prompt_3["options"]), 3)
         self.assertEqual(prompt_3["options"][0]["label"], self.option_1.label)
         self.assertEqual(prompt_3["options"][1]["label"], self.option_2.label)
@@ -353,9 +348,7 @@ class TestFeedbackFormList(APITestCase, ResetFactorySequencesMixin):
         self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
 
 
-class TestFeedbackFormPathPatternDetail(
-    APITestCase, ResetFactorySequencesMixin
-):
+class TestFeedbackFormPathPatternDetail(APITestCase, ResetFactorySequencesMixin):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory()

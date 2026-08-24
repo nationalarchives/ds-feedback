@@ -82,12 +82,8 @@ class FeedbackFormAccessTests(TestCase):
             for url in [
                 self.get_feedback_form_list_url(self.project),
                 self.get_feedback_form_create_url(self.project),
-                self.get_feedback_form_detail_url(
-                    self.project, self.feedback_form
-                ),
-                self.get_feedback_form_delete_url(
-                    self.project, self.feedback_form
-                ),
+                self.get_feedback_form_detail_url(self.project, self.feedback_form),
+                self.get_feedback_form_delete_url(self.project, self.feedback_form),
             ]:
                 with self.subTest(user=user, url=url):
                     self.client.force_login(user)
@@ -128,9 +124,7 @@ class FeedbackFormAccessTests(TestCase):
         """
         self.client.force_login(self.owner)
         response = self.client.get(
-            self.get_feedback_form_detail_url(
-                self.project, self.other_feedback_form
-            )
+            self.get_feedback_form_detail_url(self.project, self.other_feedback_form)
         )
         self.assertIn(response.status_code, (403, 404))
 
@@ -138,9 +132,7 @@ class FeedbackFormAccessTests(TestCase):
         self.client.force_login(self.owner)
         url = self.get_feedback_form_detail_url(
             self.project,
-            type(
-                "Fake", (), {"uuid": "00000000-0000-0000-0000-000000000000"}
-            )(),
+            type("Fake", (), {"uuid": "00000000-0000-0000-0000-000000000000"})(),
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
@@ -228,9 +220,7 @@ class PathPatternAccessTests(TestCase):
     def test_authorised_users_can_access_path_pattern_views(self):
         for user in self.authorised_users:
             for url in [
-                self.get_path_pattern_create_url(
-                    self.project, self.feedback_form
-                ),
+                self.get_path_pattern_create_url(self.project, self.feedback_form),
                 self.get_path_pattern_update_url(
                     self.project, self.feedback_form, self.path_pattern
                 ),
@@ -274,9 +264,7 @@ class PathPatternAccessTests(TestCase):
             with self.subTest(user=user):
                 self.client.force_login(user)
                 response = self.client.get(
-                    self.get_feedback_form_detail_url(
-                        self.project, self.feedback_form
-                    )
+                    self.get_feedback_form_detail_url(self.project, self.feedback_form)
                 )
                 self.assertContains(
                     response, self.path_pattern.pattern, status_code=200

@@ -77,9 +77,7 @@ class ProjectMembershipCreateView(
     CustomCreateView,
 ):
     form_class = ProjectMembershipCreateForm
-    template_name = (
-        "editor_ui/project_memberships/project_membership_create.html"
-    )
+    template_name = "editor_ui/project_memberships/project_membership_create.html"
 
     # required by ProjectMembershipRequiredMixin
     project_roles_required = ["owner"]
@@ -104,9 +102,7 @@ class ProjectMembershipCreateView(
         try:
             response = super().form_valid(form)
         except IntegrityError:
-            form.add_error(
-                "email", "This user is already a member of the project."
-            )
+            form.add_error("email", "This user is already a member of the project.")
             return self.form_invalid(form)
         else:
             send_email_util(
@@ -152,9 +148,7 @@ class ProjectMembershipUpdateView(
     CustomUpdateView,
 ):
     form_class = ProjectMembershipUpdateForm
-    template_name = (
-        "editor_ui/project_memberships/project_membership_update.html"
-    )
+    template_name = "editor_ui/project_memberships/project_membership_update.html"
     slug_field = "uuid"
     slug_url_kwarg = "membership_uuid"
 
@@ -190,16 +184,12 @@ class ProjectMembershipUpdateView(
 
         if original_role == "owner" and new_role != "owner":
             with transaction.atomic():
-                memberships = (
-                    ProjectMembership.objects.select_for_update().filter(
-                        project=self.object.project
-                    )
+                memberships = ProjectMembership.objects.select_for_update().filter(
+                    project=self.object.project
                 )
 
                 owners_count = (
-                    memberships.filter(role="owner")
-                    .exclude(pk=self.object.pk)
-                    .count()
+                    memberships.filter(role="owner").exclude(pk=self.object.pk).count()
                 )
 
                 if owners_count == 0:
@@ -282,16 +272,12 @@ class ProjectMembershipDeleteView(
 
         if self.object.role == "owner":
             with transaction.atomic():
-                memberships = (
-                    ProjectMembership.objects.select_for_update().filter(
-                        project=self.object.project
-                    )
+                memberships = ProjectMembership.objects.select_for_update().filter(
+                    project=self.object.project
                 )
 
                 owners_count = (
-                    memberships.filter(role="owner")
-                    .exclude(pk=self.object.pk)
-                    .count()
+                    memberships.filter(role="owner").exclude(pk=self.object.pk).count()
                 )
 
                 if owners_count == 0:

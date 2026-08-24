@@ -29,9 +29,7 @@ class TestAdminProjectsView(ResetFactorySequencesMixin, TestCase):
         response = self.client.get(reverse("admin:projects_project_changelist"))
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertEqual(
-            get_change_list_results(response), [project2, project1]
-        )
+        self.assertEqual(get_change_list_results(response), [project2, project1])
 
     def test_create_project_sets_created_by(self):
         self.client.force_login(self.admin_user)
@@ -43,9 +41,7 @@ class TestAdminProjectsView(ResetFactorySequencesMixin, TestCase):
                 "retention_period_days": 60,
             },
         )
-        self.assertRedirects(
-            response, reverse("admin:projects_project_changelist")
-        )
+        self.assertRedirects(response, reverse("admin:projects_project_changelist"))
 
         project = Project.objects.get(name="Test Project")
         self.assertEqual(project.created_by, self.admin_user)

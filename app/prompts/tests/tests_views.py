@@ -51,9 +51,7 @@ class TestAdminTextPromptsView(ResetFactorySequencesMixin, TestCase):
 
         self.client.force_login(self.admin_user)
         response = self.client.get(
-            reverse_with_query(
-                "admin:prompts_textprompt_changelist", {"q": "you"}
-            )
+            reverse_with_query("admin:prompts_textprompt_changelist", {"q": "you"})
         )
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -242,9 +240,7 @@ class TestAdminRangedPromptsView(ResetFactorySequencesMixin, TestCase):
             },
         )
 
-        text_prompt_formset = get_inline_formset(
-            response.context, RangedPromptOption
-        )
+        text_prompt_formset = get_inline_formset(response.context, RangedPromptOption)
         self.assertEqual(
             text_prompt_formset[1].errors["label"],
             ["This label is used in another option"],
