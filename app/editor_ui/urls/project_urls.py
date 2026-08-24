@@ -36,9 +36,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:project_uuid>/feedback-forms/",
-        include(
-            "app.editor_ui.urls.feedback_form_urls", namespace="feedback_forms"
-        ),
+        include("app.editor_ui.urls.feedback_form_urls", namespace="feedback_forms"),
     ),
     path(
         "<uuid:project_uuid>/responses/",

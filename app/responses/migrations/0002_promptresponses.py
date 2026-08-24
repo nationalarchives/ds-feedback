@@ -7,7 +7,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("prompts", "0003_rangedprompt_rangedpromptoption"),
         ("responses", "0001_initial"),

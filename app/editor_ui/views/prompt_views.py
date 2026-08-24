@@ -63,9 +63,7 @@ class PromptCreateView(
 
     def get_feedback_form(self):
         """Helper method to get the feedback form"""
-        return FeedbackForm.objects.get(
-            uuid=self.kwargs.get("feedback_form_uuid")
-        )
+        return FeedbackForm.objects.get(uuid=self.kwargs.get("feedback_form_uuid"))
 
     def form_valid(self, form):
         cleaned_data = form.cleaned_data
@@ -79,9 +77,7 @@ class PromptCreateView(
             prompts_locked = feedback_form.prompts.select_for_update().all()
 
             # Count active prompts (published) **after** acquiring the lock
-            active_count = prompts_locked.filter(
-                disabled_at__isnull=True
-            ).count()
+            active_count = prompts_locked.filter(disabled_at__isnull=True).count()
             will_be_active = cleaned_data.get("is_published", True)
             if will_be_active and active_count >= settings.MAX_ACTIVE_PROMPTS:
                 form.add_error(
@@ -91,9 +87,7 @@ class PromptCreateView(
                 return self.form_invalid(form)
 
             # Calculate the next order value for the new prompt
-            next_order = (
-                prompts_locked.aggregate(m=Max("order"))["m"] or 0
-            ) + 1
+            next_order = (prompts_locked.aggregate(m=Max("order"))["m"] or 0) + 1
 
             # Create the appropriate Prompt subclass instance with required fields
             self.object = model_cls(

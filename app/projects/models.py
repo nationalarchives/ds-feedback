@@ -16,9 +16,7 @@ ROLE_CHOICES = [
 ]
 
 
-class ProjectMembership(
-    TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin
-):
+class ProjectMembership(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
     project = models.ForeignKey("Project", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=32, choices=ROLE_CHOICES)
@@ -40,9 +38,7 @@ class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
     domain = models.CharField(max_length=256)
     retention_period_days = models.PositiveSmallIntegerField(
         "Retention period",
-        choices={
-            choice: f"{choice} days" for choice in RETENTION_PERIOD_CHOICES
-        },
+        choices={choice: f"{choice} days" for choice in RETENTION_PERIOD_CHOICES},
     )
     members = models.ManyToManyField(
         User,
@@ -71,9 +67,7 @@ class Project(TimestampedModelMixin, UUIDModelMixin, CreatedByModelMixin):
     class Meta:
         constraints = [
             CheckConstraint(
-                condition=models.Q(
-                    retention_period_days__in=RETENTION_PERIOD_CHOICES
-                ),
+                condition=models.Q(retention_period_days__in=RETENTION_PERIOD_CHOICES),
                 name="retention_period_days_choices",
             ),
             models.UniqueConstraint(

@@ -1,5 +1,4 @@
 from django.db import models
-
 from model_utils.managers import InheritanceManager
 
 from app.feedback_forms.models import FeedbackForm
@@ -68,9 +67,7 @@ class BinaryPrompt(Prompt):
         """
         Returns the label given a positive or negative answer
         """
-        return (
-            self.positive_answer_label if answer else self.negative_answer_label
-        )
+        return self.positive_answer_label if answer else self.negative_answer_label
 
 
 class RangedPrompt(Prompt):

@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("prompts", "0004_rangedpromptoption_uuid"),
         ("responses", "0002_promptresponses"),

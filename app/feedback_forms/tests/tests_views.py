@@ -70,9 +70,9 @@ class TestAdminFeedbackFormView(ResetFactorySequencesMixin, TestCase):
         list_url = reverse("admin:feedback_forms_feedbackform_changelist")
         self.assertRedirects(response, list_url)
 
-        feedback_form = FeedbackForm.objects.prefetch_related(
-            "path_patterns"
-        ).get(name="Test feedback form")
+        feedback_form = FeedbackForm.objects.prefetch_related("path_patterns").get(
+            name="Test feedback form"
+        )
         patterns = feedback_form.path_patterns.all()
         self.assertEqual(len(patterns), 2)
         self.assertEqual(patterns[0].pattern, "/foo/")
@@ -208,9 +208,9 @@ class TestAdminFeedbackFormView(ResetFactorySequencesMixin, TestCase):
         list_url = reverse("admin:feedback_forms_feedbackform_changelist")
         self.assertRedirects(response, list_url)
 
-        feedback_form = FeedbackForm.objects.prefetch_related(
-            "path_patterns"
-        ).get(name="Test feedback form")
+        feedback_form = FeedbackForm.objects.prefetch_related("path_patterns").get(
+            name="Test feedback form"
+        )
         prompts = feedback_form.prompts.all().select_subclasses()
         self.assertEqual(len(prompts), 3)
         self.assertIsInstance(prompts[0], BinaryPrompt)

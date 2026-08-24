@@ -29,9 +29,7 @@ class ProjectMembershipListViewTests(TestCase):
     def test_admin_sees_all_user_management_actions(self):
         self.client.force_login(self.admin)
         response = self.client.get(
-            reverse(
-                "editor_ui:projects:memberships:list", args=[self.project.uuid]
-            )
+            reverse("editor_ui:projects:memberships:list", args=[self.project.uuid])
         )
 
         self.assertEqual(response.status_code, 200)
@@ -42,9 +40,7 @@ class ProjectMembershipListViewTests(TestCase):
     def test_owner_sees_all_user_management_actions(self):
         self.client.force_login(self.owner)
         response = self.client.get(
-            reverse(
-                "editor_ui:projects:memberships:list", args=[self.project.uuid]
-            )
+            reverse("editor_ui:projects:memberships:list", args=[self.project.uuid])
         )
 
         self.assertEqual(response.status_code, 200)
@@ -55,9 +51,7 @@ class ProjectMembershipListViewTests(TestCase):
     def test_editor_sees_limited_user_management_actions(self):
         self.client.force_login(self.editor)
         response = self.client.get(
-            reverse(
-                "editor_ui:projects:memberships:list", args=[self.project.uuid]
-            )
+            reverse("editor_ui:projects:memberships:list", args=[self.project.uuid])
         )
 
         self.assertEqual(response.status_code, 200)
@@ -111,6 +105,4 @@ class ProjectMembershipDetailViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(
-            response, 'data-testing-id="edit-project-button"'
-        )
+        self.assertNotContains(response, 'data-testing-id="edit-project-button"')

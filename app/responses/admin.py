@@ -43,9 +43,7 @@ class PromptResponseInline(admin.TabularInline):
             ),
             kwargs={"object_id": instance.prompt.id},
         )
-        return format_html(
-            '<a href="{url}">{text}</a>', url=url, text=instance.prompt
-        )
+        return format_html('<a href="{url}">{text}</a>', url=url, text=instance.prompt)
 
     prompt_link.short_description = "Prompt"
 

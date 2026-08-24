@@ -9,9 +9,7 @@ from app.projects.models import Project
 from app.responses.models import PromptResponse, Response
 
 
-class ResponseListingView(
-    ProjectMembershipRequiredMixin, BreadCrumbsMixin, ListView
-):
+class ResponseListingView(ProjectMembershipRequiredMixin, BreadCrumbsMixin, ListView):
     model = Response
     template_name = "editor_ui/responses/response_list.html"
     context_object_name = "responses"
@@ -28,9 +26,7 @@ class ResponseListingView(
         return (
             Response.objects.all()
             .select_related("feedback_form")
-            .filter(
-                feedback_form__project__uuid=self.kwargs.get("project_uuid")
-            )
+            .filter(feedback_form__project__uuid=self.kwargs.get("project_uuid"))
             .order_by("-created_at")
         )
 
@@ -44,9 +40,7 @@ class ResponseListingView(
         return context
 
 
-class ResponseDetailView(
-    ProjectMembershipRequiredMixin, BreadCrumbsMixin, DetailView
-):
+class ResponseDetailView(ProjectMembershipRequiredMixin, BreadCrumbsMixin, DetailView):
     model = Response
     template_name = "editor_ui/responses/response_detail.html"
     context_object_name = "response"
@@ -68,14 +62,10 @@ class ResponseDetailView(
             .prefetch_related(
                 Prefetch(
                     "prompt_responses",
-                    PromptResponse.objects.select_related(
-                        "prompt"
-                    ).select_subclasses(),
+                    PromptResponse.objects.select_related("prompt").select_subclasses(),
                 )
             )
-            .filter(
-                feedback_form__project__uuid=self.kwargs.get("project_uuid")
-            )
+            .filter(feedback_form__project__uuid=self.kwargs.get("project_uuid"))
         )
 
     def get_context_data(self, **kwargs):

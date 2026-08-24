@@ -140,9 +140,7 @@ class ProjectMembershipRequiredMixin:
             # For list and create views
             obj = self.get_parent_object()
 
-        if hasattr(obj, "get_parent_project") and callable(
-            obj.get_parent_project
-        ):
+        if hasattr(obj, "get_parent_project") and callable(obj.get_parent_project):
             project = obj.get_parent_project()
         elif isinstance(obj, Project):
             project = obj
@@ -192,9 +190,7 @@ class ProjectMembershipRequiredMixin:
             not self._current_membership
             or self._current_membership.role not in self.project_roles_required
         ):
-            raise PermissionDenied(
-                "You do not have permission for this project."
-            )
+            raise PermissionDenied("You do not have permission for this project.")
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -215,9 +211,7 @@ class BreadCrumbsMixin:
     """
 
     def __init__(self) -> None:
-        if not hasattr(self, "breadcrumb") and not hasattr(
-            self, "breadcrumb_field"
-        ):
+        if not hasattr(self, "breadcrumb") and not hasattr(self, "breadcrumb_field"):
             raise ImproperlyConfigured(
                 f"{self.__class__.__name__} requires either 'breadcrumb' or "
                 "'breadcrumb_field' to be set, as it's using the BreadCrumbsMixin."

@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 from django.utils import timezone
-
 from rest_framework.test import APITestCase
 
 from app.api.acl import (
@@ -175,9 +174,7 @@ class TestAcl(APITestCase, ResetFactorySequencesMixin):
             allowed_roles=[APIRole.EXPLORE_RESPONSES, APIRole.SUBMIT_RESPONSES],
         )
 
-        self.assertEqual(
-            list(result), [self.project_1, self.project_2, self.project_5]
-        )
+        self.assertEqual(list(result), [self.project_1, self.project_2, self.project_5])
 
     def test_get_accessible_projects_with_role_is_empty(self):
         result = get_accessible_projects_with_role(

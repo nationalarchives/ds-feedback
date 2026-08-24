@@ -1,6 +1,5 @@
 from django.db import models
 from django.db.models import UniqueConstraint
-
 from model_utils.managers import InheritanceManager
 
 from app.feedback_forms.models import FeedbackForm
@@ -32,18 +31,14 @@ class Response(TimestampedModelMixin, UUIDModelMixin):
         return self.url
 
 
-class PromptResponse(
-    TimestampedModelMixin, UUIDModelMixin, GetSubclassesModelMixin
-):
+class PromptResponse(TimestampedModelMixin, UUIDModelMixin, GetSubclassesModelMixin):
     objects = InheritanceManager()
     prompt_type = Prompt
 
     response = models.ForeignKey(
         Response, on_delete=models.PROTECT, related_name="prompt_responses"
     )
-    prompt = models.ForeignKey(
-        Prompt, on_delete=models.PROTECT, related_name="+"
-    )
+    prompt = models.ForeignKey(Prompt, on_delete=models.PROTECT, related_name="+")
 
     class Meta:
         constraints = [
@@ -79,10 +74,10 @@ class PromptResponse(
                     if isinstance(prompt, subclass.prompt_type)
                 ),
             )
-        except StopIteration:
+        except StopIteration as e:
             raise ValueError(
                 f"Could not find PromptResponse subclass for {repr(prompt)}"
-            )
+            ) from e
 
     def __str__(self):
         return str(self.uuid)

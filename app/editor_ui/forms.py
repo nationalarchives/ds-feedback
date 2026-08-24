@@ -128,9 +128,7 @@ class PathPatternForm(forms.ModelForm):
 
 
 class PromptForm(forms.ModelForm):
-    PROMPT_TYPES = [
-        (name, cls.field_label) for name, cls in Prompt.PROMPT_MAP.items()
-    ]
+    PROMPT_TYPES = [(name, cls.field_label) for name, cls in Prompt.PROMPT_MAP.items()]
 
     prompt_type = forms.ChoiceField(
         choices=PROMPT_TYPES,
@@ -304,10 +302,10 @@ class ProjectMembershipCreateForm(forms.ModelForm):
 
         try:
             user = get_user_model().objects.get(email=email)
-        except get_user_model().DoesNotExist:
+        except get_user_model().DoesNotExist as e:
             raise forms.ValidationError(
                 "No user account found for this email address."
-            )
+            ) from e
 
         self.cleaned_data["user_obj"] = user
         return email
@@ -360,9 +358,9 @@ class ProjectAPIAccessCreateForm(forms.ModelForm):
 
         project_owner_ids = [
             membership.user.id
-            for membership in ProjectMembership.objects.select_related(
-                "user"
-            ).filter(project=project, role="owner")
+            for membership in ProjectMembership.objects.select_related("user").filter(
+                project=project, role="owner"
+            )
         ]
 
         if user and (user.is_superuser or user.id in project_owner_ids):
@@ -389,10 +387,10 @@ class ProjectAPIAccessCreateForm(forms.ModelForm):
                     "User must be a member of this project to receive API access."
                 )
 
-        except get_user_model().DoesNotExist:
+        except get_user_model().DoesNotExist as e:
             raise forms.ValidationError(
                 "No user account found for this email address."
-            )
+            ) from e
 
         self.cleaned_data["grantee_user"] = user
         return grantee_email

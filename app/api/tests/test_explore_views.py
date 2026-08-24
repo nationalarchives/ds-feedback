@@ -3,7 +3,6 @@ from http import HTTPStatus
 
 from django.urls import reverse
 from django.utils import timezone
-
 from rest_framework.test import APITestCase
 
 from app.api.factories import APIAccessLifespanFactory, TokenFactory
@@ -148,16 +147,10 @@ class TestResponseList(APITestCase, ResetFactorySequencesMixin):
         self.assertEqual(
             response_1_prompts[0]["value"], "More pictures of cats please!"
         )
-        self.assertEqual(
-            response_1_prompts[1]["prompt"], self.binary_prompt.uuid
-        )
+        self.assertEqual(response_1_prompts[1]["prompt"], self.binary_prompt.uuid)
         self.assertEqual(response_1_prompts[1]["value"], True)
-        self.assertEqual(
-            response_1_prompts[2]["prompt"], self.ranged_prompt.uuid
-        )
-        self.assertEqual(
-            response_1_prompts[2]["value"], self.option_satisfied.uuid
-        )
+        self.assertEqual(response_1_prompts[2]["prompt"], self.ranged_prompt.uuid)
+        self.assertEqual(response_1_prompts[2]["value"], self.option_satisfied.uuid)
 
         response_2_data = response.data[1]
         self.assertEqual(response_2_data["url"], "https://example.com/path/2")
@@ -168,22 +161,14 @@ class TestResponseList(APITestCase, ResetFactorySequencesMixin):
         self.assertEqual(
             response_2_prompts[0]["value"], "Less pictures of cats please!"
         )
-        self.assertEqual(
-            response_2_prompts[1]["prompt"], self.binary_prompt.uuid
-        )
+        self.assertEqual(response_2_prompts[1]["prompt"], self.binary_prompt.uuid)
         self.assertEqual(response_2_prompts[1]["value"], False)
-        self.assertEqual(
-            response_2_prompts[2]["prompt"], self.ranged_prompt.uuid
-        )
-        self.assertEqual(
-            response_2_prompts[2]["value"], self.option_unsatisfied.uuid
-        )
+        self.assertEqual(response_2_prompts[2]["prompt"], self.ranged_prompt.uuid)
+        self.assertEqual(response_2_prompts[2]["value"], self.option_unsatisfied.uuid)
 
     def test_get_responses_by_project(self):
         response = self.client.get(
-            reverse_with_query(
-                "api:response_list", {"project": self.project_1.uuid}
-            ),
+            reverse_with_query("api:response_list", {"project": self.project_1.uuid}),
             headers={"Authorization": f"Token {self.admin_token.key}"},
         )
 
@@ -325,15 +310,11 @@ class TestResponseDetail(APITestCase, ResetFactorySequencesMixin):
         response_prompts = response.data["prompt_responses"]
         self.assertEqual(len(response_prompts), 3)
         self.assertEqual(response_prompts[0]["prompt"], self.text_prompt.uuid)
-        self.assertEqual(
-            response_prompts[0]["value"], "More pictures of cats please!"
-        )
+        self.assertEqual(response_prompts[0]["value"], "More pictures of cats please!")
         self.assertEqual(response_prompts[1]["prompt"], self.binary_prompt.uuid)
         self.assertEqual(response_prompts[1]["value"], True)
         self.assertEqual(response_prompts[2]["prompt"], self.ranged_prompt.uuid)
-        self.assertEqual(
-            response_prompts[2]["value"], self.option_satisfied.uuid
-        )
+        self.assertEqual(response_prompts[2]["value"], self.option_satisfied.uuid)
 
     def test_get_missing_response(self):
         with ignore_request_warnings():
@@ -371,9 +352,7 @@ class TestResponseDetail(APITestCase, ResetFactorySequencesMixin):
 
         with ignore_request_warnings():
             response = self.client.get(
-                reverse(
-                    "api:response_detail", kwargs={"id": self.response.uuid}
-                ),
+                reverse("api:response_detail", kwargs={"id": self.response.uuid}),
                 headers={"Authorization": f"Token {self.token.key}"},
             )
 
@@ -382,9 +361,7 @@ class TestResponseDetail(APITestCase, ResetFactorySequencesMixin):
     def test_get_response_fails_without_auth(self):
         with ignore_request_warnings():
             response = self.client.get(
-                reverse(
-                    "api:response_detail", kwargs={"id": self.response.uuid}
-                )
+                reverse("api:response_detail", kwargs={"id": self.response.uuid})
             )
 
         self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
@@ -479,9 +456,7 @@ class TestPromptResponseList(APITestCase, ResetFactorySequencesMixin):
 
         self.assertEqual(len(response.data), 3)
         self.assertEqual(response.data[0]["prompt"], self.text_prompt.uuid)
-        self.assertEqual(
-            response.data[0]["value"], "More pictures of cats please!"
-        )
+        self.assertEqual(response.data[0]["value"], "More pictures of cats please!")
         self.assertEqual(response.data[1]["prompt"], self.binary_prompt.uuid)
         self.assertEqual(response.data[1]["value"], True)
         self.assertEqual(response.data[2]["prompt"], self.ranged_prompt.uuid)
@@ -615,9 +590,7 @@ class TestPromptResponseDetail(APITestCase, ResetFactorySequencesMixin):
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
         self.assertEqual(response.data["prompt"], self.text_prompt.uuid)
-        self.assertEqual(
-            response.data["value"], "More pictures of cats please!"
-        )
+        self.assertEqual(response.data["value"], "More pictures of cats please!")
 
     def test_get_missing_prompt_response(self):
         response = ResponseFactory.create(

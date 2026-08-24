@@ -1,5 +1,4 @@
 from django.db import transaction
-
 from drf_spectacular.extensions import OpenApiSerializerExtension
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -34,9 +33,7 @@ class RangedPromptOptionSerializer(serializers.ModelSerializer):
 
 class PromptSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=True, source="uuid")
-    feedback_form = serializers.SlugRelatedField(
-        slug_field="uuid", read_only=True
-    )
+    feedback_form = serializers.SlugRelatedField(slug_field="uuid", read_only=True)
     prompt_type = serializers.CharField(read_only=True, source="type")
     text = serializers.CharField(read_only=True)
 
@@ -73,10 +70,10 @@ class PromptSerializer(serializers.ModelSerializer):
                     )
                 ),
             )
-        except StopIteration:
+        except StopIteration as e:
             raise ValueError(
                 f"Could not find PromptSerializer subclass for {repr(prompt)}."
-            )
+            ) from e
 
     def to_representation(self, instance):
         """
@@ -89,9 +86,7 @@ class PromptSerializer(serializers.ModelSerializer):
 
         if type(self) is PromptSerializer:
             PromptSerializerSubclass = self.get_subclass_from_prompt(instance)
-            return PromptSerializerSubclass(instance).to_representation(
-                instance
-            )
+            return PromptSerializerSubclass(instance).to_representation(instance)
 
         return super().to_representation(instance)
 
@@ -183,10 +178,10 @@ class PromptResponseSerializer(serializers.ModelSerializer):
                     )
                 ),
             )
-        except StopIteration:
+        except StopIteration as e:
             raise ValueError(
                 f"Could not find PromptResponseSerializer subclass for {repr(prompt_response)}."
-            )
+            ) from e
 
     def to_representation(self, instance):
         """
@@ -203,8 +198,8 @@ class PromptResponseSerializer(serializers.ModelSerializer):
             instance = PromptResponse.objects.get_subclass(id=instance.id)
 
         if type(self) is PromptResponseSerializer:
-            PromptResponseSerializerSubclass = (
-                self.get_subclass_from_prompt_response(instance)
+            PromptResponseSerializerSubclass = self.get_subclass_from_prompt_response(
+                instance
             )
             return PromptResponseSerializerSubclass(instance).to_representation(
                 instance
@@ -225,7 +220,7 @@ class PromptResponseSerializer(serializers.ModelSerializer):
             if prompt_response_exists:
                 raise ValidationError(
                     {
-                        "prompt": f"Prompt response already exists for prompt id={data["prompt"].uuid} and response id={data["response"].uuid}."
+                        "prompt": f"Prompt response already exists for prompt id={data['prompt'].uuid} and response id={data['response'].uuid}."
                     }
                 )
 
@@ -264,9 +259,7 @@ class PromptResponseSerializer(serializers.ModelSerializer):
 
             # Unfortunately we need an extra query here to get the prompt to determine which serialiser to use
             prompt = Prompt.objects.get_subclass(uuid=data["prompt"])
-            PromptResponseSubclass = PromptResponse.get_subclass_from_prompt(
-                prompt
-            )
+            PromptResponseSubclass = PromptResponse.get_subclass_from_prompt(prompt)
             PromptResponseSerializerSubclass = (
                 PromptResponseSerializer.get_subclass_from_prompt_response(
                     PromptResponseSubclass
@@ -407,7 +400,7 @@ class ResponseSerializer(serializers.ModelSerializer):
         if prompt.id != first_prompt.id:
             raise ValidationError(
                 {
-                    "prompt": f"Prompt must be the first enabled prompt in the feedback form {data["feedback_form"].uuid}"
+                    "prompt": f"Prompt must be the first enabled prompt in the feedback form {data['feedback_form'].uuid}"
                 }
             )
 

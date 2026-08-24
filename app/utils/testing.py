@@ -7,7 +7,6 @@ from django.template.response import TemplateResponse
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.http import urlencode
-
 from factory.django import DjangoModelFactory
 
 
@@ -37,8 +36,8 @@ def get_inline_formset(context: Context, model_class: ModelBase):
                 if formset.formset.model == model_class
             ),
         )
-    except StopIteration:
-        raise ValueError(f"Inline formset for {repr(model_class)} not found")
+    except StopIteration as e:
+        raise ValueError(f"Inline formset for {repr(model_class)} not found") from e
 
 
 @contextlib.contextmanager

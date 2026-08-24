@@ -18,10 +18,7 @@ class CustomCreateView(CreateView):
     model_display_name = None
 
     def get_context_data(self, **kwargs):
-        if (
-            not self.model_display_name
-            or type(self.model_display_name) is not str
-        ):
+        if not self.model_display_name or type(self.model_display_name) is not str:
             raise ImproperlyConfigured(
                 f"{self.__class__.__name__} requires 'model_display_name' to be set as a string."
             )
@@ -50,10 +47,7 @@ class CustomUpdateView(UpdateView):
     model_display_name = None
 
     def get_context_data(self, **kwargs):
-        if (
-            not self.model_display_name
-            or type(self.model_display_name) is not str
-        ):
+        if not self.model_display_name or type(self.model_display_name) is not str:
             raise ImproperlyConfigured(
                 f"{self.__class__.__name__} requires 'model_display_name' to be set as a string."
             )

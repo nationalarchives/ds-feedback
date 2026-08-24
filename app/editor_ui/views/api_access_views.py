@@ -54,16 +54,13 @@ class APIAccessListView(
 
         project_owner_ids = [
             membership.user.id
-            for membership in ProjectMembership.objects.select_related(
-                "user"
-            ).filter(project__uuid=project_uuid, role="owner")
+            for membership in ProjectMembership.objects.select_related("user").filter(
+                project__uuid=project_uuid, role="owner"
+            )
         ]
 
         # Only superusers, and project owners can see API access of other users
-        if (
-            self.request.user.is_superuser
-            or self.request.user.id in project_owner_ids
-        ):
+        if self.request.user.is_superuser or self.request.user.id in project_owner_ids:
             return project_qs
 
         return project_qs.filter(grantee=self.request.user)
@@ -119,9 +116,7 @@ class APIAccessCreateView(
         Associates the API access with its parent project and sets the role to read-only.
         """
         instance = form.save(commit=False)
-        instance.project = Project.objects.get(
-            uuid=self.kwargs.get("project_uuid")
-        )
+        instance.project = Project.objects.get(uuid=self.kwargs.get("project_uuid"))
 
         # Only Project Owners can specify which user to grant access to
         if "grantee_user" in form.cleaned_data:

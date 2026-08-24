@@ -154,9 +154,7 @@ class ProjectDetailView(
             .prefetch_related(
                 Prefetch(
                     "members",
-                    queryset=UserModel.objects.filter(
-                        projectmembership__role="owner"
-                    ),
+                    queryset=UserModel.objects.filter(projectmembership__role="owner"),
                     to_attr="owner_members",
                 )
             )

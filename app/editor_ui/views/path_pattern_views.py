@@ -42,12 +42,8 @@ class PathPatternCreateView(
         instance.feedback_form = FeedbackForm.objects.get(
             uuid=self.kwargs.get("feedback_form_uuid")
         )
-        instance.project = Project.objects.get(
-            uuid=self.kwargs.get("project_uuid")
-        )
-        instance.pattern_with_wildcard = form.cleaned_data[
-            "pattern_with_wildcard"
-        ]
+        instance.project = Project.objects.get(uuid=self.kwargs.get("project_uuid"))
+        instance.pattern_with_wildcard = form.cleaned_data["pattern_with_wildcard"]
 
         try:
             response = super().form_valid(form)
@@ -111,9 +107,7 @@ class PathPatternUpdateView(
 
     def form_valid(self, form):
         instance = form.save(commit=False)
-        instance.pattern_with_wildcard = form.cleaned_data[
-            "pattern_with_wildcard"
-        ]
+        instance.pattern_with_wildcard = form.cleaned_data["pattern_with_wildcard"]
 
         try:
             response = super().form_valid(form)

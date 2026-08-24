@@ -127,12 +127,8 @@ class RangedPromptOptionFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
 
-        disallow_duplicates(
-            self.forms, "value", "This value is used in another option"
-        )
-        disallow_duplicates(
-            self.forms, "label", "This label is used in another option"
-        )
+        disallow_duplicates(self.forms, "value", "This value is used in another option")
+        disallow_duplicates(self.forms, "label", "This label is used in another option")
 
 
 class RangedPromptOptionAdmin(admin.TabularInline):
@@ -181,9 +177,7 @@ class RangedPromptAdmin(SetDisabledByWhenDisabledAdmin):
         return False
 
     def options(self, obj):
-        return ", ".join(
-            option.label for option in obj.options.all().order_by("value")
-        )
+        return ", ".join(option.label for option in obj.options.all().order_by("value"))
 
     options.short_description = "Path patterns"
 

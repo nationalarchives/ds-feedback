@@ -35,9 +35,9 @@ class PathPatternForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields["pattern_with_wildcard"].initial = (
-            self.instance.pattern_with_wildcard
-        )
+        self.fields[
+            "pattern_with_wildcard"
+        ].initial = self.instance.pattern_with_wildcard
 
 
 class PathPatternFormSet(BaseInlineFormSet):
@@ -128,9 +128,7 @@ class PromptForm(IsDisabledCheckboxForm):
 
             # For existing prompts set prompt type
             if self.instance.pk:
-                self.fields["prompt_type"].initial = (
-                    self.instance._meta.model_name
-                )
+                self.fields["prompt_type"].initial = self.instance._meta.model_name
                 self.fields["prompt_type"].disabled = True
                 self.fields["prompt_type"].required = False
 
@@ -183,9 +181,7 @@ class PromptAdmin(admin.TabularInline):
 
     def get_queryset(self, request):
         query_set = super().get_queryset(request)
-        return query_set.select_subclasses().select_related(
-            "created_by", "disabled_by"
-        )
+        return query_set.select_subclasses().select_related("created_by", "disabled_by")
 
 
 class FeedbackFormAdmin(
@@ -228,9 +224,7 @@ class FeedbackFormAdmin(
     def get_queryset(self, request):
         is_list_page = not request.resolver_match.kwargs.get("object_id")
         query_set = super().get_queryset(request)
-        query_set = query_set.select_related(
-            "created_by", "disabled_by", "project"
-        )
+        query_set = query_set.select_related("created_by", "disabled_by", "project")
         if is_list_page:
             query_set = query_set.prefetch_related(
                 "path_patterns__created_by",

@@ -19,9 +19,7 @@ class PromptAccessTests(TestCase):
         cls.owner = UserFactory(email="owner@example.com")
         cls.editor = UserFactory(email="editor@example.com")
         cls.other_user = UserFactory(email="other_user@example.com")
-        cls.superuser = UserFactory(
-            email="superuser@example.com", is_superuser=True
-        )
+        cls.superuser = UserFactory(email="superuser@example.com", is_superuser=True)
 
         # Users authorised to access prompts create/update/delete views
         cls.authorised_users = [cls.superuser, cls.owner, cls.editor]
@@ -100,9 +98,7 @@ class PromptAccessTests(TestCase):
             with self.subTest(user=user):
                 self.client.force_login(user)
                 response = self.client.get(
-                    self.get_feedback_form_detail_url(
-                        self.project, self.feedback_form
-                    )
+                    self.get_feedback_form_detail_url(self.project, self.feedback_form)
                 )
                 self.assertContains(response, self.prompt.text, status_code=200)
 
@@ -125,12 +121,8 @@ class PromptAccessTests(TestCase):
     def test_unauthenticated_user_cannot_access_prompt_views(self):
         for url in [
             self.get_prompt_create_url(self.project, self.feedback_form),
-            self.get_prompt_detail_url(
-                self.project, self.feedback_form, self.prompt
-            ),
-            self.get_prompt_update_url(
-                self.project, self.feedback_form, self.prompt
-            ),
+            self.get_prompt_detail_url(self.project, self.feedback_form, self.prompt),
+            self.get_prompt_update_url(self.project, self.feedback_form, self.prompt),
         ]:
             with self.subTest(url=url):
                 self.client.force_login(self.other_user)
@@ -140,18 +132,14 @@ class PromptAccessTests(TestCase):
     def test_other_user_cannot_access_prompt_detail(self):
         self.client.force_login(self.other_user)
         response = self.client.get(
-            self.get_prompt_detail_url(
-                self.project, self.feedback_form, self.prompt
-            )
+            self.get_prompt_detail_url(self.project, self.feedback_form, self.prompt)
         )
         self.assertIn(response.status_code, (403, 404))
 
     def test_owner_cannot_access_prompt_create_for_other_project(self):
         self.client.force_login(self.owner)
         response = self.client.get(
-            self.get_prompt_create_url(
-                self.other_project, self.other_feedback_form
-            )
+            self.get_prompt_create_url(self.other_project, self.other_feedback_form)
         )
         self.assertIn(response.status_code, (403, 404))
 
@@ -162,9 +150,7 @@ class PromptAccessTests(TestCase):
         response = self.client.get(
             self.get_feedback_form_detail_url(self.project, self.feedback_form)
         )
-        self.assertNotContains(
-            response, self.other_prompt.text, status_code=200
-        )
+        self.assertNotContains(response, self.other_prompt.text, status_code=200)
 
     def test_owner_cannot_access_prompt_from_other_project_with_no_membership(
         self,
@@ -267,9 +253,7 @@ class RangedPromptAccessTests(TestCase):
             ],
         )
 
-    def get_ranged_prompt_options_create_url(
-        self, project, form, ranged_prompt
-    ):
+    def get_ranged_prompt_options_create_url(self, project, form, ranged_prompt):
         return reverse(
             "editor_ui:projects:feedback_forms:prompts:options:create",
             args=[str(project.uuid), str(form.uuid), str(ranged_prompt.uuid)],
@@ -393,9 +377,7 @@ class RangedPromptAccessTests(TestCase):
         url = self.get_ranged_prompt_options_create_url(
             self.project,
             self.feedback_form,
-            type(
-                "Fake", (), {"uuid": "00000000-0000-0000-0000-000000000000"}
-            )(),
+            type("Fake", (), {"uuid": "00000000-0000-0000-0000-000000000000"})(),
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)

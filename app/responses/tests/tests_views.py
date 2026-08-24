@@ -124,7 +124,5 @@ class TestAdminResponseView(ResetFactorySequencesMixin, TestCase):
         )
         self.assertEqual(responses[1].answer(), "Positive")
 
-        self.assertEqual(
-            responses[2].prompt.text, "Are you satisfied with page?"
-        )
+        self.assertEqual(responses[2].prompt.text, "Are you satisfied with page?")
         self.assertEqual(responses[2].answer(), "Satisfied")

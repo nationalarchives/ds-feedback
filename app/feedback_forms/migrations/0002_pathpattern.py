@@ -9,7 +9,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("feedback_forms", "0001_initial"),
         ("projects", "0001_initial"),

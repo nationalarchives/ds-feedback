@@ -14,9 +14,7 @@ class TestDocumentationView(ResetFactorySequencesMixin, TestCase):
 
     def test_get_index_not_authorised(self):
         response = self.client.get(reverse("documentation"))
-        login_url = reverse_with_query(
-            "editor_auth:login", {"next": "/documentation/"}
-        )
+        login_url = reverse_with_query("editor_auth:login", {"next": "/documentation/"})
         self.assertRedirects(response, login_url)
 
     def test_get_index_authorised(self):
@@ -36,9 +34,7 @@ class TestAdminIndexView(ResetFactorySequencesMixin, TestCase):
 
     def test_get_index_not_authorised(self):
         response = self.client.get(reverse("admin:index"))
-        login_url = reverse_with_query(
-            "admin:login", {"next": reverse("admin:index")}
-        )
+        login_url = reverse_with_query("admin:login", {"next": reverse("admin:index")})
         self.assertRedirects(response, login_url)
 
     def test_get_index_authorised(self):

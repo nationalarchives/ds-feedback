@@ -1,6 +1,6 @@
 import {
-  initAll,
   Cookies,
+  initAll,
 } from "@nationalarchives/frontend/nationalarchives/all.mjs";
 
 const cookiesDomain =

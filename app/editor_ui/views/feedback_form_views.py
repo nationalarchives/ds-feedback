@@ -66,9 +66,7 @@ class FeedbackFormCreateView(
         Associates the feedback form with its parent project using the project UUID.
         """
         instance = form.save(commit=False)
-        instance.project = Project.objects.get(
-            uuid=self.kwargs.get("project_uuid")
-        )
+        instance.project = Project.objects.get(uuid=self.kwargs.get("project_uuid"))
         # If the feedback form should be unpublished, set the disabled timestamp
         if form.cleaned_data.get("is_published") is False:
             instance.disabled_at = timezone.now()
@@ -291,9 +289,9 @@ class FeedbackFormDeleteView(
 
     def get_queryset(self):
         project_uuid = self.kwargs.get("project_uuid")
-        return FeedbackForm.objects.filter(
-            project__uuid=project_uuid
-        ).select_related("project")
+        return FeedbackForm.objects.filter(project__uuid=project_uuid).select_related(
+            "project"
+        )
 
     def get_success_url(self):
         project_uuid = self.kwargs.get("project_uuid")
