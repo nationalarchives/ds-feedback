@@ -4,8 +4,7 @@ from sysconfig import get_path
 
 from csp.constants import NONE, SELF
 from django.core.exceptions import ImproperlyConfigured
-
-from config.util import strtobool
+from tna_utilities import strtobool
 
 env = os.environ.copy()
 

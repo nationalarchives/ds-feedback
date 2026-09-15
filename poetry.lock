@@ -996,6 +996,24 @@ jinja2 = ">=3"
 wtforms = ["flask-wtf[email]"]
 
 [[package]]
+name = "tna-utilities"
+version = "1.9.0"
+description = "A library of common National Archives Python functions"
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "tna_utilities-1.9.0-py3-none-any.whl", hash = "sha256:11c998c177e176aa064eacaedffaaba1491b7bbfc2da1597c4b31b2148ea2014"},
+    {file = "tna_utilities-1.9.0.tar.gz", hash = "sha256:4283180a935491839a3fff34e578a88e9790f44579984e1d163183579e0b23dc"},
+]
+
+[package.dependencies]
+requests = "*"
+
+[package.extras]
+flask = ["Flask"]
+
+[[package]]
 name = "typing-extensions"
 version = "4.15.0"
 description = "Backported and Experimental Type Hints for Python 3.9+"
@@ -1069,4 +1087,4 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "499ae55513e9c2df2b26d1d471414b73573228175c74fe092b71e09d38793921"
+content-hash = "a52bf558c194ce07701ddebcdbeafbfb93bf8396b1f9cb2557f13ccc5a691e5f"

@@ -1,5 +1,3 @@
-import {
-  initAll
-} from "@nationalarchives/frontend/nationalarchives/all.mjs";
+import { initAll } from "@nationalarchives/frontend/nationalarchives/all.mjs";
 
 initAll();

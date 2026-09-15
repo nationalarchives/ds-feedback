@@ -1,0 +1,8 @@
+# Extend the default Ruff configuration
+extend = "/home/app/ruff.toml"
+extend-exclude = ["migrations"]
+
+[lint]
+ignore = [
+    "RUF012", # mutable default value for class attribute
+]

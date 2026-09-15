@@ -238,11 +238,11 @@ class FeedbackFormAdmin(
         super().save_formset(request, form, formset, change)
 
         if formset.model == Prompt:
-            for form in formset.forms:
-                prompt: Prompt = form.instance
-                if not form.cleaned_data.get("id") and prompt.id:
+            for each_form in formset.forms:
+                prompt: Prompt = each_form.instance
+                if not each_form.cleaned_data.get("id") and prompt.id:
                     PromptModel = Prompt.get_subclass_by_name(
-                        form.cleaned_data["prompt_type"]
+                        each_form.cleaned_data["prompt_type"]
                     )
                     prompt.create_subclass(PromptModel).save()
 

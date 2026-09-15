@@ -1,8 +1,8 @@
 import os
 
-from config.util import strtobool
+from tna_utilities import strtobool
 
-from .features import *  # noqa: F401, F403
-from .production import *  # noqa: F401, F403
+from .features import *
+from .production import *
 
 DEBUG = strtobool(os.getenv("DEBUG", "False"))

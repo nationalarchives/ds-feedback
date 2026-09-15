@@ -32,11 +32,11 @@ class SetCreatedByOnCreationAdmin(admin.ModelAdmin):
 
     # Update created_by on inline forms
     def save_formset(self, request, form, formset, change):
-        for form in formset.forms:
-            if isinstance(form.instance, CreatedByModelMixin):
-                form.instance.set_initial_created_by(request.user, commit=False)
+        for each_form in formset.forms:
+            if isinstance(each_form.instance, CreatedByModelMixin):
+                each_form.instance.set_initial_created_by(request.user, commit=False)
 
-        super().save_formset(request, form, formset, change)
+        super().save_formset(request, each_form, formset, change)
 
 
 class SetDisabledByWhenDisabledAdmin(admin.ModelAdmin):
@@ -52,11 +52,11 @@ class SetDisabledByWhenDisabledAdmin(admin.ModelAdmin):
 
     # Update disabled_by on inline forms
     def save_formset(self, request, form, formset, change):
-        for form in formset.forms:
-            if isinstance(form.instance, DisableableModelMixin):
-                form.instance.update_disabled_by(request.user, commit=False)
+        for each_form in formset.forms:
+            if isinstance(each_form.instance, DisableableModelMixin):
+                each_form.instance.update_disabled_by(request.user, commit=False)
 
-        super().save_formset(request, form, formset, change)
+        super().save_formset(request, each_form, formset, change)
 
 
 class IsDisabledCheckboxForm(forms.ModelForm):
@@ -100,8 +100,9 @@ def disallow_duplicates(forms: list[forms.ModelForm], field_name: str, error: st
     values = set()
     for form in forms:
         if field_name in form.cleaned_data:
-            if getattr(form.instance, field_name) in values:
-                if not form.has_error(field_name):
-                    form.add_error(field_name, ValidationError(error))
+            if getattr(form.instance, field_name) in values and not form.has_error(
+                field_name
+            ):
+                form.add_error(field_name, ValidationError(error))
 
             values.add(getattr(form.instance, field_name))
