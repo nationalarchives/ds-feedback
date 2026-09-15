@@ -2,7 +2,6 @@ import json
 import os
 from sysconfig import get_path
 
-import dj_database_url
 from csp.constants import NONE, SELF
 from django.core.exceptions import ImproperlyConfigured
 
@@ -97,8 +96,16 @@ ASGI_APPLICATION = "config.asgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# Using dj-database-url for the temporary Heroku dev environment
-DATABASES = {"default": dj_database_url.config(conn_max_age=600)}
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DATABASE_NAME", ""),
+        "USER": os.environ.get("DATABASE_USER", ""),
+        "PASSWORD": os.environ.get("DATABASE_PASSWORD", ""),
+        "HOST": os.environ.get("DATABASE_HOST", ""),
+        "PORT": os.environ.get("DATABASE_PORT", "5432"),
+    }
+}
 
 
 # Password validation

@@ -10,9 +10,12 @@ services:
       - SECRET_KEY=abc123
       - DEBUG=True
       - NPM_DEVELOP_COMMAND=dev
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
-      - DJANGO_SUPERUSER_PASSWORD=admin
+      - DATABASE_NAME=postgres
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_HOST=db
       - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_PASSWORD=admin
       - DJANGO_SUPERUSER_EMAIL=admin@tna.dev
       - COOKIE_DOMAIN=localhost
       - CSP_STYLE_SRC_ELEM='self',fonts.googleapis.com,p.typekit.net,use.typekit.net
@@ -29,8 +32,6 @@ services:
 
   db:
     image: postgres:latest
-    ports:
-      - 5432:5432
     environment:
       - POSTGRES_PASSWORD=postgres
     volumes:
