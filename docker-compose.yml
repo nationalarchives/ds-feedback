@@ -8,6 +8,7 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings.develop
       - SECRET_KEY=abc123
+      - CSRF_TRUSTED_ORIGINS=http://localhost:65527,https://feedback.localhost
       - DEBUG=True
       - NPM_DEVELOP_COMMAND=dev
       - DATABASE_NAME=postgres
