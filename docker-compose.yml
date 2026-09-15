@@ -4,7 +4,7 @@ services:
       context: .
       args:
         IMAGE: ghcr.io/nationalarchives/tna-python-dev
-        IMAGE_TAG: latest
+        IMAGE_TAG: preview
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings.develop
       - SECRET_KEY=abc123
