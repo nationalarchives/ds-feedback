@@ -273,7 +273,7 @@ class BreadCrumbsMixin:
                                 )
                             else:
                                 text = "Unknown"
-                        except Exception:
+                        except Exception:  # noqa: BLE001
                             text = "Unknown"
                     # handle static text
                     elif hasattr(view_class, "breadcrumb"):
@@ -324,5 +324,5 @@ class BreadCrumbsMixin:
             # cache the result
             self._breadcrumb_object_cache[cache_key] = obj
             return obj
-        except Exception:
+        except Exception:  # noqa: BLE001
             return None

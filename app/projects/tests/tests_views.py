@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from http import HTTPStatus
 
 from django.test import TestCase
@@ -20,10 +20,10 @@ class TestAdminProjectsView(ResetFactorySequencesMixin, TestCase):
 
     def test_list_projects_by_most_recent(self):
         project1 = ProjectFactory.create(
-            created_at=datetime(2000, 1, 2), created_by=self.admin_user
+            created_at=datetime(2000, 1, 2, tzinfo=UTC), created_by=self.admin_user
         )
         project2 = ProjectFactory.create(
-            created_at=datetime(2000, 1, 1), created_by=self.admin_user
+            created_at=datetime(2000, 1, 1, tzinfo=UTC), created_by=self.admin_user
         )
         self.client.force_login(self.admin_user)
         response = self.client.get(reverse("admin:projects_project_changelist"))

@@ -1,6 +1,6 @@
 import json
 import re
-from datetime import datetime
+from datetime import UTC, datetime
 
 from django.conf import settings
 from django.template.defaultfilters import date as dj_date
@@ -20,7 +20,7 @@ def slugify(s):
 
 
 def now_iso_8601():
-    now = datetime.now()
+    now = datetime.now(UTC)
     now_date = now.strftime("%Y-%m-%dT%H:%M:%SZ")
     return now_date
 

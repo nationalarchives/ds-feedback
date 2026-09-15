@@ -72,7 +72,7 @@ class PromptSerializer(serializers.ModelSerializer):
             )
         except StopIteration as e:
             raise ValueError(
-                f"Could not find PromptSerializer subclass for {repr(prompt)}."
+                f"Could not find PromptSerializer subclass for {prompt!r}."
             ) from e
 
     def to_representation(self, instance):
@@ -180,7 +180,7 @@ class PromptResponseSerializer(serializers.ModelSerializer):
             )
         except StopIteration as e:
             raise ValueError(
-                f"Could not find PromptResponseSerializer subclass for {repr(prompt_response)}."
+                f"Could not find PromptResponseSerializer subclass for {prompt_response!r}."
             ) from e
 
     def to_representation(self, instance):

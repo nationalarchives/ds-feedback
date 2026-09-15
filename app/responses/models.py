@@ -76,7 +76,7 @@ class PromptResponse(TimestampedModelMixin, UUIDModelMixin, GetSubclassesModelMi
             )
         except StopIteration as e:
             raise ValueError(
-                f"Could not find PromptResponse subclass for {repr(prompt)}"
+                f"Could not find PromptResponse subclass for {prompt!r}"
             ) from e
 
     def __str__(self):

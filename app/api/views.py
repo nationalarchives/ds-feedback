@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from django.db.models import F, Prefetch, Q, Value
 from django.db.models.functions import Length
@@ -24,7 +24,7 @@ from app.prompts.models import Prompt
 from app.responses.models import PromptResponse, Response
 from app.utils.views import is_valid_uuid
 
-EXAMPLE_DATE = datetime.now().isoformat(timespec="milliseconds") + "Z"
+EXAMPLE_DATE = datetime.now(UTC).isoformat(timespec="milliseconds") + "Z"
 
 TEXT_PROMPT_EXAMPLE = {
     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
@@ -159,9 +159,8 @@ class ValidateUUIDMixin:
         """
         Validates a query param is a valid UUID
         """
-        if param in query_params:
-            if not is_valid_uuid(query_params[param]):
-                raise NotFound(f"{param}={query_params[param]} is not a valid UUID.")
+        if param in query_params and not is_valid_uuid(query_params[param]):
+            raise NotFound(f"{param}={query_params[param]} is not a valid UUID.")
 
 
 class FeedbackFormDetail(generics.RetrieveAPIView, CheckProjectAccessMixin):
