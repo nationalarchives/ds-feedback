@@ -14,7 +14,7 @@
     "@nationalarchives/frontend": "1.4.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.11",
+    "@babel/core": "^7.29.7",
     "@babel/preset-env": "^7.22.10",
     "babel-loader": "^9.1.3",
     "eslint": "^8.47.0",
