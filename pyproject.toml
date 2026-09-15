@@ -7,7 +7,6 @@ readme = "README.md"
 packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
-dj-database-url = "^2.3.0" # Using dj-database-url for the temporary Heroku dev environment
 django = "^6.0.2"
 django-csp = "^4.0"
 django-model-utils = "^5.0.0"
@@ -16,7 +15,7 @@ drf-spectacular = "^0.28.0"
 psycopg2-binary = "^2.9.9"
 python = "^3.12"
 requests = "^2.31.0"
-tna-frontend-jinja = "0.32.0"
+tna-frontend-jinja = "1.4.0"
 whitenoise = "^6.7.0"
 
 [tool.poetry.group.dev]

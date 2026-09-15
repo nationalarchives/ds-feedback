@@ -176,22 +176,6 @@ files = [
 ]
 
 [[package]]
-name = "dj-database-url"
-version = "2.3.0"
-description = "Use Database URLs in your Django Application."
-optional = false
-python-versions = "*"
-groups = ["main"]
-files = [
-    {file = "dj_database_url-2.3.0-py3-none-any.whl", hash = "sha256:bb0d414ba0ac5cd62773ec7f86f8cc378a9dbb00a80884c2fc08cc570452521e"},
-    {file = "dj_database_url-2.3.0.tar.gz", hash = "sha256:ae52e8e634186b57e5a45e445da5dc407a819c2ceed8a53d1fac004cc5288787"},
-]
-
-[package.dependencies]
-Django = ">=4.2"
-typing_extensions = ">=3.10.0.0"
-
-[[package]]
 name = "django"
 version = "6.0.7"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
@@ -995,18 +979,21 @@ doc = ["furo", "sphinx"]
 
 [[package]]
 name = "tna-frontend-jinja"
-version = "0.32.0"
+version = "1.4.0"
 description = "TNA Frontend Jinja templates"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "tna_frontend_jinja-0.32.0-py3-none-any.whl", hash = "sha256:c2d79d3011e96fe43137d4c818ae5a343776f19b17e6d3f204171c4f6193c22b"},
-    {file = "tna_frontend_jinja-0.32.0.tar.gz", hash = "sha256:7f06e5052418da43184b637c1956d15751ff53e57143de764c65782f609612d8"},
+    {file = "tna_frontend_jinja-1.4.0-py3-none-any.whl", hash = "sha256:1031e4102195fa79a9e52dcc255a46857df9a7c29a3acfe939c2827110c7f495"},
+    {file = "tna_frontend_jinja-1.4.0.tar.gz", hash = "sha256:374058bafd75dbae2aa21c9470505d58dfd57e0ab5f8e98864b231aec577ebe1"},
 ]
 
 [package.dependencies]
-Jinja2 = ">=3"
+jinja2 = ">=3"
+
+[package.extras]
+wtforms = ["flask-wtf[email]"]
 
 [[package]]
 name = "typing-extensions"
@@ -1015,6 +1002,7 @@ description = "Backported and Experimental Type Hints for Python 3.9+"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
+markers = "python_version == \"3.12\""
 files = [
     {file = "typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548"},
     {file = "typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466"},
@@ -1081,4 +1069,4 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "5543e8dacf94d352f4d26e7d57b584e4f03ee36a456cd71b4b7df004bd2f363a"
+content-hash = "499ae55513e9c2df2b26d1d471414b73573228175c74fe092b71e09d38793921"
