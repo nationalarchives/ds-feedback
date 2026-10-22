@@ -12,7 +12,7 @@ django-csp = "^4.0"
 django-model-utils = "^5.0.0"
 djangorestframework = "^3.15.2"
 drf-spectacular = "^0.28.0"
-psycopg2-binary = "^2.9.9"
+psycopg = {extras = ["binary"], version = "^3.3.6"}
 python = "^3.12"
 requests = "^2.31.0"
 tna-frontend-jinja = "1.4.0"
@@ -43,3 +43,7 @@ testpaths = [
     "test",
     "app",
 ]
+
+[solver]
+min-release-age = 7
+min-release-age-exclude = "tna-frontend-jinja,tna-utilities,tna-ruff-config"
