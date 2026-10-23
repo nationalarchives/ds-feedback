@@ -43,7 +43,3 @@ testpaths = [
     "test",
     "app",
 ]
-
-[solver]
-min-release-age = 7
-min-release-age-exclude = "tna-frontend-jinja,tna-utilities,tna-ruff-config"
